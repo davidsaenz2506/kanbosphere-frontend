@@ -1,0 +1,44 @@
+
+.container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.formLog {
+   width: 50%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-direction: column;
+   background-image: url("../../public/assets/background.png");
+}
+
+.patent {
+   background: linear-gradient(90deg, rgba(107,254,255,1) 0%, rgba(148,190,233,1) 100%);
+   width: 50%;
+   border-radius: 50% 0% 0% 50%;
+}
+
+.userLogin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    background-image: url("../../public/assets/tumblelogo.png");
+    height: 400px;
+    width: 500px;
+    margin-right: 60px;
+    margin-top: -90px;
+}
+
+.banner {
+    background-image: url("../../public/assets/banner.png");
+    height: 90vh;
+    width: 800px;
+    margin-left: 200px;
+    margin-top: -90px;   
+}
