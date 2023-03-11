@@ -11,8 +11,7 @@ export default function Home() {
           <div>
             <form className={styles.userLogin}>
               <div style={{ marginBottom: "20px" }}>
-                <h2 style={{ textAlign: "center" }}>Tumble tasks</h2>
-                <p style={{ textAlign: "center" }}>
+                <p style={{ textAlign: "center", fontWeight: "bolder" }}>
                   Inicia sesión con tu usuario y contraseña
                 </p>
               </div>
@@ -44,6 +43,7 @@ export default function Home() {
             </form>
           </div>
         </div>
+        
         <div className={styles.patent}>
           <h1
             style={{

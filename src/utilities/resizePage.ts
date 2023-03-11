@@ -25,8 +25,8 @@ export default function initResizer(resizerTool: any, toolSpace: any) {
             toolSpace.style.width = `${cw}px`;
         }
 
-        if (cw < 250) {
-            toolSpace.style.width = `250px`;
+        if (cw < 350) {
+            toolSpace.style.width = `350px`;
         }
     }
 
