@@ -82,7 +82,7 @@ const PortalUser = () => {
               workspaceFlow={workspaceFlow}
               setWorkSpaceFlow={setWorkspaceFlow}
             />
-            <EndBar />
+            <EndBar setWorkSpaceFlow={setWorkspaceFlow} />
           </div>
 
           <div id="resizerTool" className={styles.resizerParticle}></div>

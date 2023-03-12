@@ -7,48 +7,47 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import { useRouter } from "next/router";
 
-import EndSession from "../organisms/modals/endSession"
+import EndSession from "../organisms/modals/endSession";
 
-const EndBar = () => {
-    
+const EndBar = ({ setWorkSpaceFlow }) => {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-    <EndSession isOpen={isOpen} setIsOpen={setIsOpen} router={router}/>
-    <div style={{ position: "absolute", bottom: 0, marginBottom: "20px" }}>
-      <SettingsIcon sx={{ marginLeft: "20px" }} />
-      <button
-        type="button"
-        className="btn btn-secondary btn-lg btn-block"
-        style={{
-          backgroundColor: "#e2e2e2",
-          border: "none",
-          color: "#2d3b50",
-          marginLeft: "5px",
-        }}
-      >
-        Configuración de usuario
-      </button>
-      <br />
-      <CloseIcon sx={{ marginLeft: "20px", marginTop: "2px" }} />
-      <button
-        type="button"
-        className="btn btn-secondary btn-lg btn-block"
-        style={{
-          backgroundColor: "#e2e2e2",
-          border: "none",
-          color: "#2d3b50",
-          marginLeft: "5px",
-        }}
-        onClick={() => setIsOpen(true)}
-      >
-        Cerrar sesión
-      </button>
-    </div>
+      <EndSession isOpen={isOpen} setIsOpen={setIsOpen} router={router} />
+      <div style={{ position: "absolute", bottom: 0, marginBottom: "20px" }}>
+        <SettingsIcon sx={{ marginLeft: "20px" }} />
+        <button
+          type="button"
+          className="btn btn-secondary btn-lg btn-block"
+          style={{
+            backgroundColor: "#e2e2e2",
+            border: "none",
+            color: "#2d3b50",
+            marginLeft: "5px",
+          }}
+          onClick={() => setWorkSpaceFlow("userConfig")}
+        >
+          Configuración de usuario
+        </button>
+        <br />
+        <CloseIcon sx={{ marginLeft: "20px", marginTop: "2px" }} />
+        <button
+          type="button"
+          className="btn btn-secondary btn-lg btn-block"
+          style={{
+            backgroundColor: "#e2e2e2",
+            border: "none",
+            color: "#2d3b50",
+            marginLeft: "5px",
+          }}
+          onClick={() => setIsOpen(true)}
+        >
+          Cerrar sesión
+        </button>
+      </div>
     </>
-   
   );
 };
 

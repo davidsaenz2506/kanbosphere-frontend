@@ -51,7 +51,7 @@ const ToDoWorkspace = () => {
       >
         <Card sx={{ minWidth: "500px" }}>
           <CardHeader>
-            <Heading size="md"> Customer dashboard</Heading>
+            <Heading size="md"> In process</Heading>
           </CardHeader>
           <CardBody>
             <Text>
