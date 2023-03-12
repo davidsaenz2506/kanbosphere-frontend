@@ -1,0 +1,9 @@
+
+.collapsed {
+  display: none;
+}
+
+.expanded {
+  display: block;
+  margin-left: 30px;
+}

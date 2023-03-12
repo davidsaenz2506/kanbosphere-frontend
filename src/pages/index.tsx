@@ -11,7 +11,13 @@ export default function Home() {
           <div>
             <form className={styles.userLogin}>
               <div style={{ marginBottom: "20px" }}>
-                <p style={{ textAlign: "center", fontWeight: "bolder" }}>
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bolder",
+                    cursor: "default",
+                  }}
+                >
                   Inicia sesión con tu usuario y contraseña
                 </p>
               </div>
@@ -43,7 +49,7 @@ export default function Home() {
             </form>
           </div>
         </div>
-        
+
         <div className={styles.patent}>
           <h1
             style={{
@@ -54,6 +60,7 @@ export default function Home() {
               fontWeight: "bolder",
               textAlign: "right",
               marginRight: "40px",
+              cursor: "default",
             }}
           >
             Portal de Usuarios
