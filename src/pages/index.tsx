@@ -58,9 +58,9 @@ export default function Home() {
               marginTop: "30px",
               marginBottom: "100px",
               fontWeight: "bolder",
-              textAlign: "right",
-              marginRight: "40px",
               cursor: "default",
+              alignSelf: "flex-end",
+              marginRight: "20px"
             }}
           >
             Portal de Usuarios

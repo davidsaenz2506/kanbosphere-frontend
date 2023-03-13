@@ -1,9 +1,10 @@
+
 export interface IDataToDo {
-    user: string,
+    userId: string,
     taskId: string,
     status: string,
     info: string,
     title: string,
     createDate: Date,
-    finishDate: Date
+    finishDate?: Date
 }

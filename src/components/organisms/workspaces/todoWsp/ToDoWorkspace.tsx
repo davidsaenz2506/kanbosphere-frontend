@@ -1,121 +1,68 @@
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import React from "react";
+import React, { useState } from "react";
+import ToDoLanes from "./utils/ToDoLanes";
 
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Button,
-  Heading,
-  Text,
-} from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
+import AddTask from "../../modals/AddTask";
 
 const ToDoWorkspace = () => {
 
-  const currentWsp = useCurrentWorkspace();
+  const [addTask, setAddTask] = useState(false);
 
   React.useEffect(() => {
-     const todoDocument : HTMLDivElement | null = document.querySelector(".todoContainer");
-     const navBarDocument : any = document.getElementById("navbarHome");
-     const bodyDocument : HTMLBodyElement | null = document.querySelector("body");
+    const todoDocument: HTMLDivElement | null =
+      document.querySelector(".todoContainer");
+    const navBarDocument: any = document.getElementById("navbarHome");
+    const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
 
     if (todoDocument && bodyDocument) {
-      todoDocument.style.height = `${bodyDocument.getBoundingClientRect().height - navBarDocument.getBoundingClientRect().height}px`;
+      todoDocument.style.height = `${
+        bodyDocument.getBoundingClientRect().height -
+        navBarDocument.getBoundingClientRect().height
+      }px`;
     }
-  })
+  });
 
   return (
     <div
       className="todoContainer"
-      style={{ width: "100%", overflowX: "scroll" }}
+      style={{ width: "100%", overflowX: "scroll", overflowY: "hidden" }}
     >
-      <div className="header">
-        <h2
-          style={{ textAlign: "start", marginTop: "20px", marginLeft: "30px" }}
-        >
-          Bienvenido a tu espacio de trabajo To Do David!
-        </h2>
-        <p style={{ textAlign: "start", marginLeft: "32px" }}>
-          Aqui podras revisar tus tareas de trabajo y gestionarlas.
-        </p>
-      </div>
+      <AddTask isOpen={addTask} onClose={setAddTask} />
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
-          marginRight: "20px",
-          marginLeft: "20px",
-          marginTop: "30px",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "sticky",
+          left: 0
         }}
       >
-        <Card sx={{ minWidth: "500px" }}>
-          <CardHeader>
-            <Heading size="md"> In process</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>
-              View a summary of all your customers over the last month.
-            </Text>
-          </CardBody>
-          <CardFooter>
-            <Button>View here</Button>
-          </CardFooter>
-        </Card>
-        <Card sx={{ minWidth: "500px" }}>
-          <CardHeader>
-            <Heading size="md"> Customer dashboard</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>
-              View a summary of all your customers over the last month.
-            </Text>
-          </CardBody>
-          <CardFooter>
-            <Button>View here</Button>
-          </CardFooter>
-        </Card>
-        <Card sx={{ minWidth: "500px" }}>
-          <CardHeader>
-            <Heading size="md"> Customer dashboard</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>
-              View a summary of all your customers over the last month.
-            </Text>
-          </CardBody>
-          <CardFooter>
-            <Button>View here</Button>
-          </CardFooter>
-        </Card>
-        <Card sx={{ minWidth: "500px" }}>
-          <CardHeader>
-            <Heading size="md"> Customer dashboard</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>
-              View a summary of all your customers over the last month.
-            </Text>
-          </CardBody>
-          <CardFooter>
-            <Button>View here</Button>
-          </CardFooter>
-        </Card>
-
-        <Card sx={{ minWidth: "500px" }}>
-          <CardHeader>
-            <Heading size="md"> Customer dashboard</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>
-              View a summary of all your customers over the last month.
-            </Text>
-          </CardBody>
-          <CardFooter>
-            <Button>View here</Button>
-          </CardFooter>
-        </Card>
+        <div className="header">
+          <h2
+            style={{
+              textAlign: "start",
+              marginTop: "20px",
+              marginLeft: "30px",
+            
+            }}
+          >
+            Bienvenido a tu espacio de trabajo To Do David!
+          </h2>
+          <p style={{ textAlign: "start", marginLeft: "32px" }}>
+            Aqui podras revisar tus tareas de trabajo y gestionarlas.
+          </p>
+        </div>
+        <div style={{ marginRight: "20px" }}>
+          <Button onClick={() => setAddTask(true)}>
+            <AddIcon sx={{ marginRight: "10px" }} />
+            Añadir pendiente
+          </Button>
+        </div>
       </div>
+
+      <ToDoLanes />
     </div>
   );
 };

@@ -14,9 +14,8 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
 const PortalUser = () => {
   const [workspaceFlow, setWorkspaceFlow] = useState("");
-  const workSpaces = useWorkspace();
 
-  console.log(workSpaces.userWsps);
+  const workSpaces = useWorkspace();
 
   React.useEffect(() => {
     var resizerTool = document.getElementById("resizerTool");
@@ -32,6 +31,12 @@ const PortalUser = () => {
     initResizer(resizerTool, toolSpace, workSpace);
   });
 
+  React.useEffect(() => {
+    const wsp = workSpaces.fetchWorkSpaces();
+    console.log(wsp)
+  }, []);
+ 
+  
   return (
     <div style={{ backgroundColor: "white", height: "100vh" }}>
       <nav

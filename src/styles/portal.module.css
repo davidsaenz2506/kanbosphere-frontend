@@ -17,6 +17,7 @@
     height: fit-content;
     max-width:initial ;
     width: 100%;
+    display: grid;
 }
 
 .resizerParticle {
