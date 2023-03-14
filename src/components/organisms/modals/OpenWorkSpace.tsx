@@ -15,12 +15,16 @@ import { Button, Input, FormControl, FormLabel } from "@chakra-ui/react";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
 import { DateTime } from "luxon";
+import { IDataToDo } from "@/domain/entities/todo.entity";
+import { CreateWorkSpaces } from "@/services/workspaces/createWorkSpace";
+import { getAllWorkSpaces } from "@/services/workspaces/getAll";
 
 interface IWspUser {
   name: string;
   createdDate: Date;
   createdById: string;
   type: string;
+  wspData: IDataToDo[];
 }
 
 const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
@@ -33,14 +37,27 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
     createdDate: DateTime.now().toISO(),
     createdById: "",
     type: "",
+    wspData: [],
   });
+
+  async function handleCreate() {
+
+    await CreateWorkSpaces(newWorkSpace);
+    const response = await getAllWorkSpaces();
+
+    wspUser.setUsersWsps(response);
+
+    setIsOpen(false);
+
+  }
 
   React.useEffect(() => {
     setNewWorkSpace({
       name: nameValue,
       createdDate: DateTime.now().toISO(),
-      createdById: "",
-      type: title
+      createdById: "1000933190",
+      type: title,
+      wspData: [],
     });
   }, [nameValue]);
 
@@ -64,14 +81,7 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={() => {
-                wspUser.setUsersWsps([...wspUser.userWsps, newWorkSpace]);
-                setIsOpen(false);
-              }}
-            >
+            <Button colorScheme="blue" mr={3} onClick={() => handleCreate()}>
               Crear
             </Button>
             <Button onClick={() => setIsOpen(false)}>Cancelar</Button>

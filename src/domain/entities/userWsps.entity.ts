@@ -1,7 +1,7 @@
 import { IDataToDo } from "./todo.entity";
 
 export interface IWspUser {
-    userId: string;
+    _id?: string;
     name: string;
     createdDate: Date;
     createdById: string;

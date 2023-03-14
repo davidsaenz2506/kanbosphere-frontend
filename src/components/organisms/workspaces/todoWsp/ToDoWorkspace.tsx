@@ -1,4 +1,3 @@
-import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import React, { useState } from "react";
 import ToDoLanes from "./utils/ToDoLanes";
 
@@ -7,7 +6,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import AddTask from "../../modals/AddTask";
 
 const ToDoWorkspace = () => {
-
+  
   const [addTask, setAddTask] = useState(false);
 
   React.useEffect(() => {
@@ -36,7 +35,7 @@ const ToDoWorkspace = () => {
           justifyContent: "space-between",
           alignItems: "center",
           position: "sticky",
-          left: 0
+          left: 0,
         }}
       >
         <div className="header">
@@ -45,7 +44,6 @@ const ToDoWorkspace = () => {
               textAlign: "start",
               marginTop: "20px",
               marginLeft: "30px",
-            
             }}
           >
             Bienvenido a tu espacio de trabajo To Do David!

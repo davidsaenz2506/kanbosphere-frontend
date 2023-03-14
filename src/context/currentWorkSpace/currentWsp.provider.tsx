@@ -3,13 +3,20 @@ import { FC } from "react";
 
 import { CurrentWorkSpaceContext } from "./currentWsp.context";
 
+import {DateTime} from "luxon";
+
 type PropTypes = {
   children?: ReactNode;
 };
 
 export const CurrentWorkSpaceProvider: FC<PropTypes> = ({ children }: any) => {
-
-  const [currentWorkSpace, setCurrentWorkSpace] = React.useState([]);
+  const [currentWorkSpace, setCurrentWorkSpace] = React.useState({
+    name: "",
+    createdDate: DateTime.now(),
+    createdById: "",
+    type: "",
+    wspData: [],
+  });
 
   return (
     <CurrentWorkSpaceContext.Provider
@@ -21,5 +28,4 @@ export const CurrentWorkSpaceProvider: FC<PropTypes> = ({ children }: any) => {
       {children}
     </CurrentWorkSpaceContext.Provider>
   );
-
 };

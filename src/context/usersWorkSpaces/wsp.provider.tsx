@@ -16,7 +16,6 @@ export const WspProvider: FC<PropTypes> = ({ children }: any) => {
 
     try {
       const response = await getAllWorkSpaces();
-      console.log(response)
       setUsersWsps(response)
     } catch (error) {
       console.log(error)
