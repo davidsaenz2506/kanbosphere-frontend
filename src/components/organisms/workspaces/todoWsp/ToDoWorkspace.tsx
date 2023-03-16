@@ -6,19 +6,31 @@ import { AddIcon } from "@chakra-ui/icons";
 import AddTask from "../../modals/AddTask";
 
 const ToDoWorkspace = () => {
-  
   const [addTask, setAddTask] = useState(false);
+  const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
 
-  React.useEffect(() => {
+  window.onresize = function onResize() {
     const todoDocument: HTMLDivElement | null =
       document.querySelector(".todoContainer");
     const navBarDocument: any = document.getElementById("navbarHome");
-    const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
 
     if (todoDocument && bodyDocument) {
       todoDocument.style.height = `${
         bodyDocument.getBoundingClientRect().height -
         navBarDocument.getBoundingClientRect().height
+      }px`;
+    }
+  };
+
+  React.useEffect(() => {
+    const InitialTodoDocument: HTMLDivElement | null =
+      document.querySelector(".todoContainer");
+    const InitialNavBarDocument: any = document.getElementById("navbarHome");
+
+    if (InitialTodoDocument && bodyDocument) {
+      InitialTodoDocument.style.height = `${
+        bodyDocument.getBoundingClientRect().height -
+        InitialNavBarDocument.getBoundingClientRect().height
       }px`;
     }
   });

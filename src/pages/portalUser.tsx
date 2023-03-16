@@ -22,12 +22,6 @@ const PortalUser = () => {
     var toolSpace = document.getElementById("toolSpace");
     var workSpace = document.getElementById("workSpace");
 
-    if (workSpace) {
-      workSpace.style.maxWidth = `${
-        document.body.getBoundingClientRect().width - 350
-      }px`;
-    }
-
     initResizer(resizerTool, toolSpace, workSpace);
   });
 

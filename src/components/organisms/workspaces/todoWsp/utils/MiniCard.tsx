@@ -2,13 +2,25 @@ import React from "react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Button } from "@nextui-org/react";
 import EditTask from "@/components/organisms/modals/EditTask";
+import { DateTime } from "luxon";
+import DeleteTask from "../../../modals/DeleteTask"
+import { useOutsideClick } from "@chakra-ui/react";
 
 const MiniCard = ({ item, bgColor }) => {
+
   const [isClicked, setIsClicked] = React.useState(false);
   const [openEdit, setOpenEdit] = React.useState(false);
+  const [openDelete, setOpenDelete] = React.useState(false);
+  const ref : any = React.useRef()
+  useOutsideClick({
+    ref: ref,
+    handler: () => setIsClicked(false)
+  })
+
 
   return (
     <div
+      ref={ref}
       style={{
         height: "max-content",
         backgroundColor: "white",
@@ -20,6 +32,7 @@ const MiniCard = ({ item, bgColor }) => {
       }}
     >
       <EditTask isOpen={openEdit} onClose={setOpenEdit} data={item} />
+      <DeleteTask isOpen={openDelete} onClose={setOpenDelete} data={item} />
       {isClicked && (
         <div
           className="options"
@@ -42,7 +55,7 @@ const MiniCard = ({ item, bgColor }) => {
               marginRight: "5px",
             }}
           >
-            <DeleteIcon />
+            <DeleteIcon onClick={() => setOpenDelete(true)} />
           </button>
         </div>
       )}
@@ -62,7 +75,9 @@ const MiniCard = ({ item, bgColor }) => {
         >
           <p style={{ marginTop: "15px" }}>{item.status}</p>
         </div>
-        <p style={{ marginTop: "5px" }}>Fecha de inicio: {item.createdDate}</p>
+        <p style={{ marginTop: "5px" }}>
+          Fecha de inicio: {DateTime.fromISO(item.createDate).setLocale("es").toFormat("DDD")}
+        </p>
       </div>
     </div>
   );
