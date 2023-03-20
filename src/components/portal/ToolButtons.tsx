@@ -14,15 +14,28 @@ import styles from "../../styles/ToolButtons.module.css";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 
-const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
+import { DeleteIcon } from "@chakra-ui/icons";
+import DeleteWorkSpace from "../organisms/modals/Workspace Modals/DeleteWorkSpace";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
+import EditWorkSpaceName from "../organisms/modals/Workspace Modals/EditWorkSpaceName";
 
+const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const wspUsers = useWorkspace();
   const currentWorkSpace = useCurrentWorkspace();
-
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [item, setItem] = useState<IWspUser>();
+  const [currentSelected, setCurrentSelected] = useState<any>("");
 
   return (
     <>
+      <DeleteWorkSpace
+        isOpen={openDelete}
+        onClose={setOpenDelete}
+        data={item}
+      />
+      <EditWorkSpaceName isOpen={openEdit} onClose={setOpenEdit} data={item} />
       <div style={{ marginTop: "10px" }}>
         <div
           style={{
@@ -44,6 +57,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                 fontWeight: workspaceFlow == "wspUser" ? "bolder" : "normal",
               }}
               onClick={() => {
+                setCurrentSelected("");
                 setWorkSpaceFlow("wspUser");
               }}
             >
@@ -73,16 +87,44 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
           {wspUsers.userWsps.map((todoWorkspace) => (
             <List sx={{ transition: "all .5s" }} spacing={3}>
               <ListItem
-                sx={{ cursor: "pointer" }}
+                sx={{
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: " center",
+                  fontWeight:
+                    currentSelected === todoWorkspace._id ? "bolder" : "normal",
+                }}
                 onClick={() => {
-                  currentWorkSpace.setCurrentWorkSpace(todoWorkspace)
-                  setWorkSpaceFlow("todoWsp")}}
+                  setCurrentSelected(todoWorkspace._id);
+                  currentWorkSpace.setCurrentWorkSpace(todoWorkspace);
+                  setWorkSpaceFlow("todoWsp");
+                }}
               >
-                <ListIcon
-                  as={EditIcon}
-                  sx={{ marginBottom: "2px", marginRight: "15px" }}
-                />
-                {todoWorkspace.type} {todoWorkspace.name}
+                <div>
+                  <ListIcon
+                    as={StarIcon}
+                    sx={{ marginBottom: "2px", marginRight: "15px" }}
+                  />
+                  {todoWorkspace.type} {todoWorkspace.name}
+                </div>
+
+                <div>
+                  <EditIcon
+                    sx={{ marginRight: "15px", marginBottom: "5px" }}
+                    onClick={() => {
+                      setItem(todoWorkspace);
+                      setOpenEdit(true);
+                    }}
+                  />
+                  <DeleteIcon
+                    sx={{ marginRight: "10px", marginBottom: "5px" }}
+                    onClick={() => {
+                      setItem(todoWorkspace);
+                      setOpenDelete(true);
+                    }}
+                  />
+                </div>
               </ListItem>
             </List>
           ))}
@@ -101,7 +143,10 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
             marginLeft: "5px",
             fontWeight: workspaceFlow == "chatUser" ? "bolder" : "normal",
           }}
-          onClick={() => setWorkSpaceFlow("chatUser")}
+          onClick={() => {
+            setCurrentSelected("");
+            setWorkSpaceFlow("chatUser");
+          }}
         >
           Listado de contactos
         </button>
@@ -119,7 +164,10 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
             marginLeft: "5px",
             fontWeight: workspaceFlow == "calendarUser" ? "bolder" : "normal",
           }}
-          onClick={() => setWorkSpaceFlow("calendarUser")}
+          onClick={() => {
+            setCurrentSelected("");
+            setWorkSpaceFlow("calendarUser");
+          }}
         >
           Calendario
         </button>
@@ -137,7 +185,10 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
             marginLeft: "5px",
             fontWeight: workspaceFlow == "balanceUser" ? "bolder" : "normal",
           }}
-          onClick={() => setWorkSpaceFlow("balanceUser")}
+          onClick={() => {
+            setCurrentSelected("");
+            setWorkSpaceFlow("balanceUser");
+          }}
         >
           Mis Ingresos
         </button>

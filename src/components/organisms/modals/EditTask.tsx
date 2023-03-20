@@ -23,8 +23,6 @@ import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 const EditTask = ({ isOpen, onClose, data }) => {
 
-  console.log(data)
-
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const statusOptions = [
@@ -71,6 +69,7 @@ const EditTask = ({ isOpen, onClose, data }) => {
     });
 
     setUserTasks({...wspData, data: modifiedWorkSpaceData})
+  
   
   }
 

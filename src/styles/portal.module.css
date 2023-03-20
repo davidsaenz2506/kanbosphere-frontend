@@ -1,41 +1,41 @@
 .principalContainer {
-    background-color: rgb(255, 255, 255);
-    height: 100vh;
-    display: flex;
+  background-color: rgb(255, 255, 255);
+  height: 100vh;
+  display: flex;
 }
 
 .toolSpace {
-   min-width: 350px;
-   height: 100vh;
-   display: flex;
-   user-select: none;
+  min-width: 350px;
+  height: 100vh;
+  display: flex;
+  user-select: none;
 }
 
 .workSpace {
-    background-color: rgb(255, 255, 255);
-    z-index: 100;
-    height: fit-content;
-    max-width:initial ;
-    width: 100%;
-    display: grid;
+  background-color: rgb(255, 255, 255);
+  z-index: 100;
+  height: fit-content;
+  max-width: initial;
+  width: 100%;
+  display: grid;
 }
 
 .resizerParticle {
-    user-select: none;
-    width: 1%;
-    height: 100vh;
-    cursor:col-resize;
-    background-color: #d5d7d9;
-    z-index: 100;
+  user-select: none;
+  width: 1%;
+  height: 100vh;
+  cursor: col-resize;
+  background-color: #d5d7d9;
+  z-index: 100;
 }
 
 .toolContainer {
-    width: 99%;
-    background-color: #e2e2e2;
-    height: 100vh;
+  width: 99%;
+  background-color: #e2e2e2;
+  height: 100vh;
 }
 
 .hrElement {
-    width: 95%;
-  }
+  width: 95%;
+}
 

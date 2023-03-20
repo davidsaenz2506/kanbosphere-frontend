@@ -71,10 +71,10 @@ const PortalUser = () => {
                 marginBottom: "20px",
                 fontSize: "30px",
                 marginLeft: "20px",
-                fontWeight: "bolder",
+                fontWeight: 500,
               }}
             >
-              Toolbar Space
+               Barra de herramientas
             </h5>
             <hr className={styles.hrElement}></hr>
             <ToolButtons

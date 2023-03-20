@@ -29,7 +29,7 @@ export default class httpAxiosInstance implements HttpContract {
 
   public async post<T>(
     path: string,
-    body: object,
+    body?: object,
     headers?: object
   ): Promise<HttpResponseContract<T>> {
     const response = await this.axiosInstance.post(path, body, headers).catch((error) =>

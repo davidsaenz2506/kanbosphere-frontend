@@ -55,6 +55,7 @@ const DeleteTask = (props) => {
                onClick={async () => {
                 deleteCurrentTask(props.data)
                 await UpdateWorkSpace(wspData);
+                props.onClose(false)
             }}
               >
                 Eliminar

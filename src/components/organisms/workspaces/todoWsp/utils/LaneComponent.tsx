@@ -4,7 +4,7 @@ import { Card, CardHeader, CardBody, Heading } from "@chakra-ui/react";
 import styles from "../../../../../styles/cardlane.module.css";
 import MiniCard from "./MiniCard";
 
-const LaneComponent = ({ title, bgColor, data }) => {
+const LaneComponent = ({ title, bgColor, data, targetColor }) => {
 
   return (
     <Card
@@ -17,12 +17,12 @@ const LaneComponent = ({ title, bgColor, data }) => {
       }}
     >
       <CardHeader>
-        <Heading size="md"> {title} {data.length} </Heading>
+        <Heading size="md" sx={{color: "white"}}> {title} {data.length} </Heading>
       </CardHeader>
       <CardBody sx={{marginTop: "-20px", cursor: "default"}}>
         {data.map((item: any) => {
           return (
-             <MiniCard item={item} bgColor={bgColor} />
+             <MiniCard item={item} bgColor={bgColor} targetColor={targetColor} />
           );
         })}
       </CardBody>
