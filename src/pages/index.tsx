@@ -1,10 +1,29 @@
 import styles from "../styles/login.module.css";
 import "bootstrap/dist/css/bootstrap.css";
-
+import { LoginUser } from "@/services/user/login";
+import { useState } from "react";
+import { IUser } from "@/domain/entities/users.entity";
+import WrongLogin from "@/components/organisms/modals/WrongLogin";
 
 export default function Home() {
+  const [userCredentials, setUserCredentials] = useState({
+    username: "",
+    password: "",
+  });
+
+  const [openAlert, setOpenAlert] = useState(false);
+
+  function handleLogin() {
+    LoginUser(userCredentials)
+      .then((res) => window.open("/portalUser", "_self"))
+      .catch((err) => {
+        setOpenAlert(true);
+      });
+  }
+
   return (
     <>
+      <WrongLogin isOpen={openAlert} onClose={setOpenAlert} />
       <div className={styles.container}>
         <div className={styles.formLog}>
           <div className={styles.logo}></div>
@@ -24,6 +43,12 @@ export default function Home() {
               <input
                 style={{ width: "150%", marginBottom: "20px" }}
                 className="form-control"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setUserCredentials({
+                    username: e.target.value,
+                    password: userCredentials.password,
+                  });
+                }}
                 placeholder="Correo electronico"
                 type="text"
               />
@@ -32,6 +57,12 @@ export default function Home() {
                 className="form-control"
                 placeholder="Contraseña"
                 type="password"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setUserCredentials({
+                    username: userCredentials.username,
+                    password: e.target.value,
+                  });
+                }}
               />
               <button
                 type="button"
@@ -42,7 +73,9 @@ export default function Home() {
                   fontWeight: 500,
                 }}
                 className="btn btn-info"
-                onClick={() => window.open("/portalUser", "_self")}
+                onClick={() => {
+                  handleLogin()
+                }}
               >
                 Iniciar sesion
               </button>
@@ -60,7 +93,7 @@ export default function Home() {
               fontWeight: "bolder",
               cursor: "default",
               alignSelf: "flex-end",
-              marginRight: "20px"
+              marginRight: "20px",
             }}
           >
             Portal de Usuarios

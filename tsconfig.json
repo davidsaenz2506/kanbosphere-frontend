@@ -19,6 +19,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/organisms/modals/endSession.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/organisms/modals/endSession.jsx", "src/middleware.ts"],
   "exclude": ["node_modules"]
 }
