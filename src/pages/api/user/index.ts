@@ -14,7 +14,7 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
     const { data: userCred }: any = await axios.post<IUser>(`${process.env.WORKSPACE_API}/auth/login`, userCredentials);
 
     const serializedToken = serialize('tumbleToken', userCred.accessToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3600,
       path: '/'
