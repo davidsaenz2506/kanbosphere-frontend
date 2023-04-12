@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 import DeleteTask from "../../../modals/DeleteTask"
 import { useOutsideClick } from "@chakra-ui/react";
 
-const MiniCard = ({ item, bgColor, targetColor }) => {
+const MiniCard = ({ item, key, targetColor }) => {
 
   const [isClicked, setIsClicked] = React.useState(false);
   const [openEdit, setOpenEdit] = React.useState(false);
@@ -21,6 +21,7 @@ const MiniCard = ({ item, bgColor, targetColor }) => {
   return (
     <div
       ref={ref}
+      key={key}
       style={{
         height: "max-content",
         backgroundColor: "white",

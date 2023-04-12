@@ -6,5 +6,6 @@ export interface IDataToDo {
     info: string,
     title: string,
     createDate: Date,
+    file: string,
     finishDate?: Date
 }

@@ -20,9 +20,9 @@ const LaneComponent = ({ title, bgColor, data, targetColor }) => {
         <Heading size="md" sx={{color: "white"}}> {title} {data.length} </Heading>
       </CardHeader>
       <CardBody sx={{marginTop: "-20px", cursor: "default"}}>
-        {data.map((item: any) => {
+        {data.map((item: any, key: number) => {
           return (
-             <MiniCard item={item} bgColor={bgColor} targetColor={targetColor} />
+             <MiniCard key={key} item={item} bgColor={bgColor} targetColor={targetColor} />
           );
         })}
       </CardBody>

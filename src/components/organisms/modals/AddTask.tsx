@@ -32,6 +32,7 @@ const AddTask = ({ isOpen, onClose }) => {
   const [status, setStatus] = useState<string>("");
   const [taskInfo, setTaskInfo] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [file, setFile] = useState<string>("");
   const [taskId, setTaskId] = useState<string>(
     Math.random().toString(36).substr(2, 18)
   );
@@ -42,6 +43,7 @@ const AddTask = ({ isOpen, onClose }) => {
     status: "",
     info: "",
     title: "",
+    file: "",
     createDate: DateTime.now(),
   });
 
@@ -60,6 +62,7 @@ const AddTask = ({ isOpen, onClose }) => {
       status: status,
       info: taskInfo,
       title: title,
+      file: file,
       createDate: DateTime.now().toISO(),
     });
   }, [status, taskInfo, title]);

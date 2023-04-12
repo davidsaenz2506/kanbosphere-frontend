@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-} from "@chakra-ui/react";
+import { Button, Input, Modal, Text, Image } from "@nextui-org/react";
 
 import { DateTime } from "luxon";
 
@@ -22,7 +10,6 @@ import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook"
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 const EditTask = ({ isOpen, onClose, data }) => {
-
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const statusOptions = [
@@ -40,6 +27,7 @@ const EditTask = ({ isOpen, onClose, data }) => {
     label: data.status,
   });
   const [taskInfo, setTaskInfo] = useState(data.info);
+  const [pathImage, setPathImage] = useState(data.file);
 
   const [modifiedTask, setModifiedTask] = useState({});
 
@@ -50,84 +38,111 @@ const EditTask = ({ isOpen, onClose, data }) => {
       status: status.label,
       info: taskInfo,
       title: data.title,
+      file: pathImage,
       createDate: DateTime.fromISO(newDate).toISO(),
     });
-  }, [status, newDate, taskInfo]);
+  }, [status, newDate, taskInfo, pathImage]);
+
+  function handlePathImage(argument: string | ArrayBuffer | null) {
+    setPathImage(argument);
+    setModifiedTask({
+      userId: data.userId,
+      taskId: data.taskId,
+      status: status.label,
+      info: taskInfo,
+      title: data.title,
+      file: argument,
+      createDate: DateTime.fromISO(newDate).toISO(),
+    });
+  }
 
   async function editCurrentTask(currentTask: any) {
-
     let workspaceData: IDataToDo[] = wspData.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
     let modifiedWorkSpaceData = workspaceData.map((task, index) => {
-      if (task.taskId === currentTaskUser.taskId) {
-        workspaceData.splice(index, 1);
-        workspaceData.push(currentTaskUser);
-      }
-
-      return task;
+      if (task.taskId === currentTaskUser.taskId)
+        workspaceData[index] = currentTaskUser;
     });
 
-    setUserTasks({...wspData, data: modifiedWorkSpaceData})
-  
-  
+    setUserTasks({ ...wspData, data: modifiedWorkSpaceData });
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose(false)}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Editar tarea</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <FormControl>
-            <FormLabel>Información</FormLabel>
-            <Input
-              value={taskInfo}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setTaskInfo(e.target.value)
+    <Modal
+      style={{ height: "80vh" }}
+      open={isOpen}
+      onClose={() => onClose(false)}
+    >
+      <Modal.Header>
+        {" "}
+        <Text id="modal-title" size={18}>
+          Editar Tarea
+        </Text>
+      </Modal.Header>
+      <Modal.Body>
+        <Input
+          type="text"
+          initialValue={taskInfo}
+          onChange={(e) => setTaskInfo(e.target.value)}
+        />
+        <Select
+          value={status}
+          options={statusOptions}
+          onChange={(e: SingleValue<IPicklistOptions>) => {
+            if (e) setStatus({ value: e.value, label: e.label });
+          }}
+        />
+        <Input
+          type="date"
+          initialValue={newDate}
+          onChange={(e) => setNewDate(e.target.value)}
+        />
+
+        <div className="mb-4">
+          <input
+            onChange={(e: any) => {
+              if (e.target.files && e.target.files.length > 0) {
+                const userFiles: any = e.target.files[0];
+
+                if (userFiles.type.includes("image")) {
+                  const inputComputedReader = new FileReader();
+                  inputComputedReader.readAsDataURL(userFiles);
+
+                  inputComputedReader.onload = () => {
+                    handlePathImage(inputComputedReader.result);
+                  };
+                }
               }
-            />
-          </FormControl>
-
-          <FormControl mt={4}>
-            <FormLabel>Status</FormLabel>
-            <Select
-              value={status}
-              options={statusOptions}
-              onChange={(e: SingleValue<IPicklistOptions>) => {
-                if (e) setStatus({ value: e.value, label: e.label });
-              }}
-            />
-          </FormControl>
-
-          <FormControl mt={4}>
-            <FormLabel>Fecha de Inicio</FormLabel>
-            <Input
-              type="date"
-              value={newDate}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewDate(e.target.value)
-              }
-            />
-          </FormControl>
-        </ModalBody>
-
-        <ModalFooter>
-          <Button
-            colorScheme="blue"
-            mr={3}
-            onClick={async () => {
-              editCurrentTask(modifiedTask)
-              await UpdateWorkSpace(wspData);
-              onClose(false)
             }}
-          >
-            Save
-          </Button>
-          <Button onClick={() => onClose(false)}>Cancel</Button>
-        </ModalFooter>
-      </ModalContent>
+            className="form-control"
+            type="file"
+            id="formFile"
+          />
+        </div>
+
+        {pathImage && (
+          <React.Fragment>
+            <label style={{textAlign: "center"}}>Archivos adjuntos</label>
+            <Image style={{ borderRadius: "20px" }} src={pathImage} />
+          </React.Fragment>
+        )}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={() => onClose(false)} auto flat color="error">
+          Close
+        </Button>
+        <Button
+          onClick={async () => {
+            editCurrentTask(modifiedTask);
+            await UpdateWorkSpace(wspData);
+            onClose(false);
+          }}
+          auto
+        >
+          Save
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };
