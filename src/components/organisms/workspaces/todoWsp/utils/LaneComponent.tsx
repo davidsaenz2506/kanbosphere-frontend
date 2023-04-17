@@ -22,7 +22,7 @@ const LaneComponent = ({ title, bgColor, data, targetColor }) => {
       <CardBody sx={{marginTop: "-20px", cursor: "default"}}>
         {data.map((item: any, key: number) => {
           return (
-             <MiniCard key={key} item={item} bgColor={bgColor} targetColor={targetColor} />
+             <MiniCard key={key} item={item} targetColor={targetColor} />
           );
         })}
       </CardBody>

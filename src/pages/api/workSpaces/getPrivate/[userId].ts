@@ -8,7 +8,8 @@ const handler = nextConnect();
 export default handler.get(async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
-        const { data: workspaces } = await axios.get<IWspUser[]>(`${process.env.WORKSPACE_API}/workspaces`);
+        const { userId } = req.query;
+        const { data: workspaces } = await axios.get<IWspUser[]>(`${process.env.WORKSPACE_API}/workspaces/userWorkspaces/${userId}`);
         return res.status(200).json(workspaces);
 
     } catch (err: any) {

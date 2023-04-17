@@ -42,7 +42,7 @@ const Cards = () => {
             <Heading size="md">To Do Workspace</Heading>
 
             <Text py="2">
-              Crea, administra y gestiona tu lista de tareas pendientes
+              Crea, administra y gestiona tu lista de tareas pendientes.
             </Text>
           </CardBody>
 
@@ -81,7 +81,7 @@ const Cards = () => {
               La herramienta de Notas Rapidas te permite crear una interfaz
               bastante amigable donde podras registrar datos importantes,
               incluyendo imagenes, ecuaciones matematicas, graficos y muchas
-              otras opciones más
+              otras opciones más.
             </Text>
           </CardBody>
 
@@ -109,16 +109,15 @@ const Cards = () => {
         <Image
           objectFit="cover"
           maxW={{ base: "100%", sm: "200px" }}
-          src="https://theurbanhosts.com/wp-content/uploads/2022/02/entradablog01.jpg"
+          src="https://th.bing.com/th/id/R.bc5d3d51fba513f07648a794f2ea4a02?rik=WFV4m67D%2b9f8sw&riu=http%3a%2f%2fignaciomartineza.com%2fwp-content%2fuploads%2f2017%2f11%2fQu%c3%a9-es-una-hoja-de-c%c3%a1lculo.jpg&ehk=kDx%2fzgsux0%2fmRIHHBD6bY8CCz88bfQ1CJfftjQMwRMs%3d&risl=&pid=ImgRaw&r=0"
         />
 
         <Stack>
           <CardBody>
-            <Heading size="md">Calculadora Tumble</Heading>
+            <Heading size="md">Tumble Spreadsheet</Heading>
 
             <Text py="2">
-              Resuelve operaciones matematicas, obten conversión de unidades,
-              monedas y registra estos datos en tu agenda Tumble
+                Almacena grandes cantidades de datos en Tumble Spreadsheets, una hoja de calculo limpia, visualmente atractiva y poderosa.
             </Text>
           </CardBody>
 

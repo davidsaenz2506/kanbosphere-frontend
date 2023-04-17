@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import {
   AlertDialog,
@@ -11,12 +11,16 @@ import {
 
 import { Button } from "@chakra-ui/react";
 
-
 const DeleteTask = (props) => {
+  const ref = useRef(null);
 
   return (
     <>
-      <AlertDialog isOpen={props.isOpen} onClose={props.onClose}>
+      <AlertDialog
+        leastDestructiveRef={ref}
+        isOpen={props.isOpen}
+        onClose={props.onClose}
+      >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">

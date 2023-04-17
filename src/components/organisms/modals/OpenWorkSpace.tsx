@@ -18,6 +18,7 @@ import { DateTime } from "luxon";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 import { CreateWorkSpaces } from "@/services/workspaces/createWorkSpace";
 import { getAllWorkSpaces } from "@/services/workspaces/getAll";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 interface IWspUser {
   name: string;
@@ -32,6 +33,10 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
 
   const wspUser = useWorkspace();
 
+  const currentUserInfo = useCurrentUser();
+
+  const computedUserDataField = useCurrentUser();
+
   const [newWorkSpace, setNewWorkSpace] = useState<IWspUser>({
     name: "",
     createdDate: DateTime.now().toISO(),
@@ -41,21 +46,19 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
   });
 
   async function handleCreate() {
-
     await CreateWorkSpaces(newWorkSpace);
-    const response = await getAllWorkSpaces();
+    const response = await getAllWorkSpaces(computedUserDataField.currentUser.userID);
 
     wspUser.setUsersWsps(response);
 
     setIsOpen(false);
-
   }
 
   React.useEffect(() => {
     setNewWorkSpace({
       name: nameValue,
       createdDate: DateTime.now().toISO(),
-      createdById: "1000933190",
+      createdById: currentUserInfo.currentUser.userID,
       type: title,
       wspData: [],
     });

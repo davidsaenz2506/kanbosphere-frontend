@@ -18,7 +18,6 @@ import { IDataToDo } from "@/domain/entities/todo.entity";
 
 import { DateTime } from "luxon";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 export interface IPicklistOptions {

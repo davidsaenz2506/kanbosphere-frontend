@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -13,7 +13,6 @@ import {
   Input,
 } from "@chakra-ui/react";
 
-import { IDataToDo } from "@/domain/entities/todo.entity";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { IWspUser } from "@/domain/entities/userWsps.entity";

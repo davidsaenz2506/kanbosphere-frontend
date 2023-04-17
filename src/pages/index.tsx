@@ -2,20 +2,23 @@ import styles from "../styles/login.module.css";
 import "bootstrap/dist/css/bootstrap.css";
 import { LoginUser } from "@/services/user/login";
 import { useState } from "react";
-import { IUser } from "@/domain/entities/users.entity";
 import WrongLogin from "@/components/organisms/modals/WrongLogin";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 export default function Home() {
   const [userCredentials, setUserCredentials] = useState({
     username: "",
     password: "",
   });
-
+  const userOperationsComputed = useCurrentUser();
   const [openAlert, setOpenAlert] = useState(false);
 
   function handleLogin() {
     LoginUser(userCredentials)
-      .then((res) => window.open("/portalUser", "_self"))
+      .then((res) => {
+        userOperationsComputed.fetchCurrentUser(res);
+        window.open("/portalUser", "_self");
+      })
       .catch((err) => {
         setOpenAlert(true);
       });
@@ -74,7 +77,7 @@ export default function Home() {
                 }}
                 className="btn btn-info"
                 onClick={() => {
-                  handleLogin()
+                  handleLogin();
                 }}
               >
                 Iniciar sesion

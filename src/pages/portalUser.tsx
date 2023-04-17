@@ -10,12 +10,40 @@ import EndBar from "../components/portal/EndBar";
 
 import WorkspaceManager from "../components/organisms/workspaces/WorkspaceManager";
 
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+
+import Cookies from "universal-cookie";
+
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
+
+import jwtDecode from "jwt-decode";
+import { GetCurrentUser } from "@/services/user/getCurrentUser";
 
 const PortalUser = () => {
   const [workspaceFlow, setWorkspaceFlow] = useState("");
-
+  const computedUserItems = useCurrentUser();
+  const cookies = new Cookies();
+  const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
+
+  React.useEffect(() => {
+    async function getUserInfoFromServer() {
+      const decodedInfoFromServer: any = jwtDecode(userPrivateToken);
+
+      const userInfoFromDataBase = await GetCurrentUser(
+        decodedInfoFromServer.username
+      );
+
+      computedUserItems.setCurrentUser(userInfoFromDataBase);
+    }
+
+    getUserInfoFromServer();
+  }, []);
+
+  React.useEffect(() => {
+    if (computedUserItems.currentUser.userID)
+      workSpaces.fetchWorkSpaces(computedUserItems.currentUser.userID);
+  }, [computedUserItems.currentUser]);
 
   React.useEffect(() => {
     var resizerTool = document.getElementById("resizerTool");
@@ -25,12 +53,6 @@ const PortalUser = () => {
     initResizer(resizerTool, toolSpace, workSpace);
   });
 
-  React.useEffect(() => {
-    const wsp = workSpaces.fetchWorkSpaces();
-    console.log(wsp)
-  }, []);
- 
-  
   return (
     <div style={{ backgroundColor: "white", height: "100vh" }}>
       <nav
@@ -56,7 +78,7 @@ const PortalUser = () => {
           }}
         >
           <p style={{ marginRight: "20px", color: "white" }}>
-            Hans David Saenz Varon
+            {computedUserItems.currentUser.fullname}
           </p>
           <Avatar style={{ marginRight: "20px" }} text="David" />
         </div>
@@ -74,7 +96,7 @@ const PortalUser = () => {
                 fontWeight: 500,
               }}
             >
-               Barra de herramientas
+              Barra de herramientas
             </h5>
             <hr className={styles.hrElement}></hr>
             <ToolButtons

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import {
   AlertDialog,
@@ -15,17 +15,15 @@ import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook"
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 const DeleteTask = (props) => {
-
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
+  const ref = useRef(null);
 
   async function deleteCurrentTask(currentTask: IDataToDo) {
-    
     let workspaceData: IDataToDo[] = wspData.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
     let modifiedWorkSpaceData = workspaceData.map((task, index) => {
-
       if (task.taskId === currentTaskUser.taskId) {
         workspaceData.splice(index, 1);
       }
@@ -38,7 +36,11 @@ const DeleteTask = (props) => {
 
   return (
     <>
-      <AlertDialog isOpen={props.isOpen} onClose={props.onClose}>
+      <AlertDialog
+        isOpen={props.isOpen}
+        onClose={props.onClose}
+        leastDestructiveRef={ref}
+      >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -51,12 +53,14 @@ const DeleteTask = (props) => {
 
             <AlertDialogFooter>
               <Button onClick={() => props.onClose(false)}>Cancelar</Button>
-              <Button colorScheme="red" ml={3}
-               onClick={async () => {
-                deleteCurrentTask(props.data)
-                await UpdateWorkSpace(wspData);
-                props.onClose(false)
-            }}
+              <Button
+                colorScheme="red"
+                ml={3}
+                onClick={async () => {
+                  deleteCurrentTask(props.data);
+                  await UpdateWorkSpace(wspData);
+                  props.onClose(false);
+                }}
               >
                 Eliminar
               </Button>

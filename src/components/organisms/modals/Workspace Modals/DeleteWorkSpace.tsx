@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import {
   AlertDialog,
@@ -17,6 +17,7 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 const DeleteWorkSpace = (props) => {
+  const ref = useRef(null);
   const workSpace = useWorkspace();
 
   async function handleDeleteWorkSpace(wspId: string) {
@@ -35,7 +36,11 @@ const DeleteWorkSpace = (props) => {
 
   return (
     <>
-      <AlertDialog isOpen={props.isOpen} onClose={props.onClose}>
+      <AlertDialog
+        isOpen={props.isOpen}
+        onClose={props.onClose}
+        leastDestructiveRef={ref}
+      >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">

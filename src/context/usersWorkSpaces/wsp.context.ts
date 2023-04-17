@@ -4,7 +4,7 @@ import { createContext } from "react";
 export interface IWspContext {
     userWsps: IWspUser[],
     setUsersWsps: (value: any) => void,
-    fetchWorkSpaces: () => void
+    fetchWorkSpaces: (userId: string) => Promise<void>
 }
 
 export const WorkspaceContext = createContext<IWspContext>({
