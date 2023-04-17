@@ -4,10 +4,13 @@ import ToDoLanes from "./utils/ToDoLanes";
 import { Button } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import AddTask from "../../modals/AddTask";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+import { getFirstName } from "@/utilities/getFirstName";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
+  const computedUserDataField = useCurrentUser();
 
   window.onresize = function onResize() {
     const todoDocument: HTMLDivElement | null =
@@ -58,7 +61,8 @@ const ToDoWorkspace = () => {
               marginLeft: "30px",
             }}
           >
-            Bienvenido a tu espacio de trabajo To Do David!
+            Bienvenido a tu espacio de trabajo To Do{" "}
+            {getFirstName(computedUserDataField.currentUser.fullname)}!
           </h2>
           <p style={{ textAlign: "start", marginLeft: "32px" }}>
             Aqui podras revisar tus tareas de trabajo y gestionarlas.

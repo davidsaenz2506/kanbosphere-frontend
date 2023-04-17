@@ -15,6 +15,7 @@ export const CurrentUserProvider: FC<PropTypes> = ({ children }: any) => {
     userID: "",
     email: "",
     password: "",
+    profilePicture: ""
   });
 
   const fetchCurrentUser = useCallback(async (credentials: any) => {

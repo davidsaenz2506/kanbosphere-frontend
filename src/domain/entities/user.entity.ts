@@ -5,4 +5,5 @@ export default interface ICurrentUser {
     email: string;
     userID: string;
     password: string;
+    profilePicture: string;
 }

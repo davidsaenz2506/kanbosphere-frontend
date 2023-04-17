@@ -17,3 +17,11 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
     return res.status(err.response?.status || 500).json(err?.response?.data || err);
   }
 });
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    }, 
+  },
+};

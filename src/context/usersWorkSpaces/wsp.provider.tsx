@@ -3,7 +3,6 @@ import React, { ReactNode, useCallback } from "react";
 import { FC } from "react";
 
 import { WorkspaceContext } from "./wsp.context";
-import { useCurrentUser } from "../currentUser/currentUser.hook";
 
 type PropTypes = {
   children?: ReactNode;
@@ -11,7 +10,6 @@ type PropTypes = {
 
 export const WspProvider: FC<PropTypes> = ({ children }: any) => {
   const [userWsps, setUsersWsps] = React.useState<any>([]);
-  const computedUserDataField = useCurrentUser();
 
   const fetchWorkSpaces = useCallback(async (userId: string) => {
     try {

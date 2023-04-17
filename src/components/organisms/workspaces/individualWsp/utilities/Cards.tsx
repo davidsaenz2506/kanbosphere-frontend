@@ -5,7 +5,6 @@ import { Stack, Image, Heading, Button, Text } from "@chakra-ui/react";
 import OpenWorkSpace from "../../../modals/OpenWorkSpace";
 
 const Cards = () => {
-  
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [title, setTitle] = useState("");
 
@@ -117,7 +116,8 @@ const Cards = () => {
             <Heading size="md">Tumble Spreadsheet</Heading>
 
             <Text py="2">
-                Almacena grandes cantidades de datos en Tumble Spreadsheets, una hoja de calculo limpia, visualmente atractiva y poderosa.
+              Almacena grandes cantidades de datos en Tumble Spreadsheets, una
+              hoja de calculo limpia, visualmente atractiva y poderosa.
             </Text>
           </CardBody>
 

@@ -18,6 +18,7 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
 import jwtDecode from "jwt-decode";
 import { GetCurrentUser } from "@/services/user/getCurrentUser";
+import { getFirstName } from "@/utilities/getFirstName";
 
 const PortalUser = () => {
   const [workspaceFlow, setWorkspaceFlow] = useState("");
@@ -80,7 +81,7 @@ const PortalUser = () => {
           <p style={{ marginRight: "20px", color: "white" }}>
             {computedUserItems.currentUser.fullname}
           </p>
-          <Avatar style={{ marginRight: "20px" }} text="David" />
+          <Avatar style={{ marginRight: "20px" }} text={getFirstName(computedUserItems.currentUser.fullname)} src={computedUserItems.currentUser.profilePicture} />
         </div>
       </nav>
       <div className={styles.principalContainer}>
