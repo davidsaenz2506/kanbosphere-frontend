@@ -15,7 +15,8 @@ export const CurrentUserContext = createContext<ICurrentUserContext>({
         fullname: "",
         userID: "",
         email: "",
-        password: ""
+        password: "",
+        profilePicture: ""
     },
     setCurrentUser: () => {},
     fetchCurrentUser: async () => {}

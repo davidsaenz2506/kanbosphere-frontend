@@ -27,7 +27,6 @@ const DeleteTask = (props) => {
       if (task.taskId === currentTaskUser.taskId) {
         workspaceData.splice(index, 1);
       }
-
       return task;
     });
 
