@@ -1,6 +1,5 @@
 import React from "react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Button } from "@nextui-org/react";
 import EditTask from "@/components/organisms/modals/EditTask";
 import { DateTime } from "luxon";
 import DeleteTask from "../../../modals/DeleteTask"
@@ -16,7 +15,6 @@ const MiniCard = ({ item, key, targetColor }) => {
     ref: ref,
     handler: () => setIsClicked(false)
   })
-
 
   return (
     <div

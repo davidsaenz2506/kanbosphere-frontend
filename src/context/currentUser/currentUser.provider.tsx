@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback } from "react";
 import { FC } from "react";
 
 import { CurrentUserContext } from "./currentUser.context";
-import { LoginUser } from "@/services/user/login";
+
 
 type PropTypes = {
   children?: ReactNode;
