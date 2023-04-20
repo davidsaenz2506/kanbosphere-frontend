@@ -11,9 +11,10 @@ type PropTypes = {
 export const WspProvider: FC<PropTypes> = ({ children }: any) => {
   const [userWsps, setUsersWsps] = React.useState<any>([]);
 
-  const fetchWorkSpaces = useCallback(async (userId: string) => {
+  const fetchWorkSpaces = useCallback(async (userId: string, setLoadingServerData: React.Dispatch<React.SetStateAction<boolean>>) => {
     try {
       const response = await getAllWorkSpaces(userId);
+      setLoadingServerData(true)
       setUsersWsps(response);
     } catch (error) {
       console.log(error);

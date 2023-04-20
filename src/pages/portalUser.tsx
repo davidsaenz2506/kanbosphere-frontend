@@ -19,9 +19,12 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import jwtDecode from "jwt-decode";
 import { GetCurrentUser } from "@/services/user/getCurrentUser";
 import { getFirstName } from "@/utilities/getFirstName";
+import Loading from "@/components/molecules/Loading";
+import { set } from "lodash";
 
 const PortalUser = () => {
   const [workspaceFlow, setWorkspaceFlow] = useState("");
+  const [loadingServerData, setLoadingServerData] = useState(false);
   const computedUserItems = useCurrentUser();
   const cookies = new Cookies();
   const userPrivateToken = cookies.get("tumbleToken");
@@ -43,7 +46,10 @@ const PortalUser = () => {
 
   React.useEffect(() => {
     if (computedUserItems.currentUser.userID)
-      workSpaces.fetchWorkSpaces(computedUserItems.currentUser.userID);
+      workSpaces.fetchWorkSpaces(
+        computedUserItems.currentUser.userID,
+        setLoadingServerData
+      );
   }, [computedUserItems.currentUser]);
 
   React.useEffect(() => {
@@ -55,66 +61,75 @@ const PortalUser = () => {
   });
 
   return (
-    <div style={{ backgroundColor: "white", height: "100vh" }}>
-      <nav
-        id="navbarHome"
-        className="navbar navbar-light bg-light"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(45,173,255,1) 0%, rgba(36,94,249,1) 100%)",
-        }}
-      >
-        <a
-          className="navbar-brand"
-          href="#"
-          style={{ marginLeft: "20px", color: "white", fontWeight: "bolder" }}
-        >
-          Portal Home
-        </a>
-        <div
+    <React.Fragment>
+      {!loadingServerData && (
+        <Loading message="Bienvenido! Estamos cargando tu configuración" />
+      )}
+      <div style={{ backgroundColor: "white", height: "100vh" }}>
+        <nav
+          id="navbarHome"
+          className="navbar navbar-light bg-light"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            background:
+              "linear-gradient(90deg, rgba(45,173,255,1) 0%, rgba(36,94,249,1) 100%)",
           }}
         >
-          <p style={{ marginRight: "20px", color: "white" }}>
-            {computedUserItems.currentUser.fullname}
-          </p>
-          <Avatar style={{ marginRight: "20px" }} text={getFirstName(computedUserItems.currentUser.fullname)} src={computedUserItems.currentUser.profilePicture} />
-        </div>
-      </nav>
-      <div className={styles.principalContainer}>
-        <div className={styles.toolSpace}>
-          <div id="toolSpace" className={styles.toolContainer}>
-            <h5
-              style={{
-                textAlign: "left",
-                marginTop: "20px",
-                marginBottom: "20px",
-                fontSize: "30px",
-                marginLeft: "20px",
-                fontWeight: 500,
-              }}
-            >
-              Barra de herramientas
-            </h5>
-            <hr className={styles.hrElement}></hr>
-            <ToolButtons
-              workspaceFlow={workspaceFlow}
-              setWorkSpaceFlow={setWorkspaceFlow}
+          <a
+            className="navbar-brand"
+            href="#"
+            style={{ marginLeft: "20px", color: "white", fontWeight: "bolder" }}
+          >
+            Portal Home
+          </a>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <p style={{ marginRight: "20px", color: "white" }}>
+              {computedUserItems.currentUser.fullname}
+            </p>
+            <Avatar
+              style={{ marginRight: "20px" }}
+              text={getFirstName(computedUserItems.currentUser.fullname)}
+              src={computedUserItems.currentUser.profilePicture}
             />
-            <EndBar setWorkSpaceFlow={setWorkspaceFlow} />
+          </div>
+        </nav>
+        <div className={styles.principalContainer}>
+          <div className={styles.toolSpace}>
+            <div id="toolSpace" className={styles.toolContainer}>
+              <h5
+                style={{
+                  textAlign: "left",
+                  marginTop: "20px",
+                  marginBottom: "20px",
+                  fontSize: "30px",
+                  marginLeft: "20px",
+                  fontWeight: 500,
+                }}
+              >
+                Barra de herramientas
+              </h5>
+              <hr className={styles.hrElement}></hr>
+              <ToolButtons
+                workspaceFlow={workspaceFlow}
+                setWorkSpaceFlow={setWorkspaceFlow}
+              />
+              <EndBar setWorkSpaceFlow={setWorkspaceFlow} />
+            </div>
+
+            <div id="resizerTool" className={styles.resizerParticle}></div>
           </div>
 
-          <div id="resizerTool" className={styles.resizerParticle}></div>
-        </div>
-
-        <div id="workSpace" className={styles.workSpace}>
-          <WorkspaceManager workspaceFlow={workspaceFlow} />
+          <div id="workSpace" className={styles.workSpace}>
+            <WorkspaceManager workspaceFlow={workspaceFlow} />
+          </div>
         </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 

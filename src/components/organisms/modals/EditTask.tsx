@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Input, Modal, Text, Image } from "@nextui-org/react";
 import _ from "lodash";
 
@@ -10,6 +10,8 @@ import { IDataToDo } from "@/domain/entities/todo.entity";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import FileViewer from "./FileViewer";
+import Loading from "@/components/molecules/Loading";
+import { Portal } from "@chakra-ui/react";
 
 const EditTask = ({ isOpen, onClose, data }) => {
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
@@ -31,6 +33,12 @@ const EditTask = ({ isOpen, onClose, data }) => {
   const [taskInfo, setTaskInfo] = useState(data.info);
   const [pathImage, setPathImage] = useState(data.file);
   const [openModalForFiles, setOpenModalForFiles] = useState(false);
+  const [loadingAsyncEdit, setLoadingAsyncEdit] = useState(false);
+  const ref = useRef<Element | null>(null);
+
+  useEffect(() => {
+    ref.current = document.querySelector<HTMLElement>("#root");
+  }, []);
 
   const [modifiedTask, setModifiedTask] = useState({
     userId: data.userId,
@@ -110,6 +118,11 @@ const EditTask = ({ isOpen, onClose, data }) => {
 
   return (
     <React.Fragment>
+      {loadingAsyncEdit && (
+        <Portal>
+          <Loading message="Editando tarea" />
+        </Portal>
+      )}
       <FileViewer
         openModalForFiles={openModalForFiles}
         setOpenModalForFiles={setOpenModalForFiles}
@@ -185,8 +198,13 @@ const EditTask = ({ isOpen, onClose, data }) => {
           </Button>
           <Button
             onClick={async () => {
+              setLoadingAsyncEdit(true);
+
               editCurrentTask(modifiedTask);
+
               await UpdateWorkSpace(wspData);
+              setLoadingAsyncEdit(false);
+
               onClose(false);
             }}
             auto
