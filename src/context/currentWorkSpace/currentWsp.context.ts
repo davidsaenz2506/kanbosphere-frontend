@@ -12,10 +12,10 @@ export interface ICurrentWspContext {
 export const CurrentWorkSpaceContext = createContext<ICurrentWspContext>({
     currentWorkSpace: {
         name: "",
-        createdDate: DateTime.now() ,
+        createdDate: DateTime.now(),
         createdById: "",
         type: "",
         wspData: []
     },
-    setCurrentWorkSpace: () => {}
+    setCurrentWorkSpace: () => { }
 })

@@ -1,3 +1,4 @@
+import { ISpreadSheet } from "./spreadsheet.entity";
 import { IDataToDo } from "./todo.entity";
 
 export interface IWspUser {
@@ -6,5 +7,6 @@ export interface IWspUser {
     createdDate: Date;
     createdById: string;
     type: string;
-    wspData: IDataToDo[]
+    wspData?: IDataToDo[];
+    spreadSheetData?: ISpreadSheet
 }

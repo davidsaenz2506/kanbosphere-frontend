@@ -126,7 +126,7 @@ const Cards = () => {
               variant="solid"
               colorScheme="blue"
               onClick={() => {
-                setTitle("Tumble Calculator");
+                setTitle("Tumble Spreadsheet");
                 setIsOpenModal(true);
               }}
             >

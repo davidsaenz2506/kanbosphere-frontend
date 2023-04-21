@@ -67,10 +67,10 @@ const AddTask = ({ isOpen, onClose }) => {
   }, [status, taskInfo, title]);
 
   async function addTaskToWorkSpace(userTask: IDataToDo) {
-    let workspaceData: IDataToDo[] = data.wspData;
+    let workspaceData: IDataToDo[] | undefined = data.wspData;
     let newTask: IDataToDo = userTask;
 
-    workspaceData.push(newTask);
+    if (workspaceData) workspaceData.push(newTask);
 
     setUserTasks({ ...data, wspData: workspaceData });
 

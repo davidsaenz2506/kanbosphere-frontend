@@ -26,6 +26,9 @@ const EditTask = ({ isOpen, onClose, data }) => {
   const [newDate, setNewDate] = useState(
     DateTime.fromISO(data.createDate).toISODate()
   );
+  const [finishDate, setFinishDate] = useState(
+    DateTime.fromISO(data?.finishDate).toISODate()
+  );
   const [status, setStatus] = useState({
     value: data.status,
     label: data.status,
@@ -48,6 +51,7 @@ const EditTask = ({ isOpen, onClose, data }) => {
     title: data.title,
     file: pathImage,
     createDate: DateTime.fromISO(newDate).toISO(),
+    finishDate: finishDate,
   });
 
   useEffect(() => {
@@ -73,8 +77,9 @@ const EditTask = ({ isOpen, onClose, data }) => {
       title: data.title,
       file: pathImage,
       createDate: DateTime.fromISO(newDate).toISO(),
+      finishDate: finishDate,
     });
-  }, [status, newDate, taskInfo, pathImage]);
+  }, [status, newDate, taskInfo, pathImage, finishDate]);
 
   function handlePathImage(argument: string | ArrayBuffer | null) {
     setPathImage(argument);
@@ -86,15 +91,16 @@ const EditTask = ({ isOpen, onClose, data }) => {
       title: data.title,
       file: argument,
       createDate: DateTime.fromISO(newDate).toISO(),
+      finishDate: finishDate,
     });
   }
 
   async function editCurrentTask(currentTask: any) {
-    let workspaceData: IDataToDo[] = wspData.wspData;
+    let workspaceData: IDataToDo[] | undefined = wspData.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
-    let modifiedWorkSpaceData = workspaceData.map((task, index) => {
-      if (task.taskId === currentTaskUser.taskId)
+    let modifiedWorkSpaceData = workspaceData?.map((task, index) => {
+      if (task.taskId === currentTaskUser.taskId && workspaceData)
         workspaceData[index] = currentTaskUser;
     });
 
@@ -110,6 +116,7 @@ const EditTask = ({ isOpen, onClose, data }) => {
       title: data.title,
       file: "",
       createDate: DateTime.fromISO(newDate).toISO(),
+      finishDate: finishDate,
     });
     editCurrentTask(modifiedTask);
 
@@ -150,7 +157,11 @@ const EditTask = ({ isOpen, onClose, data }) => {
             value={status}
             options={statusOptions}
             onChange={(e: SingleValue<IPicklistOptions>) => {
-              if (e) setStatus({ value: e.value, label: e.label });
+              if (e) {
+                if (e.value === "Finished" || e.value === "For Review")
+                  setFinishDate(DateTime.now().toISO());
+                setStatus({ value: e.value, label: e.label });
+              }
             }}
           />
           <Input

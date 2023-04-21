@@ -19,6 +19,7 @@ import { IDataToDo } from "@/domain/entities/todo.entity";
 import { CreateWorkSpaces } from "@/services/workspaces/createWorkSpace";
 import { getAllWorkSpaces } from "@/services/workspaces/getAll";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
 interface IWspUser {
   name: string;
@@ -26,6 +27,7 @@ interface IWspUser {
   createdById: string;
   type: string;
   wspData: IDataToDo[];
+  spreadSheetData: ISpreadSheet;
 }
 
 const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
@@ -43,11 +45,18 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
     createdById: "",
     type: "",
     wspData: [],
+    spreadSheetData: {
+      columns: [],
+      data: [],
+      userId: currentUserInfo.currentUser.userID,
+    },
   });
 
   async function handleCreate() {
     await CreateWorkSpaces(newWorkSpace);
-    const response = await getAllWorkSpaces(computedUserDataField.currentUser.userID);
+    const response = await getAllWorkSpaces(
+      computedUserDataField.currentUser.userID
+    );
 
     wspUser.setUsersWsps(response);
 
@@ -61,6 +70,11 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
       createdById: currentUserInfo.currentUser.userID,
       type: title,
       wspData: [],
+      spreadSheetData: {
+        columns: [],
+        data: [],
+        userId: currentUserInfo.currentUser.userID,
+      },
     });
   }, [nameValue]);
 

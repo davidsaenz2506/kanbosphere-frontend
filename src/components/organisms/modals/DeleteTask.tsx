@@ -20,12 +20,12 @@ const DeleteTask = (props) => {
   const ref = useRef(null);
 
   async function deleteCurrentTask(currentTask: IDataToDo) {
-    let workspaceData: IDataToDo[] = wspData.wspData;
+    let workspaceData: IDataToDo[] | undefined = wspData.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
-    let modifiedWorkSpaceData = workspaceData.map((task, index) => {
+    let modifiedWorkSpaceData = workspaceData?.map((task, index) => {
       if (task.taskId === currentTaskUser.taskId) {
-        workspaceData.splice(index, 1);
+        workspaceData?.splice(index, 1);
       }
       return task;
     });

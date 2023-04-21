@@ -2,19 +2,26 @@ import React from "react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import EditTask from "@/components/organisms/modals/EditTask";
 import { DateTime } from "luxon";
-import DeleteTask from "../../../modals/DeleteTask"
+import DeleteTask from "../../../modals/DeleteTask";
 import { useOutsideClick } from "@chakra-ui/react";
+import { IDataToDo } from "@/domain/entities/todo.entity";
 
-const MiniCard = ({ item, key, targetColor }) => {
+interface IMiniCardProps {
+  item: IDataToDo;
+  key: number;
+  targetColor: string;
+}
 
+const MiniCard = (Props: IMiniCardProps) => {
+  const { item, key, targetColor } = Props;
   const [isClicked, setIsClicked] = React.useState(false);
   const [openEdit, setOpenEdit] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
-  const ref : any = React.useRef()
+  const ref: any = React.useRef();
   useOutsideClick({
     ref: ref,
-    handler: () => setIsClicked(false)
-  })
+    handler: () => setIsClicked(false),
+  });
 
   return (
     <div
@@ -75,8 +82,15 @@ const MiniCard = ({ item, key, targetColor }) => {
           <p style={{ marginTop: "15px" }}>{item.status}</p>
         </div>
         <p style={{ marginTop: "5px" }}>
-          Fecha de inicio: {DateTime.fromISO(item.createDate).setLocale("es").toFormat("DDD")}
+          <strong> Fecha de inicio: </strong>
+          {DateTime.fromISO(item.createDate).setLocale("es").toFormat("DDD")}
         </p>
+        {item.finishDate && (
+          <p style={{ marginTop: "5px" }}>
+            <strong> Fecha de finalización: </strong>
+            {DateTime.fromISO(item.finishDate).setLocale("es").toFormat("DDD")}
+          </p>
+        )}
       </div>
     </div>
   );
