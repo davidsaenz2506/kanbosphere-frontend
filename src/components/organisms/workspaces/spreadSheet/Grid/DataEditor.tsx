@@ -6,19 +6,22 @@ import {
   GridColumn,
 } from "@glideapps/glide-data-grid";
 import { DataEditor } from "@glideapps/glide-data-grid";
+import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 
 interface ISpreadProps {
-  columns: GridColumn[];
   data: any;
 }
 
 const GridDataEditor = (Props: ISpreadProps) => {
-  const { columns, data } = Props;
+  const { data } = Props;
+  const currentUserWsp = useCurrentWorkspace();
+  const columns =
+    currentUserWsp.currentWorkSpace.spreadSheetData?.columns ?? [];
 
   function getData([col, row]: Item): GridCell {
     const dataRow = data[row];
     const columnsCol = columns[col];
-    const field = columnsCol.title;
+    const field = columnsCol?.title;
 
     return {
       kind: GridCellKind.Text,
@@ -30,10 +33,10 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   const onCellEdited = useCallback((cell, newValue) => {
     const [col, row] = cell;
-    const key = columns[col].title;
-    
+    const key = columns[col]?.title;
+
     data[row][key] = newValue.data;
-  }, []);
+  }, [columns]);
 
   return (
     <div

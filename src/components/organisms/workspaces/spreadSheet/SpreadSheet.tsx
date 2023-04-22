@@ -64,9 +64,38 @@ const Spreadsheet = () => {
       ...currentWorkSpace.currentWorkSpace,
       spreadSheetData: newSpreadData,
     });
-
-    console.log(currentWorkSpace);
   }
+
+  React.useEffect(() => {
+    if (currentWorkSpace.currentWorkSpace.spreadSheetData?.data) {
+      const dataMatrix =
+        currentWorkSpace.currentWorkSpace.spreadSheetData?.data;
+      let newUserRows = [];
+      let newSpreadData = currentWorkSpace.currentWorkSpace.spreadSheetData;
+
+      dataMatrix.forEach((individualRow: object) => {
+        currentWorkSpace.currentWorkSpace.spreadSheetData?.columns.forEach(
+          (userColumn) => {
+            if (!individualRow.hasOwnProperty(userColumn?.title)) {
+              individualRow[userColumn?.title] = "";
+            }
+          }
+        );
+        // @ts-ignore
+        newUserRows.push(individualRow);
+      });
+
+      // @ts-ignore
+      newSpreadData.data = newUserRows;
+
+      currentWorkSpace.setCurrentWorkSpace({
+        ...currentWorkSpace.currentWorkSpace,
+        spreadSheetData: newSpreadData,
+      });
+    }
+  }, [userColumns]);
+
+  console.log(currentWorkSpace.currentWorkSpace.spreadSheetData)
 
   return (
     <div
@@ -135,7 +164,6 @@ const Spreadsheet = () => {
         }}
       >
         <GridDataEditor
-          columns={userColumns ?? []}
           data={currentWorkSpace.currentWorkSpace.spreadSheetData?.data ?? []}
         />
       </div>
