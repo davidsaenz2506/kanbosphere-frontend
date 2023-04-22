@@ -60,19 +60,6 @@ const renderer: CustomRenderer<DatePickerCell> = {
       />
     );
   },
-  onPaste: (v, d) => {
-    let newDate: Date | undefined;
-    try {
-      newDate = DateTime.now();
-    } catch {
-      /* do nothing */
-    }
-
-    return {
-      ...d,
-      date: Number.isNaN(newDate) ? undefined : newDate,
-    };
-  },
 };
 
 export default renderer;

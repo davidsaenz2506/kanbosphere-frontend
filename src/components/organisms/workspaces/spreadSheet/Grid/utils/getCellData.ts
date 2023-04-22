@@ -49,14 +49,28 @@ export const getCellData = (
             kind: GridCellKind.Custom,
             data: {
                 type: "date",
-                date: dataRow[field] !== "" ? dataRow[field] : "",
+                date: dataRow[field] ? dataRow[field] : DateTime.now(),
                 displayDate: !dataRow[field] ? "" : renderDateFromServer,
                 format: "date",
             },
             allowOverlay: true,
             copyData: "",
         };
-    } else
+    }
+
+    if (columnType === "picklist") return {
+        kind: GridCellKind.Custom,
+        data: {
+            type: "picklist",
+            value: dataRow[field] ?? "",
+            allowedValues: columnsCol?.picklistValues,
+        },
+        allowOverlay: true,
+        copyData: ""
+    }
+
+
+    else
         return {
             kind: GridCellKind.Text,
             data: dataRow[field] ?? "",

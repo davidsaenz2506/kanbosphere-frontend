@@ -1,8 +1,10 @@
+import { ISelectColorOptions } from "@/components/organisms/modals/Spread/AddColumn";
+
 export interface IColumnProjection {
     title: string;
     type?: string;
     width: number;
-    picklistValues?: []
+    picklistValues?: ISelectColorOptions[]
 }
 
 export interface ISpreadSheet {

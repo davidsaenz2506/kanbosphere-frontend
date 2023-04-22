@@ -24,9 +24,11 @@ export const editGridCell = async (
         // @ts-ignore
         let ISODate: Date = new Date(newValue.data.date);
         let newDate: Date = DateTime.fromISO(ISODate.toISOString()).toISO();
-        
+
         data[row][key] = newDate;
     }
+    // @ts-ignore
+    if (type === "picklist") data[row][key] = newValue?.data?.value
 
 
 

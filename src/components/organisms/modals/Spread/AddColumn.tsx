@@ -11,18 +11,31 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Box,
 } from "@chakra-ui/react";
 
 import Select, { SingleValue } from "react-select";
 
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
-import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
+import {
+  IColumnProjection,
+  ISpreadSheet,
+} from "@/domain/entities/spreadsheet.entity";
 import { setSpreadColumns } from "@/utilities/spreadsheet/setSpreadColumns";
+
+import { Tooltip } from "@chakra-ui/react";
+import { getColor } from "@/utilities/spreadsheet/getTagColor";
 
 export interface IPicklistOptions {
   value: string;
   label: string;
+}
+
+export interface ISelectColorOptions {
+  value: string;
+  label: string;
+  color?: string;
 }
 
 const CreateColumn = ({ isOpen, onClose }) => {
@@ -30,11 +43,18 @@ const CreateColumn = ({ isOpen, onClose }) => {
     useCurrentWorkspace();
   const [columnName, setColumnName] = useState("");
   const [columnType, setColumnType] = useState("");
-  const [newColumn, setNewColumn] = useState({
+  const [newColumn, setNewColumn] = useState<IColumnProjection>({
     title: "",
     type: "",
     width: 100,
   });
+
+  const [userClick, setUserClick] = useState<number>(0);
+  const [userTypedValue, setUserTypedValue] = useState<string>("");
+
+  const [userPicklistValues, setUserPicklistValues] = useState<
+    ISelectColorOptions[]
+  >([]);
 
   const [currentSpreadData, setCurrentSpreadData] = useState<ISpreadSheet>({
     columns: [...(data.spreadSheetData?.columns ?? []), newColumn],
@@ -47,8 +67,9 @@ const CreateColumn = ({ isOpen, onClose }) => {
       title: columnName,
       type: columnType,
       width: 100,
+      picklistValues: userPicklistValues,
     });
-  }, [columnName, columnType]);
+  }, [columnName, columnType, userClick, userPicklistValues]);
 
   const statusOptions: IPicklistOptions[] = [
     { value: "string", label: "Texto" },
@@ -57,7 +78,6 @@ const CreateColumn = ({ isOpen, onClose }) => {
     { value: "multipicklist", label: "Multipicklist" },
     { value: "date", label: "Fecha" },
     { value: "datetime", label: "Fecha y Hora" },
-    { value: "article", label: "Articulo" },
     { value: "mail", label: "Correo electronico" },
     { value: "cellphone", label: "Numero celular" },
     { value: "boolean", label: "Checkbox" },
@@ -98,6 +118,81 @@ const CreateColumn = ({ isOpen, onClose }) => {
               }}
             />
           </FormControl>
+
+          {columnType === "picklist" && (
+            <React.Fragment>
+              {" "}
+              <FormControl mt={4}>
+                <FormLabel>Crear valores de picklist</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Ingresa el valor que deseas agregar a la lista"
+                  value={userTypedValue}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setUserTypedValue(e.currentTarget.value)
+                  }
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === "Enter" && e.currentTarget.value) {
+                      setUserTypedValue("");
+                      setUserPicklistValues([
+                        ...userPicklistValues,
+                        {
+                          value: e.currentTarget.value,
+                          label: e.currentTarget.value,
+                          color: getColor(),
+                        },
+                      ]);
+                    }
+                  }}
+                />
+              </FormControl>
+              <div
+                className="miniTargets"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {userPicklistValues.map((individualPicklistValue, index) => (
+                  <React.Fragment>
+                    <Tooltip
+                      label="Click para eliminar"
+                      aria-label="A tooltip"
+                      placement="right"
+                    >
+                      <Box
+                        onMouseEnter={(e) => console.log(e)}
+                        style={{
+                          marginTop: "20px",
+                          backgroundColor: individualPicklistValue.color,
+                          padding: "10px",
+                          borderRadius: "20px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          const newTags = userPicklistValues;
+
+                          newTags.splice(index, 1);
+
+                          setUserPicklistValues(newTags);
+
+                          setUserClick(
+                            Math.floor(Math.random() * (10 - 1) + 1)
+                          );
+                        }}
+                      >
+                        <p style={{ fontWeight: "bolder" }}>
+                          {individualPicklistValue.label}
+                        </p>
+                      </Box>
+                    </Tooltip>
+                  </React.Fragment>
+                ))}
+              </div>
+            </React.Fragment>
+          )}
         </ModalBody>
 
         <ModalFooter>
@@ -116,7 +211,14 @@ const CreateColumn = ({ isOpen, onClose }) => {
           >
             Crear
           </Button>
-          <Button onClick={() => onClose(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setUserPicklistValues([]);
+              onClose(false);
+            }}
+          >
+            Cancel
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
