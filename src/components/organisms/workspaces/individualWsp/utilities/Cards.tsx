@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardHeader, CardBody, CardFooter } from "@chakra-ui/react";
+import { Card, CardBody, CardFooter } from "@chakra-ui/react";
 import { Stack, Image, Heading, Button, Text } from "@chakra-ui/react";
 
 import OpenWorkSpace from "../../../modals/OpenWorkSpace";
@@ -74,13 +74,10 @@ const Cards = () => {
 
         <Stack>
           <CardBody>
-            <Heading size="md">Notas Rapidas</Heading>
+            <Heading size="md">Tumble Employee Management</Heading>
 
             <Text py="2">
-              La herramienta de Notas Rapidas te permite crear una interfaz
-              bastante amigable donde podras registrar datos importantes,
-              incluyendo imagenes, ecuaciones matematicas, graficos y muchas
-              otras opciones más.
+               Establece y gestiona los usuarios de tu empresa utilizando el crud de TEM.
             </Text>
           </CardBody>
 

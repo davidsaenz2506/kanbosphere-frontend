@@ -7,10 +7,7 @@ import {
 } from "@glideapps/glide-data-grid";
 import { DataEditor } from "@glideapps/glide-data-grid";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import {
-  IColumnProjection,
-  ISpreadSheet,
-} from "@/domain/entities/spreadsheet.entity";
+import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { editGridCell } from "./utils/onCellEdites";
 import { getCellData } from "./utils/getCellData";
 import { useCustomCells } from "@glideapps/glide-data-grid";
@@ -19,9 +16,6 @@ import Date from "./fields/date";
 import PickList from "./fields/picklist";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
-import { UpdateWorkSpace } from "@/services/workspaces/update";
-import { update } from "lodash";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { sendNewColumnsToServer } from "./utils/functions/sendColumnsToServet";
 
 interface ISpreadProps {

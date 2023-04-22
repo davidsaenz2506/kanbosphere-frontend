@@ -5,7 +5,6 @@ import styles from "../../../../../styles/cardlane.module.css";
 import MiniCard from "./MiniCard";
 
 const LaneComponent = ({ title, bgColor, data, targetColor }) => {
-
   return (
     <Card
       className={styles.container}
@@ -17,13 +16,14 @@ const LaneComponent = ({ title, bgColor, data, targetColor }) => {
       }}
     >
       <CardHeader>
-        <Heading size="md" sx={{color: "white"}}> {title} {data.length} </Heading>
+        <Heading size="md" sx={{ color: "#182433", textAlign: "center" }}>
+          {" "}
+          {title}: {data.length}{" "}
+        </Heading>
       </CardHeader>
-      <CardBody sx={{marginTop: "-20px", cursor: "default"}}>
+      <CardBody sx={{ marginTop: "-20px", cursor: "default" }}>
         {data.map((item: any, key: number) => {
-          return (
-             <MiniCard key={key} item={item} targetColor={targetColor} />
-          );
+          return <MiniCard key={key} item={item} targetColor={targetColor} />;
         })}
       </CardBody>
     </Card>

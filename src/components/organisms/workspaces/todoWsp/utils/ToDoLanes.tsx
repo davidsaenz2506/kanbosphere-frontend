@@ -5,6 +5,8 @@ import LaneComponent from "./LaneComponent";
 
 const ToDoLanes = () => {
   const { currentWorkSpace: data } = useCurrentWorkspace();
+  const backGroundLaneColor = "#e2e2e2";
+
   return (
     <div
       style={{
@@ -17,7 +19,7 @@ const ToDoLanes = () => {
     >
       <LaneComponent
         title="Nuevas"
-        bgColor="#78bfd6"
+        bgColor={backGroundLaneColor}
         targetColor="#f1ebac"
         data={
           data.wspData
@@ -29,7 +31,7 @@ const ToDoLanes = () => {
       />
       <LaneComponent
         title="En proceso"
-        bgColor="#78bfd6"
+        bgColor={backGroundLaneColor}
         targetColor="#d9d9de"
         data={
           data.wspData
@@ -41,7 +43,7 @@ const ToDoLanes = () => {
       />
       <LaneComponent
         title="Para revisión"
-        bgColor="#78bfd6"
+        bgColor={backGroundLaneColor}
         targetColor="#78bfd6"
         data={
           data.wspData
@@ -53,7 +55,7 @@ const ToDoLanes = () => {
       />
       <LaneComponent
         title="Finalizadas"
-        bgColor="#78bfd6"
+        bgColor={backGroundLaneColor}
         targetColor="#88daab"
         data={
           data.wspData
@@ -65,7 +67,7 @@ const ToDoLanes = () => {
       />
       <LaneComponent
         title="Bloqueadas"
-        bgColor="#78bfd6"
+        bgColor={backGroundLaneColor}
         targetColor="#ff866c"
         data={
           data.wspData

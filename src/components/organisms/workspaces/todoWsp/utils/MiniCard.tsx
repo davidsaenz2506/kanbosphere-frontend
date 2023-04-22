@@ -32,7 +32,7 @@ const MiniCard = (Props: IMiniCardProps) => {
         backgroundColor: "white",
         marginBottom: "20px",
         padding: "15px",
-        borderRadius: "10px",
+        borderRadius: "5px",
         cursor: isClicked ? "default" : "pointer",
         border: isClicked ? "1px solid black" : "none",
       }}
