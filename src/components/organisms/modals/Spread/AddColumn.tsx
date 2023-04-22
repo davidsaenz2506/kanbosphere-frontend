@@ -63,9 +63,34 @@ const CreateColumn = ({ isOpen, onClose }) => {
   ];
 
   function setSpreadColumns() {
+    let newUserRows = [];
+
+    if (data.spreadSheetData?.data) {
+      const dataMatrix = data.spreadSheetData?.data;
+
+      let newSpreadData = data.spreadSheetData;
+
+      dataMatrix.forEach((individualRow: object) => {
+        data.spreadSheetData?.columns.forEach((userColumn) => {
+          if (!individualRow.hasOwnProperty(userColumn?.title)) {
+            individualRow[userColumn?.title] = "";
+          }
+        });
+        // @ts-ignore
+        newUserRows.push(individualRow);
+      });
+      // @ts-ignore
+      newSpreadData.data = newUserRows;
+      setUserTasks({
+        ...data,
+        spreadSheetData: newSpreadData,
+      });
+    }
+
     setCurrentSpreadData({
       columns: [...(data.spreadSheetData?.columns ?? []), newColumn],
-      data: data.spreadSheetData?.data ?? [],
+      // @ts-ignore
+      data: newUserRows ?? [],
       userId: data.spreadSheetData?.userId ?? data.createdById,
     });
   }

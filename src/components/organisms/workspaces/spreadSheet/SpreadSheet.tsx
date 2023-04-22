@@ -9,6 +9,7 @@ import "@glideapps/glide-data-grid/dist/index.css";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import GridDataEditor from "./Grid/DataEditor";
 import CreateColumn from "../../modals/Spread/AddColumn";
+import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState(false);
@@ -17,6 +18,8 @@ const Spreadsheet = () => {
   const userColumns =
     currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns;
   const computedUserDataField = useCurrentUser();
+  const userComputedRows =
+    currentWorkSpace.currentWorkSpace.spreadSheetData?.data;
 
   window.onresize = function onResize() {
     const todoDocument: HTMLDivElement | null =
@@ -44,7 +47,7 @@ const Spreadsheet = () => {
     }
   });
 
-  function addGridRow() {
+  async function addGridRow() {
     const tumbleSpreadRow = {};
     const userColumns =
       currentWorkSpace.currentWorkSpace.spreadSheetData?.columns;
@@ -64,38 +67,11 @@ const Spreadsheet = () => {
       ...currentWorkSpace.currentWorkSpace,
       spreadSheetData: newSpreadData,
     });
+
+    await UpdateWorkSpace(currentWorkSpace.currentWorkSpace);
   }
 
-  React.useEffect(() => {
-    if (currentWorkSpace.currentWorkSpace.spreadSheetData?.data) {
-      const dataMatrix =
-        currentWorkSpace.currentWorkSpace.spreadSheetData?.data;
-      let newUserRows = [];
-      let newSpreadData = currentWorkSpace.currentWorkSpace.spreadSheetData;
-
-      dataMatrix.forEach((individualRow: object) => {
-        currentWorkSpace.currentWorkSpace.spreadSheetData?.columns.forEach(
-          (userColumn) => {
-            if (!individualRow.hasOwnProperty(userColumn?.title)) {
-              individualRow[userColumn?.title] = "";
-            }
-          }
-        );
-        // @ts-ignore
-        newUserRows.push(individualRow);
-      });
-
-      // @ts-ignore
-      newSpreadData.data = newUserRows;
-
-      currentWorkSpace.setCurrentWorkSpace({
-        ...currentWorkSpace.currentWorkSpace,
-        spreadSheetData: newSpreadData,
-      });
-    }
-  }, [userColumns]);
-
-  console.log(currentWorkSpace.currentWorkSpace.spreadSheetData)
+  console.log(currentWorkSpace.currentWorkSpace.spreadSheetData);
 
   return (
     <div
