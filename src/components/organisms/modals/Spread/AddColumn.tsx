@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -18,6 +18,7 @@ import Select, { SingleValue } from "react-select";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
+import { setSpreadColumns } from "@/utilities/spreadsheet/setSpreadColumns";
 
 export interface IPicklistOptions {
   value: string;
@@ -62,39 +63,6 @@ const CreateColumn = ({ isOpen, onClose }) => {
     { value: "boolean", label: "Checkbox" },
   ];
 
-  function setSpreadColumns() {
-    let newUserRows = [];
-
-    if (data.spreadSheetData?.data) {
-      const dataMatrix = data.spreadSheetData?.data;
-
-      let newSpreadData = data.spreadSheetData;
-
-      dataMatrix.forEach((individualRow: object) => {
-        data.spreadSheetData?.columns.forEach((userColumn) => {
-          if (!individualRow.hasOwnProperty(userColumn?.title)) {
-            individualRow[userColumn?.title] = "";
-          }
-        });
-        // @ts-ignore
-        newUserRows.push(individualRow);
-      });
-      // @ts-ignore
-      newSpreadData.data = newUserRows;
-      setUserTasks({
-        ...data,
-        spreadSheetData: newSpreadData,
-      });
-    }
-
-    setCurrentSpreadData({
-      columns: [...(data.spreadSheetData?.columns ?? []), newColumn],
-      // @ts-ignore
-      data: newUserRows ?? [],
-      userId: data.spreadSheetData?.userId ?? data.createdById,
-    });
-  }
-
   async function addColumn() {
     setUserTasks({ ...data, spreadSheetData: currentSpreadData });
     await UpdateWorkSpace(data);
@@ -126,7 +94,7 @@ const CreateColumn = ({ isOpen, onClose }) => {
             <Select
               options={statusOptions}
               onChange={(e: SingleValue<IPicklistOptions>) => {
-                if (e) setColumnType(e.label);
+                if (e) setColumnType(e.value);
               }}
             />
           </FormControl>
@@ -137,7 +105,12 @@ const CreateColumn = ({ isOpen, onClose }) => {
             colorScheme="blue"
             mr={3}
             onClick={() => {
-              setSpreadColumns();
+              setSpreadColumns(
+                data,
+                setUserTasks,
+                setCurrentSpreadData,
+                newColumn
+              );
               onClose(false);
             }}
           >

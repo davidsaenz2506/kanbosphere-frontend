@@ -5,9 +5,6 @@ import LaneComponent from "./LaneComponent";
 
 const ToDoLanes = () => {
   const { currentWorkSpace: data } = useCurrentWorkspace();
-
-  console.log(data.wspData);
-
   return (
     <div
       style={{

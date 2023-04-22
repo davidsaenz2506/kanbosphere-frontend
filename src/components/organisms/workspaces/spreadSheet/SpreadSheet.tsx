@@ -10,16 +10,15 @@ import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook"
 import GridDataEditor from "./Grid/DataEditor";
 import CreateColumn from "../../modals/Spread/AddColumn";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
+import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
+import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
+import { IColumnProjection, ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
 const Spreadsheet = () => {
-  const [addTask, setAddTask] = useState(false);
+  const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
-  const currentWorkSpace = useCurrentWorkspace();
-  const userColumns =
-    currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns;
-  const computedUserDataField = useCurrentUser();
-  const userComputedRows =
-    currentWorkSpace.currentWorkSpace.spreadSheetData?.data;
+  const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
+  const computedUserDataField: ICurrentUserContext = useCurrentUser();
 
   window.onresize = function onResize() {
     const todoDocument: HTMLDivElement | null =
@@ -49,7 +48,7 @@ const Spreadsheet = () => {
 
   async function addGridRow() {
     const tumbleSpreadRow = {};
-    const userColumns =
+    const userColumns: IColumnProjection[] | undefined =
       currentWorkSpace.currentWorkSpace.spreadSheetData?.columns;
 
     userColumns?.forEach((individualColumn) => {
@@ -58,7 +57,7 @@ const Spreadsheet = () => {
       }
     });
 
-    let newSpreadData = currentWorkSpace.currentWorkSpace.spreadSheetData;
+    let newSpreadData: ISpreadSheet | undefined = currentWorkSpace.currentWorkSpace.spreadSheetData;
 
     // @ts-ignore
     newSpreadData?.data?.push(tumbleSpreadRow);
@@ -70,8 +69,6 @@ const Spreadsheet = () => {
 
     await UpdateWorkSpace(currentWorkSpace.currentWorkSpace);
   }
-
-  console.log(currentWorkSpace.currentWorkSpace.spreadSheetData);
 
   return (
     <div

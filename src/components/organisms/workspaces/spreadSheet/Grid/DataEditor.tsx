@@ -1,12 +1,13 @@
 import React, { useCallback } from "react";
-import {
-  Item,
-  GridCell,
-  GridCellKind,
-  GridColumn,
-} from "@glideapps/glide-data-grid";
+import { Item, GridCell, EditableGridCell } from "@glideapps/glide-data-grid";
 import { DataEditor } from "@glideapps/glide-data-grid";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
+import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
+import { editGridCell } from "./utils/onCellEdites";
+import { getCellData } from "./utils/getCellData";
+import { useCustomCells } from "@glideapps/glide-data-grid";
+
+import Date from "./fields/date";
 
 interface ISpreadProps {
   data: any;
@@ -15,28 +16,22 @@ interface ISpreadProps {
 const GridDataEditor = (Props: ISpreadProps) => {
   const { data } = Props;
   const currentUserWsp = useCurrentWorkspace();
-  const columns =
+  const columns: IColumnProjection[] =
     currentUserWsp.currentWorkSpace.spreadSheetData?.columns ?? [];
 
-  function getData([col, row]: Item): GridCell {
-    const dataRow = data[row];
-    const columnsCol = columns[col];
-    const field = columnsCol?.title;
+  const CustomCells = useCustomCells([Date]);
 
-    return {
-      kind: GridCellKind.Text,
-      data: dataRow[field] ?? "",
-      allowOverlay: true,
-      displayData: dataRow[field] ?? "",
-    };
-  }
+  const getUserData = useCallback(
+    ([col, row]: Item): GridCell => getCellData([col, row], data, columns),
+    [data, columns]
+  );
 
-  const onCellEdited = useCallback((cell, newValue) => {
-    const [col, row] = cell;
-    const key = columns[col]?.title;
-
-    data[row][key] = newValue.data;
-  }, [columns]);
+  const onCellEdited = useCallback(
+    (cell: Item, newValue: EditableGridCell) => {
+      editGridCell(cell, columns, data, newValue, currentUserWsp);
+    },
+    [columns, data]
+  );
 
   return (
     <div
@@ -50,9 +45,10 @@ const GridDataEditor = (Props: ISpreadProps) => {
       <DataEditor
         columns={columns}
         onCellEdited={onCellEdited}
+        {...CustomCells}
         rowMarkers="both"
         rows={data.length}
-        getCellContent={getData}
+        getCellContent={getUserData}
         width={"100%"}
         height={"100%"}
         smoothScrollX={true}

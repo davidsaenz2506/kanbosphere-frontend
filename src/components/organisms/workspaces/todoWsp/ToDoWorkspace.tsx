@@ -6,11 +6,12 @@ import { AddIcon } from "@chakra-ui/icons";
 import AddTask from "../../modals/AddTask";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { getFirstName } from "@/utilities/getFirstName";
+import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
-  const computedUserDataField = useCurrentUser();
+  const computedUserDataField: ICurrentUserContext = useCurrentUser();
 
   window.onresize = function onResize() {
     const todoDocument: HTMLDivElement | null =
