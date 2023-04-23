@@ -13,8 +13,6 @@ interface DatePickerCellProps {
   readonly format: "date" | "datetime-local";
 }
 
-import { DateTime } from "luxon";
-
 export type DatePickerCell = CustomCell<DatePickerCellProps>;
 
 const renderer: CustomRenderer<DatePickerCell> = {

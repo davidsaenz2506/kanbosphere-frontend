@@ -20,7 +20,6 @@ import jwtDecode from "jwt-decode";
 import { GetCurrentUser } from "@/services/user/getCurrentUser";
 import { getFirstName } from "@/utilities/getFirstName";
 import Loading from "@/components/molecules/Loading";
-import { set } from "lodash";
 
 const PortalUser = () => {
   const [workspaceFlow, setWorkspaceFlow] = useState("");
