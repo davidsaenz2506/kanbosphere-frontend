@@ -13,8 +13,7 @@ const ToDoLanes = () => {
         display: "flex",
         flexDirection: "row",
         marginTop: "30px",
-        maxHeight: "82%",
-        minHeight: "82%",
+        height: "90%"
       }}
     >
       <LaneComponent

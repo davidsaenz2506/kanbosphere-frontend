@@ -19,7 +19,6 @@ export const editGridCell = async (
     if (type === "boolean") data[row][key] = newValue.data;
     if (type === "number") data[row][key] = newValue.data;
 
-
     if (type === "date") {
         // @ts-ignore
         let ISODate: Date = new Date(newValue.data.date);
@@ -33,7 +32,21 @@ export const editGridCell = async (
     // @ts-ignore
     if (type === "multipicklist") data[row][key] = newValue.data.tags.join(";");
 
+    if (type === "mail") {
+        const errors: string[] = [];
+        if (typeof newValue.data === "string") {
+            let res = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
+            const valor = res.test(newValue.data);
+
+            if (!valor) errors.push("err::invalidEmail");
+        }
+
+        if (errors.length) {
+            return false;
+        } else data[row][key] = newValue.data;
+    }
 
     await UpdateWorkSpace(currentUserWsp.currentWorkSpace);
+    return true;
 };

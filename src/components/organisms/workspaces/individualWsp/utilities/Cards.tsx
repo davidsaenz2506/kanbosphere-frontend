@@ -17,6 +17,7 @@ const Cards = () => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        paddingBottom: "60px",
       }}
     >
       <OpenWorkSpace
@@ -77,7 +78,8 @@ const Cards = () => {
             <Heading size="md">Tumble Employee Management</Heading>
 
             <Text py="2">
-               Establece y gestiona los usuarios de tu empresa utilizando el crud de TEM.
+              Establece y gestiona los usuarios de tu empresa utilizando el crud
+              de TEM.
             </Text>
           </CardBody>
 

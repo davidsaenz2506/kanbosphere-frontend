@@ -12,7 +12,10 @@ import CreateColumn from "../../modals/Spread/AddColumn";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
-import { IColumnProjection, ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
+import {
+  IColumnProjection,
+  ISpreadSheet,
+} from "@/domain/entities/spreadsheet.entity";
 
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
@@ -57,7 +60,8 @@ const Spreadsheet = () => {
       }
     });
 
-    let newSpreadData: ISpreadSheet | undefined = currentWorkSpace.currentWorkSpace.spreadSheetData;
+    let newSpreadData: ISpreadSheet | undefined =
+      currentWorkSpace.currentWorkSpace.spreadSheetData;
 
     // @ts-ignore
     newSpreadData?.data?.push(tumbleSpreadRow);

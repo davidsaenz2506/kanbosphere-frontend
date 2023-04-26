@@ -13,6 +13,8 @@ import FileViewer from "./FileViewer";
 import Loading from "@/components/molecules/Loading";
 import { Portal } from "@chakra-ui/react";
 
+import { useToast } from "@chakra-ui/react";
+
 const EditTask = ({ isOpen, onClose, data }) => {
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
@@ -38,6 +40,7 @@ const EditTask = ({ isOpen, onClose, data }) => {
   const [openModalForFiles, setOpenModalForFiles] = useState(false);
   const [loadingAsyncEdit, setLoadingAsyncEdit] = useState(false);
   const ref = useRef<Element | null>(null);
+  const toastNotification = useToast();
 
   useEffect(() => {
     ref.current = document.querySelector<HTMLElement>("#root");
@@ -105,6 +108,26 @@ const EditTask = ({ isOpen, onClose, data }) => {
     });
 
     setUserTasks({ ...wspData, data: modifiedWorkSpaceData });
+  }
+
+  async function handleSendNewTask() {
+    setLoadingAsyncEdit(true);
+
+    editCurrentTask(modifiedTask);
+
+    await UpdateWorkSpace(wspData);
+    setLoadingAsyncEdit(false);
+
+    toastNotification({
+      title: "Correcto",
+      description:
+        "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
+      status: "success",
+      duration: 4000,
+      isClosable: true,
+    });
+
+    onClose(false);
   }
 
   function deleteFileFromDirectory() {
@@ -209,14 +232,17 @@ const EditTask = ({ isOpen, onClose, data }) => {
           </Button>
           <Button
             onClick={async () => {
-              setLoadingAsyncEdit(true);
-
-              editCurrentTask(modifiedTask);
-
-              await UpdateWorkSpace(wspData);
-              setLoadingAsyncEdit(false);
-
-              onClose(false);
+              try {
+                handleSendNewTask();
+              } catch (error) {
+                toastNotification({
+                  title: "Ups, algo ha ocurrido...",
+                  description: "Comprueba tu conexión a Internet.",
+                  status: "error",
+                  duration: 4000,
+                  isClosable: true,
+                });
+              }
             }}
             auto
           >

@@ -12,7 +12,7 @@ const UserWorkSpace = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          flexDirection: "column",
+          flexDirection: "column"
         }}
       >
         <h2

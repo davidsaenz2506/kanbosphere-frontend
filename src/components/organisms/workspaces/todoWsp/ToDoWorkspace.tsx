@@ -51,6 +51,7 @@ const ToDoWorkspace = () => {
           justifyContent: "space-between",
           alignItems: "center",
           position: "sticky",
+          height: "12%",
           left: 0,
         }}
       >
@@ -76,8 +77,9 @@ const ToDoWorkspace = () => {
           </Button>
         </div>
       </div>
-
-      <ToDoLanes />
+      <div style={{ height: "90%" }}>
+        <ToDoLanes />
+      </div>
     </div>
   );
 };

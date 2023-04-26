@@ -20,6 +20,8 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 import { sendNewColumnsToServer } from "./utils/functions/sendColumnsToServet";
 
+import { useToast } from "@chakra-ui/react";
+
 interface ISpreadProps {
   data: any;
 }
@@ -28,6 +30,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
   const { data } = Props;
   const currentUserWsp = useCurrentWorkspace();
   const currentUser = useCurrentUser();
+  const toastNotification = useToast();
   const columns: IColumnProjection[] =
     currentUserWsp.currentWorkSpace.spreadSheetData?.columns ?? [];
 
@@ -45,9 +48,37 @@ const GridDataEditor = (Props: ISpreadProps) => {
     [data, userColumns]
   );
 
+  function handleStateForNotificationSnack(staticValueFromServer: boolean) {
+    if (!staticValueFromServer)
+      toastNotification({
+        title: "Ups, algo ha ocurrido...",
+        description: "Asegúrate de ingresar los datos correctamente",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    else
+      toastNotification({
+        title: "Correcto",
+        description:
+          "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+  }
+
   const onCellEdited = useCallback(
-    (cell: Item, newValue: EditableGridCell) => {
-      editGridCell(cell, userColumns, data, newValue, currentUserWsp);
+    async (cell: Item, newValue: EditableGridCell) => {
+      const validationExportedFromUtils: boolean = await editGridCell(
+        cell,
+        userColumns,
+        data,
+        newValue,
+        currentUserWsp
+      );
+
+      handleStateForNotificationSnack(validationExportedFromUtils);
     },
     [userColumns, data]
   );
