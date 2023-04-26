@@ -15,6 +15,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@glideapps/glide-data-grid": "^5.2.1",
+    "@linaria/react": "^4.3.7",
     "@nextui-org/react": "^1.0.0-beta.12",
     "@types/node": "18.15.0",
     "@types/react": "18.0.28",

@@ -12,69 +12,84 @@ export const getCellData = (
     const columnType: string | undefined = columnsCol.type;
     const field: string = columnsCol?.title;
 
-    if (columnType === "string")
-        return {
-            kind: GridCellKind.Text,
-            data: dataRow[field] ?? "",
-            allowOverlay: true,
-            displayData: dataRow[field] ?? "",
-        };
+    switch (columnType) {
+        case "string":
+            return {
+                kind: GridCellKind.Text,
+                data: dataRow[field] ?? "",
+                allowOverlay: true,
+                displayData: dataRow[field] ?? "",
+            };
 
-    if (columnType === "boolean")
-        return {
-            kind: GridCellKind.Boolean,
-            data: dataRow[field] || false,
-            allowOverlay: false,
-        };
+        case "boolean":
+            return {
+                kind: GridCellKind.Boolean,
+                data: dataRow[field] || false,
+                allowOverlay: false,
+            };
 
-    if (columnType === "number")
-        return {
-            kind: GridCellKind.Number,
-            data: dataRow[field] ?? "",
-            allowOverlay: true,
-            displayData: dataRow[field].toString() ?? "",
-        };
+        case "number":
+            return {
+                kind: GridCellKind.Number,
+                data: dataRow[field] ?? "",
+                allowOverlay: true,
+                displayData: dataRow[field]?.toString() ?? "",
+            };
 
-    if (columnType === "date") {
-        const newUserDate = new Date(new Date(dataRow[field])).toUTCString();
-        const jsonDate = new Date(newUserDate).toJSON();
+        case "date":
+            const newUserDate = new Date(new Date(dataRow[field])).toUTCString();
+            const jsonDate = new Date(newUserDate).toJSON();
 
-        let renderDateFromServer = "";
+            let renderDateFromServer = "";
 
-        if (jsonDate) {
-            renderDateFromServer = DateTime.fromSQL(jsonDate.split("T")[0]).toFormat("DDD");
-        }
+            if (jsonDate) {
+                renderDateFromServer = DateTime.fromSQL(
+                    jsonDate.split("T")[0]
+                ).toFormat("DDD");
+            }
 
-        return {
-            kind: GridCellKind.Custom,
-            data: {
-                type: "date",
-                date: dataRow[field] ? dataRow[field] : DateTime.now(),
-                displayDate: !dataRow[field] ? "" : renderDateFromServer,
-                format: "date",
-            },
-            allowOverlay: true,
-            copyData: "",
-        };
+            return {
+                kind: GridCellKind.Custom,
+                data: {
+                    type: "date",
+                    date: dataRow[field] ? dataRow[field] : DateTime.now(),
+                    displayDate: !dataRow[field] ? "" : renderDateFromServer,
+                    format: "date",
+                },
+                allowOverlay: true,
+                copyData: "",
+            };
+
+        case "picklist":
+            return {
+                kind: GridCellKind.Custom,
+                data: {
+                    type: "picklist",
+                    value: dataRow[field] ?? "",
+                    allowedValues: columnsCol?.picklistValues,
+                },
+                allowOverlay: true,
+                copyData: "",
+            };
+
+        case "multipicklist":
+            return {
+                kind: GridCellKind.Custom,
+                data: {
+                    type: "multipicklist",
+                    tags: dataRow[field] ? dataRow[field].split(";") : "",
+                    possibleTags: columnsCol?.picklistValues,
+                },
+                allowOverlay: true,
+                copyData: "",
+            }
+
+        default:
+            return {
+                kind: GridCellKind.Text,
+                data: dataRow[field] ?? "",
+                allowOverlay: true,
+                displayData: dataRow[field] ?? "",
+            };
     }
-
-    if (columnType === "picklist") return {
-        kind: GridCellKind.Custom,
-        data: {
-            type: "picklist",
-            value: dataRow[field] ?? "",
-            allowedValues: columnsCol?.picklistValues,
-        },
-        allowOverlay: true,
-        copyData: ""
-    }
-
-
-    else
-        return {
-            kind: GridCellKind.Text,
-            data: dataRow[field] ?? "",
-            allowOverlay: true,
-            displayData: dataRow[field] ?? "",
-        };
 };

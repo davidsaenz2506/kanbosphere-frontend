@@ -14,6 +14,8 @@ import { useCustomCells } from "@glideapps/glide-data-grid";
 
 import Date from "./fields/date";
 import PickList from "./fields/picklist";
+import Multipicklist from "./fields/multipicklist";
+
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 import { sendNewColumnsToServer } from "./utils/functions/sendColumnsToServet";
@@ -32,7 +34,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
   const [userColumns, setUserColumns] =
     React.useState<IColumnProjection[]>(columns);
 
-  const CustomCells = useCustomCells([Date, PickList]);
+  const CustomCells = useCustomCells([Date, PickList, Multipicklist]);
 
   React.useEffect(() => {
     setUserColumns(columns);

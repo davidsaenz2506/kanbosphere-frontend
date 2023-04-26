@@ -28,7 +28,10 @@ export const editGridCell = async (
         data[row][key] = newDate;
     }
     // @ts-ignore
-    if (type === "picklist") data[row][key] = newValue?.data?.value
+    if (type === "picklist") data[row][key] = newValue?.data?.value;
+
+    // @ts-ignore
+    if (type === "multipicklist") data[row][key] = newValue.data.tags.join(";");
 
 
 

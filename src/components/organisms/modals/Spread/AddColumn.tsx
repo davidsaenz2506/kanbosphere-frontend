@@ -119,80 +119,81 @@ const CreateColumn = ({ isOpen, onClose }) => {
             />
           </FormControl>
 
-          {columnType === "picklist" && (
-            <React.Fragment>
-              {" "}
-              <FormControl mt={4}>
-                <FormLabel>Crear valores de picklist</FormLabel>
-                <Input
-                  type="text"
-                  placeholder="Ingresa el valor que deseas agregar a la lista"
-                  value={userTypedValue}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setUserTypedValue(e.currentTarget.value)
-                  }
-                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                    if (e.key === "Enter" && e.currentTarget.value) {
-                      setUserTypedValue("");
-                      setUserPicklistValues([
-                        ...userPicklistValues,
-                        {
-                          value: e.currentTarget.value,
-                          label: e.currentTarget.value,
-                          color: getColor(),
-                        },
-                      ]);
+          {columnType === "picklist" ||
+            (columnType === "multipicklist" && (
+              <React.Fragment>
+                {" "}
+                <FormControl mt={4}>
+                  <FormLabel>Crear valores de picklist</FormLabel>
+                  <Input
+                    type="text"
+                    placeholder="Ingresa el valor que deseas agregar a la lista"
+                    value={userTypedValue}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setUserTypedValue(e.currentTarget.value)
                     }
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                      if (e.key === "Enter" && e.currentTarget.value) {
+                        setUserTypedValue("");
+                        setUserPicklistValues([
+                          ...userPicklistValues,
+                          {
+                            value: e.currentTarget.value,
+                            label: e.currentTarget.value,
+                            color: getColor(),
+                          },
+                        ]);
+                      }
+                    }}
+                  />
+                </FormControl>
+                <div
+                  className="miniTargets"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
-                />
-              </FormControl>
-              <div
-                className="miniTargets"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {userPicklistValues.map((individualPicklistValue, index) => (
-                  <React.Fragment>
-                    <Tooltip
-                      label="Click para eliminar"
-                      aria-label="A tooltip"
-                      placement="right"
-                    >
-                      <Box
-                        onMouseEnter={(e) => console.log(e)}
-                        style={{
-                          marginTop: "20px",
-                          backgroundColor: individualPicklistValue.color,
-                          padding: "10px",
-                          borderRadius: "20px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          const newTags = userPicklistValues;
-
-                          newTags.splice(index, 1);
-
-                          setUserPicklistValues(newTags);
-
-                          setUserClick(
-                            Math.floor(Math.random() * (10 - 1) + 1)
-                          );
-                        }}
+                >
+                  {userPicklistValues.map((individualPicklistValue, index) => (
+                    <React.Fragment>
+                      <Tooltip
+                        label="Click para eliminar"
+                        aria-label="A tooltip"
+                        placement="right"
                       >
-                        <p style={{ fontWeight: "bolder" }}>
-                          {individualPicklistValue.label}
-                        </p>
-                      </Box>
-                    </Tooltip>
-                  </React.Fragment>
-                ))}
-              </div>
-            </React.Fragment>
-          )}
+                        <Box
+                          onMouseEnter={(e) => console.log(e)}
+                          style={{
+                            marginTop: "20px",
+                            backgroundColor: individualPicklistValue.color,
+                            padding: "10px",
+                            borderRadius: "20px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            const newTags = userPicklistValues;
+
+                            newTags.splice(index, 1);
+
+                            setUserPicklistValues(newTags);
+
+                            setUserClick(
+                              Math.floor(Math.random() * (10 - 1) + 1)
+                            );
+                          }}
+                        >
+                          <p style={{ fontWeight: "bolder" }}>
+                            {individualPicklistValue.label}
+                          </p>
+                        </Box>
+                      </Tooltip>
+                    </React.Fragment>
+                  ))}
+                </div>
+              </React.Fragment>
+            ))}
         </ModalBody>
 
         <ModalFooter>
