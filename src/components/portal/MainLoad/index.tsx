@@ -28,7 +28,7 @@ export const MainLoad = () => {
           </div>
           <div className={styles.userProps}>
             <WeatherComponent />
-            <UserComponent/>
+            <UserComponent />
           </div>
         </div>
         <div className="tumbleNewsSection"></div>
