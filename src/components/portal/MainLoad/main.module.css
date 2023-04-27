@@ -1,0 +1,150 @@
+.mainContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.weatherSection {
+  margin-top: 30px;
+  width: 50%;
+}
+
+.weatherCard {
+  padding: 20px;
+  border: none;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: row;
+  background-color: #7c9bb8;
+  color: white;
+  height: 100%;
+}
+
+.weatherImage {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.currentLocation {
+  width: 50%;
+  text-align: center;
+  padding: 20px;
+}
+
+.currentLocation p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.currentUserSection {
+  width: 50%;
+  margin-top: 30px;
+}
+
+.userInfo {
+  text-align: center;
+  margin-top: -20px;
+  margin-bottom: 10px;
+}
+
+.userProps {
+  display: flex;
+}
+
+.userNewsSection {
+}
+
+.mainContainer {
+  padding: 40px;
+  width: 100%;
+  overflow-y: scroll;
+  background-color: #002c49;
+  height: 100vh;
+}
+
+.userCard {
+  padding: 20px;
+  border: none;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: row;
+  background-color: #536079;
+  color: white;
+  height: 100%;
+  margin-left: 20px;
+}
+
+.userImage {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.currentUser {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 50%;
+  text-align: start;
+  padding: 20px;
+}
+
+.currentUser p {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@media (max-width: 1540px) {
+  .userCard {
+    flex-direction: column;
+  }
+
+  .userImage {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .currentUser {
+    width: 100%;
+    align-items: center;
+  }
+
+  .weatherCard {
+    flex-direction: column;
+
+    align-items: center;
+  }
+
+  .weatherImage {
+    width: 30%;
+    height: 200px;
+    margin-top: 20px;
+  }
+
+  .currentLocation {
+    width: 100%;
+    align-items: center;
+  }
+}
+
+@media (max-width: 1250px) {
+  .currentLocation p {
+    font-size: 15px;
+  }
+
+  .currentLocation h3 {
+    font-size: 20px;
+  }
+
+  .currentUser p {
+    font-size: 15px;
+  }
+
+  .currentUser h3 {
+    font-size: 20px;
+  }
+}

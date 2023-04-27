@@ -4,10 +4,12 @@ import UserWorkSpace from "./individualWsp/UserWorkSpace";
 
 import ToDoWorkSpace from "./todoWsp/ToDoWorkspace";
 import Spreadsheet from "./spreadSheet/SpreadSheet";
+import { MainLoad } from "@/components/portal/MainLoad";
 
 const WorkspaceManager = ({ workspaceFlow }) => {
   return (
     <>
+      {workspaceFlow === "" && <MainLoad />}
       {workspaceFlow === "wspUser" && <UserWorkSpace />}
       {workspaceFlow === "To Do" && <ToDoWorkSpace />}
       {workspaceFlow === "Tumble Spreadsheet" && <Spreadsheet />}
