@@ -8,7 +8,6 @@ import {
 } from "@glideapps/glide-data-grid";
 import * as React from "react";
 import { roundedRect } from "./draw-fns";
-import { m } from "framer-motion";
 
 interface TagsCellProps {
   readonly kind: "multipicklist";

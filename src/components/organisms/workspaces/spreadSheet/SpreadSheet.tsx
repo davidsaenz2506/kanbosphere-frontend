@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 
-import { Button } from "@chakra-ui/react";
-import { AddIcon, ExternalLinkIcon, PlusSquareIcon } from "@chakra-ui/icons";
+import { Button, useToast } from "@chakra-ui/react";
+import {
+  AddIcon,
+  ExternalLinkIcon,
+  PlusSquareIcon,
+  DeleteIcon,
+} from "@chakra-ui/icons";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { getFirstName } from "@/utilities/getFirstName";
 
@@ -9,19 +14,22 @@ import "@glideapps/glide-data-grid/dist/index.css";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import GridDataEditor from "./Grid/DataEditor";
 import CreateColumn from "../../modals/Spread/AddColumn";
-import { UpdateWorkSpace } from "@/services/workspaces/update";
+
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
-import {
-  IColumnProjection,
-  ISpreadSheet,
-} from "@/domain/entities/spreadsheet.entity";
+
+import { deleteIndividualGridRow } from "./Grid/utils/functions/deleteIndividualGridRows";
+import { addGridRow } from "./Grid/utils/functions/addGridRow";
 
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
   const computedUserDataField: ICurrentUserContext = useCurrentUser();
+
+  const [currentRowsSelected, setCurrentRowsSelected] = useState<number>();
+
+  const toastNotification = useToast();
 
   window.onresize = function onResize() {
     const todoDocument: HTMLDivElement | null =
@@ -48,31 +56,6 @@ const Spreadsheet = () => {
       }px`;
     }
   });
-
-  async function addGridRow() {
-    const tumbleSpreadRow = {};
-    const userColumns: IColumnProjection[] | undefined =
-      currentWorkSpace.currentWorkSpace.spreadSheetData?.columns;
-
-    userColumns?.forEach((individualColumn) => {
-      if (!tumbleSpreadRow.hasOwnProperty(individualColumn?.title)) {
-        tumbleSpreadRow[individualColumn?.title] = "";
-      }
-    });
-
-    let newSpreadData: ISpreadSheet | undefined =
-      currentWorkSpace.currentWorkSpace.spreadSheetData;
-
-    // @ts-ignore
-    newSpreadData?.data?.push(tumbleSpreadRow);
-
-    currentWorkSpace.setCurrentWorkSpace({
-      ...currentWorkSpace.currentWorkSpace,
-      spreadSheetData: newSpreadData,
-    });
-
-    await UpdateWorkSpace(currentWorkSpace.currentWorkSpace);
-  }
 
   return (
     <div
@@ -118,9 +101,24 @@ const Spreadsheet = () => {
             </Button>
           </div>
           <div style={{ marginRight: "20px" }}>
-            <Button onClick={() => addGridRow()}>
+            <Button onClick={() => addGridRow(currentWorkSpace)}>
               <PlusSquareIcon sx={{ marginRight: "10px" }} />
               Añadir fila
+            </Button>
+          </div>
+          <div style={{ marginRight: "20px" }}>
+            <Button
+              onClick={() =>
+                deleteIndividualGridRow(
+                  currentRowsSelected,
+                  currentWorkSpace,
+                  toastNotification
+                )
+              }
+              isDisabled={currentRowsSelected !== undefined ? false : true}
+            >
+              <DeleteIcon sx={{ marginRight: "10px" }} />
+              Eliminar fila
             </Button>
           </div>
           <div style={{ marginRight: "20px" }}>
@@ -142,6 +140,7 @@ const Spreadsheet = () => {
       >
         <GridDataEditor
           data={currentWorkSpace.currentWorkSpace.spreadSheetData?.data ?? []}
+          setCurrentRowsSelected={setCurrentRowsSelected}
         />
       </div>
     </div>

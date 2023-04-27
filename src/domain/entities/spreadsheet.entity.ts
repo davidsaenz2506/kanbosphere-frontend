@@ -10,5 +10,5 @@ export interface IColumnProjection {
 export interface ISpreadSheet {
     userId: string,
     columns: IColumnProjection[],
-    data?: []
+    data: []
 }

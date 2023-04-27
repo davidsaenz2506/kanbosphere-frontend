@@ -1,9 +1,11 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import {
   Item,
   GridCell,
   EditableGridCell,
   GridColumn,
+  CompactSelection,
+  GridSelection,
 } from "@glideapps/glide-data-grid";
 import { DataEditor } from "@glideapps/glide-data-grid";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
@@ -24,15 +26,25 @@ import { useToast } from "@chakra-ui/react";
 
 interface ISpreadProps {
   data: any;
+  setCurrentRowsSelected: any;
 }
 
 const GridDataEditor = (Props: ISpreadProps) => {
-  const { data } = Props;
+  const { data, setCurrentRowsSelected } = Props;
   const currentUserWsp = useCurrentWorkspace();
   const currentUser = useCurrentUser();
   const toastNotification = useToast();
   const columns: IColumnProjection[] =
     currentUserWsp.currentWorkSpace.spreadSheetData?.columns ?? [];
+
+  const selection: GridSelection = {
+    current: undefined,
+    columns: CompactSelection.empty(),
+    rows: CompactSelection.empty(),
+  };
+
+  const [userSelection, setUserSelection] =
+    React.useState<GridSelection>(selection);
 
   const [userColumns, setUserColumns] =
     React.useState<IColumnProjection[]>(columns);
@@ -83,6 +95,12 @@ const GridDataEditor = (Props: ISpreadProps) => {
     [userColumns, data]
   );
 
+  React.useEffect(() => { 
+      // @ts-ignore
+      setCurrentRowsSelected(userSelection.rows?.items.length ? userSelection.rows?.items[0][0] : undefined);
+  }, [userSelection.rows]);
+
+
   return (
     <div
       style={{
@@ -113,6 +131,9 @@ const GridDataEditor = (Props: ISpreadProps) => {
           sendNewColumnsToServer(currentUserWsp, currentUser, userColumns, data)
         }
         onCellEdited={onCellEdited}
+        onGridSelectionChange={(e: GridSelection) => {
+          setUserSelection(e);
+        }}
         {...CustomCells}
         rowMarkers="both"
         rows={data.length}
@@ -121,6 +142,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
         height={"100%"}
         smoothScrollX={true}
         smoothScrollY={true}
+        gridSelection={userSelection}
       />
       <div id="portal" />
     </div>

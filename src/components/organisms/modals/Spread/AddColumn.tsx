@@ -164,7 +164,6 @@ const CreateColumn = ({ isOpen, onClose }) => {
                         placement="right"
                       >
                         <Box
-                          onMouseEnter={(e) => console.log(e)}
                           style={{
                             marginTop: "20px",
                             backgroundColor: individualPicklistValue.color,
