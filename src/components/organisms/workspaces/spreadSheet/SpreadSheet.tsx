@@ -60,7 +60,13 @@ const Spreadsheet = () => {
   return (
     <div
       className="todoContainer"
-      style={{ width: "100%", overflowX: "scroll", overflowY: "hidden" }}
+      style={{
+        width: "100%",
+        overflowX: "scroll",
+        overflowY: "hidden",
+        background:
+          "linear-gradient(90deg, rgba(127,179,216,1) 2%, rgba(78,199,223,1) 48%, rgba(170,160,223,1) 97%)",
+      }}
     >
       <CreateColumn isOpen={addTask} onClose={setAddTask} />
       <div
@@ -80,14 +86,11 @@ const Spreadsheet = () => {
               textAlign: "start",
               marginTop: "20px",
               marginLeft: "30px",
+              color: "whitesmoke",
             }}
           >
-            Spreadsheet de{" "}
-            {getFirstName(computedUserDataField.currentUser.fullname)}
+            {currentWorkSpace.currentWorkSpace.name}
           </h2>
-          <p style={{ textAlign: "start", marginLeft: "32px" }}>
-            Almacena y exporta datos con Tumble Spreadsheet
-          </p>
         </div>
         <div style={{ display: "flex" }}>
           <div style={{ marginRight: "20px" }}>

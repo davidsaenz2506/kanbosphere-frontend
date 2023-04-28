@@ -16,6 +16,9 @@
   background-color: #7c9bb8;
   color: white;
   height: 100%;
+  animation-name: inEase;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
 }
 
 .weatherImage {
@@ -46,6 +49,9 @@
   text-align: center;
   margin-top: -20px;
   margin-bottom: 10px;
+  animation-name: inEaseUser;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
 }
 
 .userProps {
@@ -73,6 +79,9 @@
   color: white;
   height: 100%;
   margin-left: 20px;
+  animation-name: outEase;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
 }
 
 .userImage {
@@ -96,6 +105,35 @@
 .currentUser p {
   font-size: 16px;
   font-weight: 500;
+}
+
+@keyframes inEaseUser {
+  0% {
+    transform: translateY(-1000px);
+    scale: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    scale: 1;
+  }
+}
+
+@keyframes inEase {
+  0% {
+    transform: translateX(-1000px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+@keyframes outEase {
+  0% {
+    transform: translateX(2000px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
 }
 
 @media (max-width: 1540px) {

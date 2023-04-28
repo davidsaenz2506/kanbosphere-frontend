@@ -13,7 +13,6 @@ import { GeolocatedResult, useGeolocated } from "react-geolocated";
 import Image from "next/image";
 
 import styles from "../main.module.css";
-import { error } from "console";
 
 const WeatherComponent = () => {
   const geolocated: GeolocatedResult = useGeolocated();

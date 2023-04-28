@@ -29,12 +29,13 @@ const MiniCard = (Props: IMiniCardProps) => {
       key={key}
       style={{
         height: "max-content",
-        backgroundColor: "white",
+        backgroundColor: "whitesmoke",
         marginBottom: "20px",
         padding: "15px",
         borderRadius: "5px",
         cursor: isClicked ? "default" : "pointer",
         border: isClicked ? "1px solid black" : "none",
+        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"
       }}
     >
       <EditTask isOpen={openEdit} onClose={setOpenEdit} data={item} />

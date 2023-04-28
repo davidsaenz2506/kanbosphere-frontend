@@ -1,0 +1,12 @@
+
+.individualBox {
+    transition: all .2s;
+}
+
+
+.individualBox:hover {
+  cursor: pointer;
+  background-color: #dcdcdc;
+  border-radius: 10px;
+  padding: 10px;
+}

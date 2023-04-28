@@ -13,7 +13,8 @@ const LaneComponent = ({ title, bgColor, data, targetColor }) => {
           minWidth: "350px",
           backgroundColor: bgColor,
           marginLeft: "20px",
-          overflowY: "auto"
+          overflowY: "auto",
+          zIndex: 1
         }}
       >
         <CardHeader>

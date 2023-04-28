@@ -5,7 +5,7 @@ import LaneComponent from "./LaneComponent";
 
 const ToDoLanes = () => {
   const { currentWorkSpace: data } = useCurrentWorkspace();
-  const backGroundLaneColor = "#e2e2e2";
+  const backGroundLaneColor = "#f8f8f8";
 
   return (
     <div
