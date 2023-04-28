@@ -9,7 +9,7 @@ import { MainLoad } from "@/components/portal/MainLoad";
 const WorkspaceManager = ({ workspaceFlow }) => {
   return (
     <>
-      {workspaceFlow === "" && <MainLoad />}
+      {(workspaceFlow === "mainMenu" || workspaceFlow === "") && <MainLoad />}
       {workspaceFlow === "wspUser" && <UserWorkSpace />}
       {workspaceFlow === "To Do" && <ToDoWorkSpace />}
       {workspaceFlow === "Tumble Spreadsheet" && <Spreadsheet />}

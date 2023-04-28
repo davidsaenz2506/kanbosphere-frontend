@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Card, CardBody, CardFooter } from "@chakra-ui/react";
+import { Card, CardBody, CardFooter, Portal } from "@chakra-ui/react";
 import { Stack, Image, Heading, Button, Text } from "@chakra-ui/react";
 
 import OpenWorkSpace from "../../../modals/OpenWorkSpace";
+import Loading from "@/components/molecules/Loading";
 
 const Cards = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState("");
 
   return (
@@ -20,10 +22,16 @@ const Cards = () => {
         paddingBottom: "60px",
       }}
     >
+      {isLoading && (
+        <Portal>
+          <Loading message="Agregando espacio de trabajo a su portafolio" />
+        </Portal>
+      )}
       <OpenWorkSpace
         isOpen={isOpenModal}
         title={title}
         setIsOpen={setIsOpenModal}
+        setIsLoading={setIsLoading}
       />
       <Card
         direction={{ base: "column", sm: "row" }}

@@ -3,6 +3,8 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import React from "react";
 
+import { Skeleton, Stack } from "@chakra-ui/react";
+
 import styles from "../main.module.css";
 import { Avatar } from "@chakra-ui/react";
 
@@ -15,13 +17,25 @@ const UserComponent = () => {
         <div className={styles.currentUser}>
           <h3 style={{ fontWeight: "bold" }}>Tarjeta de usuario</h3>
 
-          <p style={{ fontSize: "30px" }}>{currentUser.fullname}</p>
-
-          <p>{currentUser.email}</p>
-          <p>{currentUser.userID} </p>
-          <p style={{ marginTop: "20px" }}>
-            Total de workspaces: {wspUser.userWsps.length}{" "}
-          </p>
+          {!currentUser.fullname ? (
+            <Stack
+              style={{ width: "90%", marginTop: "10px", marginBottom: "10px" }}
+            >
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+            </Stack>
+          ) : (
+            <>
+              {" "}
+              <p style={{ fontSize: "30px" }}>{currentUser.fullname}</p>
+              <p>{currentUser.email}</p>
+              <p>{currentUser.userID} </p>
+              <p style={{ marginTop: "20px" }}>
+                Total de workspaces: {wspUser.userWsps.length}
+              </p>
+            </>
+          )}
         </div>
         <div className={styles.userImage}>
           <Avatar

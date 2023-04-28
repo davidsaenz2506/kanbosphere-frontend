@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Button, useToast } from "@chakra-ui/react";
+import { Button, Portal, useToast } from "@chakra-ui/react";
 import {
   AddIcon,
   ExternalLinkIcon,
@@ -20,13 +20,13 @@ import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
 
 import { deleteIndividualGridRow } from "./Grid/utils/functions/deleteIndividualGridRows";
 import { addGridRow } from "./Grid/utils/functions/addGridRow";
+import Loading from "@/components/molecules/Loading";
 
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
-  const computedUserDataField: ICurrentUserContext = useCurrentUser();
-
+  const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number>();
 
   const toastNotification = useToast();
@@ -68,7 +68,16 @@ const Spreadsheet = () => {
           "linear-gradient(90deg, rgba(127,179,216,1) 2%, rgba(78,199,223,1) 48%, rgba(170,160,223,1) 97%)",
       }}
     >
-      <CreateColumn isOpen={addTask} onClose={setAddTask} />
+      <CreateColumn
+        isOpen={addTask}
+        onClose={setAddTask}
+        setIsLoading={setIsLoading}
+      />
+      {isLoading && (
+        <Portal>
+          <Loading message="Agregando nueva columna" />
+        </Portal>
+      )}
       <div
         style={{
           display: "flex",

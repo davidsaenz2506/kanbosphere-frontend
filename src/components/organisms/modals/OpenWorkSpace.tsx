@@ -30,7 +30,7 @@ interface IWspUser {
   spreadSheetData: ISpreadSheet;
 }
 
-const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
+const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
   const [nameValue, setNameValue] = useState("");
 
   const wspUser = useWorkspace();
@@ -53,12 +53,16 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen }) => {
   });
 
   async function handleCreate() {
+    setIsLoading(true);
+
     await CreateWorkSpaces(newWorkSpace);
     const response = await getAllWorkSpaces(
       computedUserDataField.currentUser.userID
     );
 
     wspUser.setUsersWsps(response);
+
+    setIsLoading(false);
 
     setIsOpen(false);
   }

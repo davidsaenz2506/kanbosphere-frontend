@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import { AttachmentIcon } from "@chakra-ui/icons";
+import { ArrowForwardIcon, AttachmentIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { ChatIcon, CalendarIcon, StarIcon } from "@chakra-ui/icons";
 
 import { ChevronDownIcon, ChevronLeftIcon } from "@chakra-ui/icons";
 
-import { List, ListItem, ListIcon } from "@chakra-ui/react";
+import { List, ListItem, ListIcon, Stack } from "@chakra-ui/react";
+
+import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
 import { EditIcon } from "@chakra-ui/icons";
 
@@ -18,10 +20,12 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import DeleteWorkSpace from "../organisms/modals/Workspace Modals/DeleteWorkSpace";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import EditWorkSpaceName from "../organisms/modals/Workspace Modals/EditWorkSpaceName";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const wspUsers = useWorkspace();
+  const currentSession = useCurrentUser();
   const currentWorkSpace = useCurrentWorkspace();
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -37,6 +41,26 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
       />
       <EditWorkSpaceName isOpen={openEdit} onClose={setOpenEdit} data={item} />
       <div style={{ marginTop: "10px" }}>
+        <div>
+          <HamburgerIcon sx={{ marginLeft: "20px" }} />
+          <button
+            type="button"
+            className="btn btn-secondary btn-lg btn-block"
+            style={{
+              backgroundColor: "#e2e2e2",
+              border: "none",
+              color: "#2d3b50",
+              marginLeft: "5px",
+              fontWeight: workspaceFlow == "mainMenu" ? "bolder" : "normal",
+            }}
+            onClick={() => {
+              setCurrentSelected("");
+              setWorkSpaceFlow("mainMenu");
+            }}
+          >
+            Menú principal
+          </button>
+        </div>
         <div
           style={{
             display: "flex",
@@ -84,50 +108,62 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
         </div>
 
         <div className={isCollapsed ? styles.collapsed : styles.expanded}>
-          {wspUsers.userWsps.map((todoWorkspace) => (
-            <List sx={{ transition: "all .5s" }} spacing={3}>
-              <ListItem
-                sx={{
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: " center",
-                  fontWeight:
-                    currentSelected === todoWorkspace._id ? "bolder" : "normal",
-                }}
-                onClick={() => {
-                  setCurrentSelected(todoWorkspace._id);
-                  currentWorkSpace.setCurrentWorkSpace(todoWorkspace);
-                  setWorkSpaceFlow(todoWorkspace.type);
-                }}
-              >
-                <div>
-                  <ListIcon
-                    as={StarIcon}
-                    sx={{ marginBottom: "2px", marginRight: "15px" }}
-                  />
-                  {todoWorkspace.type} {todoWorkspace.name}
-                </div>
+          {!currentSession.currentUser.userID && !wspUsers.userWsps.length ? (
+            <Stack
+              style={{ width: "90%", marginTop: "10px", marginBottom: "10px" }}
+            >
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+              <Skeleton height="20px" />
+            </Stack>
+          ) : (
+            wspUsers.userWsps.map((todoWorkspace) => (
+              <List sx={{ transition: "all .5s" }} spacing={3}>
+                <ListItem
+                  sx={{
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: " center",
+                    fontWeight:
+                      currentSelected === todoWorkspace._id
+                        ? "bolder"
+                        : "normal",
+                  }}
+                  onClick={() => {
+                    setCurrentSelected(todoWorkspace._id);
+                    currentWorkSpace.setCurrentWorkSpace(todoWorkspace);
+                    setWorkSpaceFlow(todoWorkspace.type);
+                  }}
+                >
+                  <div>
+                    <ListIcon
+                      as={ArrowForwardIcon}
+                      sx={{ marginBottom: "2px", marginRight: "15px" }}
+                    />
+                    {todoWorkspace.type} {todoWorkspace.name}
+                  </div>
 
-                <div>
-                  <EditIcon
-                    sx={{ marginRight: "15px", marginBottom: "5px" }}
-                    onClick={() => {
-                      setItem(todoWorkspace);
-                      setOpenEdit(true);
-                    }}
-                  />
-                  <DeleteIcon
-                    sx={{ marginRight: "10px", marginBottom: "5px" }}
-                    onClick={() => {
-                      setItem(todoWorkspace);
-                      setOpenDelete(true);
-                    }}
-                  />
-                </div>
-              </ListItem>
-            </List>
-          ))}
+                  <div>
+                    <EditIcon
+                      sx={{ marginRight: "15px", marginBottom: "5px" }}
+                      onClick={() => {
+                        setItem(todoWorkspace);
+                        setOpenEdit(true);
+                      }}
+                    />
+                    <DeleteIcon
+                      sx={{ marginRight: "10px", marginBottom: "5px" }}
+                      onClick={() => {
+                        setItem(todoWorkspace);
+                        setOpenDelete(true);
+                      }}
+                    />
+                  </div>
+                </ListItem>
+              </List>
+            ))
+          )}
         </div>
       </div>
 
