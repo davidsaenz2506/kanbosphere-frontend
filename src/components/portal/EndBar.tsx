@@ -22,9 +22,9 @@ const EndBar = ({ setWorkSpaceFlow }) => {
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#e2e2e2",
+            backgroundColor: "#263849",
             border: "none",
-            color: "#2d3b50",
+            color: "whitesmoke",
             marginLeft: "5px",
           }}
           onClick={() => setWorkSpaceFlow("userConfig")}
@@ -37,9 +37,9 @@ const EndBar = ({ setWorkSpaceFlow }) => {
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#e2e2e2",
+            backgroundColor: "#263849",
             border: "none",
-            color: "#2d3b50",
+            color: "whitesmoke",
             marginLeft: "5px",
           }}
           onClick={() => setIsOpen(true)}

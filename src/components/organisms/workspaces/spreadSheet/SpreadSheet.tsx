@@ -21,28 +21,51 @@ import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
 import { deleteIndividualGridRow } from "./Grid/utils/functions/deleteIndividualGridRows";
 import { addGridRow } from "./Grid/utils/functions/addGridRow";
 import Loading from "@/components/molecules/Loading";
+import initResizer from "@/utilities/resizePage";
 
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
+  const [resizeListener, setResizeListener] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number>();
 
+  const isBrowser = () => typeof window !== "undefined";
+
   const toastNotification = useToast();
 
-  window.onresize = function onResize() {
-    const todoDocument: HTMLDivElement | null =
-      document.querySelector(".todoContainer");
-    const navBarDocument: any = document.getElementById("navbarHome");
+  if (isBrowser()) {
+    window.onresize = function onResize() {
+      const todoDocument: HTMLDivElement | null =
+        document.querySelector(".todoContainer");
+      const navBarDocument: any = document.getElementById("navbarHome");
+      const bodyDocumentData: HTMLBodyElement | null =
+        document.querySelector("body");
 
-    if (todoDocument && bodyDocument) {
-      todoDocument.style.height = `${
-        bodyDocument.getBoundingClientRect().height -
-        navBarDocument.getBoundingClientRect().height
-      }px`;
-    }
-  };
+      const workSpaceContainer = document.getElementById("workSpace");
+
+      const resizetToolData: HTMLElement | null =
+        document.getElementById("resizerTool");
+
+      setResizeListener(Math.random() * 10 - 1 + 1);
+
+      if (
+        todoDocument &&
+        bodyDocument &&
+        bodyDocumentData &&
+        resizetToolData &&
+        workSpaceContainer
+      ) {
+        todoDocument.style.height = `${
+          bodyDocument.getBoundingClientRect().height -
+          navBarDocument.getBoundingClientRect().height
+        }px`;
+
+        workSpaceContainer.style.width = "100%";
+      }
+    };
+  }
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
@@ -55,6 +78,14 @@ const Spreadsheet = () => {
         InitialNavBarDocument.getBoundingClientRect().height
       }px`;
     }
+  });
+
+  React.useEffect(() => {
+    var resizerTool = document.getElementById("resizerTool");
+    var toolSpace = document.getElementById("toolSpace");
+    var workSpace = document.getElementById("workSpace");
+
+    initResizer(resizerTool, toolSpace, workSpace);
   });
 
   return (

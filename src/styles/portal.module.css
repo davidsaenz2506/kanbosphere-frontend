@@ -25,14 +25,15 @@
   width: 1%;
   height: 100vh;
   cursor: col-resize;
-  background-color: #d5d7d9;
+  background-color: #233142;
   z-index: 100;
 }
 
 .toolContainer {
   width: 99%;
-  background-color: #e2e2e2;
+  background-color: #263849;
   height: 100vh;
+  color: whitesmoke
 }
 
 .hrElement {

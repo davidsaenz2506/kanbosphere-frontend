@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import { ArrowForwardIcon, AttachmentIcon, HamburgerIcon } from "@chakra-ui/icons";
+import {
+  ArrowForwardIcon,
+  AttachmentIcon,
+  HamburgerIcon,
+} from "@chakra-ui/icons";
 import { ChatIcon, CalendarIcon, StarIcon } from "@chakra-ui/icons";
 
 import { ChevronDownIcon, ChevronLeftIcon } from "@chakra-ui/icons";
@@ -47,9 +51,9 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
             type="button"
             className="btn btn-secondary btn-lg btn-block"
             style={{
-              backgroundColor: "#e2e2e2",
+              backgroundColor: "#263849",
               border: "none",
-              color: "#2d3b50",
+              color: "whitesmoke",
               marginLeft: "5px",
               fontWeight: workspaceFlow == "mainMenu" ? "bolder" : "normal",
             }}
@@ -74,9 +78,9 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
               type="button"
               className="btn btn-secondary btn-lg btn-block"
               style={{
-                backgroundColor: "#e2e2e2",
+                backgroundColor: "#263849",
                 border: "none",
-                color: "#2d3b50",
+                color: "whitesmoke",
                 marginLeft: "5px",
                 fontWeight: workspaceFlow == "wspUser" ? "bolder" : "normal",
               }}
@@ -125,6 +129,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: " center",
+                    color: "whitesmoke",
                     fontWeight:
                       currentSelected === todoWorkspace._id
                         ? "bolder"
@@ -144,7 +149,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                     {todoWorkspace.type} {todoWorkspace.name}
                   </div>
 
-                  <div>
+                  <div style={{display: "flex"}}>
                     <EditIcon
                       sx={{ marginRight: "15px", marginBottom: "5px" }}
                       onClick={() => {
@@ -173,9 +178,9 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#e2e2e2",
+            backgroundColor: "#263849",
             border: "none",
-            color: "#2d3b50",
+            color: "whitesmoke",
             marginLeft: "5px",
             fontWeight: workspaceFlow == "chatUser" ? "bolder" : "normal",
           }}
@@ -194,9 +199,9 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#e2e2e2",
+            backgroundColor: "#263849",
             border: "none",
-            color: "#2d3b50",
+            color: "whitesmoke",
             marginLeft: "5px",
             fontWeight: workspaceFlow == "calendarUser" ? "bolder" : "normal",
           }}
@@ -215,9 +220,9 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#e2e2e2",
+            backgroundColor: "#263849",
             border: "none",
-            color: "#2d3b50",
+            color: "whitesmoke",
             marginLeft: "5px",
             fontWeight: workspaceFlow == "balanceUser" ? "bolder" : "normal",
           }}

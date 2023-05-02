@@ -4,15 +4,16 @@ import ToDoLanes from "./utils/ToDoLanes";
 import AddTask from "../../modals/AddTask";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import Header from "./utils/Header";
+import initResizer from "@/utilities/resizePage";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const { currentWorkSpace } = useCurrentWorkspace();
-  const [currentColor, setCurrentColor] = useState<string>(
-    "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
-  );
+  const [currentColor, setCurrentColor] = useState<string>("#364567");
+  const [resizeListener, setResizeListener] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const isBrowser = () => typeof window !== "undefined";
   const colorObject = {
     "Default color": "#364567",
     "Blue gradient":
@@ -23,18 +24,38 @@ const ToDoWorkspace = () => {
       "linear-gradient(90deg, rgba(32,44,57,1) 0%, rgba(66,97,104,1) 100%)",
   };
 
-  window.onresize = function onResize() {
-    const todoDocument: HTMLDivElement | null =
-      document.querySelector(".todoContainer");
-    const navBarDocument: any = document.getElementById("navbarHome");
+  if (isBrowser()) {
+    window.onresize = function onResize() {
+      const todoDocument: HTMLDivElement | null =
+        document.querySelector(".todoContainer");
+      const navBarDocument: any = document.getElementById("navbarHome");
+      const bodyDocumentData: HTMLBodyElement | null =
+        document.querySelector("body");
 
-    if (todoDocument && bodyDocument) {
-      todoDocument.style.height = `${
-        bodyDocument.getBoundingClientRect().height -
-        navBarDocument.getBoundingClientRect().height
-      }px`;
-    }
-  };
+      const workSpaceContainer = document.getElementById("workSpace");
+
+      const resizetToolData: HTMLElement | null =
+        document.getElementById("resizerTool");
+
+      setResizeListener(Math.random() * 10 - 1 + 1);
+
+      if (
+        todoDocument &&
+        bodyDocument &&
+        bodyDocumentData &&
+        resizetToolData &&
+        workSpaceContainer
+      ) {
+        todoDocument.style.height = `${
+          bodyDocument.getBoundingClientRect().height -
+          navBarDocument.getBoundingClientRect().height
+        }px`;
+
+        workSpaceContainer.style.width = "100%";
+
+      }
+    };
+  }
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
@@ -47,6 +68,14 @@ const ToDoWorkspace = () => {
         InitialNavBarDocument.getBoundingClientRect().height
       }px`;
     }
+  });
+
+  React.useEffect(() => {
+    var resizerTool = document.getElementById("resizerTool");
+    var toolSpace = document.getElementById("toolSpace");
+    var workSpace = document.getElementById("workSpace");
+
+    initResizer(resizerTool, toolSpace, workSpace);
   });
 
   return (

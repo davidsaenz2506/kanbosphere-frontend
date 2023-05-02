@@ -110,11 +110,9 @@
 @keyframes inEaseUser {
   0% {
     transform: translateY(-1000px);
-    scale: 0;
   }
   100% {
     transform: translateY(0px);
-    scale: 1;
   }
 }
 

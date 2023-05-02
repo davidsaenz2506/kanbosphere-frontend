@@ -22,18 +22,20 @@ export default function initResizer(
     var dx: number = e.clientX - x;
     var cw: number = w + dx;
 
-    workSpace.style.maxWidth = `${
-      document.body.getBoundingClientRect().width - 350
-    }px`;
 
     if (cw < bodyWidth / 2) {
       toolSpace.style.width = `${cw}px`;
       workSpace.style.width = `${bodyWidth - cw}px`;
     }
 
+    if (cw > bodyWidth / 2) {
+      toolSpace.style.width = `${bodyWidth / 2}px`;
+      workSpace.style.width = `${bodyWidth / 2}px`;
+    }
+
     if (cw < 350) {
       toolSpace.style.width = `350px`;
-      workSpace.style.width = `${bodyWidth - cw}px`;
+      workSpace.style.width = `${bodyWidth - 350}px`;
     }
   }
 

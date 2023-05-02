@@ -24,10 +24,23 @@ import Loading from "@/components/molecules/Loading";
 const PortalUser = () => {
   const [workspaceFlow, setWorkspaceFlow] = useState("");
   const [loadingServerData, setLoadingServerData] = useState(false);
+  const [resizeListener, setResizeListener] = useState(0);
   const computedUserItems = useCurrentUser();
   const cookies = new Cookies();
   const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
+  const isBrowser = () => typeof window !== "undefined";
+
+  if (isBrowser()) {
+    window.onresize = function onResize() {
+      const workSpaceContainer = document.getElementById("workSpace");
+      setResizeListener(Math.random() * 10 - 1 + 1);
+
+      if (workSpaceContainer) {
+        workSpaceContainer.style.width = "100%";
+      }
+    };
+  }
 
   React.useEffect(() => {
     async function getUserInfoFromServer() {
@@ -70,7 +83,7 @@ const PortalUser = () => {
           className="navbar navbar-light bg-light"
           style={{
             background:
-              "linear-gradient(90deg, rgba(45,173,255,1) 0%, rgba(36,94,249,1) 100%)",
+              "linear-gradient(90deg, rgba(57,72,103,1) 0%, rgba(33,42,62,1) 100%, rgba(0,212,255,1) 100%)",
           }}
         >
           <a
