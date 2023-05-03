@@ -7,25 +7,18 @@ export async function middleware(request) {
 
   if (request.nextUrl.pathname.includes("/portalUser")) {
     if (jwt === undefined) {
-      /* NETLIFY DOESN´T SUPPORT NEXT REDIRECT ROUTES */
-      // return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));+
-      //router.replace('/')
-      window.open("/", "_self")
+      return  window.open("/", "_self");
     }
 
     try {
       const { payload } = await jwtVerify(
         finalToken,
-        new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'super-secret')
+        new TextEncoder().encode(process.env.NEXTAUTH_SECRET)
       );
 
       return NextResponse.next();
     } catch (error) {
-      /* NETLIFY DOESN´T SUPPORT NEXT REDIRECT ROUTES */
-      // return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));
-      //router.replace('/')
-
-      window.open("/", "_self")
+      return window.open("/", "_self");
     }
   }
 
