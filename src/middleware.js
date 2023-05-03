@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import { useRouter } from "next/dist/client/router";
 import { jwtVerify } from "jose";
 
 export async function middleware(request) {
   const jwt = request.cookies.get("tumbleToken");
-  const router = useRouter();
   const finalToken = jwt?.value;
 
   if (request.nextUrl.pathname.includes("/portalUser")) {
