@@ -1,5 +1,8 @@
 {
-    "rewrites":  [
-      {"source": "/", "destination": "/portalUser"}
+    "redirects": [
+        {
+            "source": "/",
+            "destination": "/portalUser"
+        }
     ]
-  }
+}
