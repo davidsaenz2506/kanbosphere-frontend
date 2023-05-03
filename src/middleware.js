@@ -9,8 +9,10 @@ export async function middleware(request) {
 
   if (request.nextUrl.pathname.includes("/portalUser")) {
     if (jwt === undefined) {
+      /* NETLIFY DOESN´T SUPPORT NEXT REDIRECT ROUTES */
       // return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));+
-      router.replace('/')
+      //router.replace('/')
+      window.open("/", "_self")
     }
 
     try {
@@ -21,8 +23,11 @@ export async function middleware(request) {
 
       return NextResponse.next();
     } catch (error) {
+      /* NETLIFY DOESN´T SUPPORT NEXT REDIRECT ROUTES */
       // return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));
-      router.replace('/')
+      //router.replace('/')
+
+      window.open("/", "_self")
     }
   }
 
