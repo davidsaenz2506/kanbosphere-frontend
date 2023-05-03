@@ -18,12 +18,11 @@ const EndSession = (props) => {
   const nextRouterHook = useRouter()
 
   async function clearUserSessionCookie() {
+    window.open("/", "_self");
     const tokenValue = await Cookies.get("tumbleToken");
     await Cookies.remove("tumbleToken", tokenValue);
-
-    nextRouterHook.reload(window.location.pathname)
   }
-  
+
   return (
     <>
       <AlertDialog isOpen={props.isOpen}>
