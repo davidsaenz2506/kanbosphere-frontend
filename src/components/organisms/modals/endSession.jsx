@@ -1,6 +1,7 @@
 import React from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
+import { NextResponse } from "next/server";
 
 import {
   AlertDialog,
@@ -21,7 +22,7 @@ const EndSession = (props) => {
     const tokenValue = await Cookies.get("tumbleToken");
     await Cookies.remove("tumbleToken", tokenValue);
 
-    nextRouterHook.reload(window.location.pathname)
+    NextResponse.redirect(new URL("/", request.url));
   }
   
   return (
