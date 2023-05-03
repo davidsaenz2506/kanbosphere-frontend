@@ -7,7 +7,7 @@ export async function middleware(request) {
 
   if (request.nextUrl.pathname.includes("/portalUser")) {
     if (jwt === undefined) {
-      return  window.open("/", "_self");
+      window.open("/", "_self");
     }
 
     try {
@@ -18,7 +18,7 @@ export async function middleware(request) {
 
       return NextResponse.next();
     } catch (error) {
-      return window.open("/", "_self");
+      window.open("/", "_self");
     }
   }
 
