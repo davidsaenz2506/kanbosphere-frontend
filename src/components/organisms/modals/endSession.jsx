@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Button } from "@chakra-ui/react";
-import { redirect } from "next/navigation"
+import Router from "next/router";
 
 const EndSession = (props) => {
 
@@ -23,7 +23,7 @@ const EndSession = (props) => {
     const tokenValue = await Cookies.get("tumbleToken");
     await Cookies.remove("tumbleToken", tokenValue);
 
-    redirect('/')
+    Router.push("/")
   }
 
   return (
