@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
+import { useRouter } from "next/dist/client/router";
 import { jwtVerify } from "jose";
 
 export async function middleware(request) {
   const jwt = request.cookies.get("tumbleToken");
+  const router = useRouter();
   const finalToken = jwt?.value;
 
   if (request.nextUrl.pathname.includes("/portalUser")) {
     if (jwt === undefined) {
-      return NextResponse.redirect(new URL("lighthearted-manatee-b0f198.netlify.app/", request.url));
+      // return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));+
+      router.replace('/')
     }
 
     try {
@@ -18,7 +21,8 @@ export async function middleware(request) {
 
       return NextResponse.next();
     } catch (error) {
-      return NextResponse.redirect(new URL("lighthearted-manatee-b0f198.netlify.app/", request.url));
+      // return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));
+      router.replace('/')
     }
   }
 
