@@ -4,6 +4,7 @@ import { LoginUser } from "@/services/user/login";
 import { useState } from "react";
 import WrongLogin from "@/components/organisms/modals/WrongLogin";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [userCredentials, setUserCredentials] = useState({
@@ -12,12 +13,13 @@ export default function Home() {
   });
   const userOperationsComputed = useCurrentUser();
   const [openAlert, setOpenAlert] = useState(false);
+  const Router = useRouter();
 
   function handleLogin() {
     LoginUser(userCredentials)
       .then((res) => {
         userOperationsComputed.fetchCurrentUser(res);
-        window.open("/portalUser", "_self");
+        Router.push('/portalUser')
       })
       .catch((err) => {
         setOpenAlert(true);
