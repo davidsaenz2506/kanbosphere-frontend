@@ -11,7 +11,7 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
 
     const userCredentials: Partial<IUser> = req.body;
 
-    const { data: userCred }: any = await axios.post<IUser>(`${process.env.WORKSPACE_API}/auth/login`, userCredentials);
+    const { data: userCred }: any = await axios.post<IUser>(`${process.env.WORKSPACE_API || "https://fair-lime-crocodile-slip.cyclic.app/api"}/auth/login`, userCredentials);
 
     const serializedToken = serialize('tumbleToken', userCred.accessToken, {
       httpOnly: false,

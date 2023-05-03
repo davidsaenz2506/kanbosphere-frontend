@@ -7,7 +7,7 @@ const handler = nextConnect();
 export default handler.post(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const { username } = req.query;
-        const { data: userInfo } = await axios.post<ICurrentUser>(`${process.env.WORKSPACE_API}/auth/user/${username}`);
+        const { data: userInfo } = await axios.post<ICurrentUser>(`${process.env.WORKSPACE_API || "https://fair-lime-crocodile-slip.cyclic.app/api"}/auth/user/${username}`);
 
         return res.status(200).send(userInfo);
     } catch (err: any) {

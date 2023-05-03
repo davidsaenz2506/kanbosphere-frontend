@@ -13,7 +13,7 @@ export async function middleware(request) {
     try {
       const { payload } = await jwtVerify(
         finalToken,
-        new TextEncoder().encode(process.env.NEXTAUTH_SECRET)
+        new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'super-secret')
       );
 
       return NextResponse.next();
