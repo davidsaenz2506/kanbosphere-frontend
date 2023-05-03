@@ -1,7 +1,6 @@
 import React from "react";
 import Cookies from "js-cookie";
-import { Router, useRouter } from "next/router";
-import { NextResponse } from "next/server";
+import { useRouter } from "next/router";
 
 import {
   AlertDialog,
@@ -13,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 
 import { Button } from "@chakra-ui/react";
-import Router from "next/router";
 
 const EndSession = (props) => {
 
@@ -23,9 +21,9 @@ const EndSession = (props) => {
     const tokenValue = await Cookies.get("tumbleToken");
     await Cookies.remove("tumbleToken", tokenValue);
 
-    Router.push("/")
+    nextRouterHook.reload(window.location.pathname)
   }
-
+  
   return (
     <>
       <AlertDialog isOpen={props.isOpen}>
