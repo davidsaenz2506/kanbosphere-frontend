@@ -7,7 +7,7 @@ export async function middleware(request) {
 
   if (request.nextUrl.pathname.includes("/portalUser")) {
     if (jwt === undefined) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));
     }
 
     try {
@@ -18,7 +18,7 @@ export async function middleware(request) {
 
       return NextResponse.next();
     } catch (error) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("https://lighthearted-manatee-b0f198.netlify.app/", request.url));
     }
   }
 
