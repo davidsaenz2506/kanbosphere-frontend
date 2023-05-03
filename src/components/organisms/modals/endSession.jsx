@@ -1,6 +1,6 @@
 import React from "react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import { NextResponse } from "next/server";
 
 import {
@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Button } from "@chakra-ui/react";
+import { redirect } from "next/navigation"
 
 const EndSession = (props) => {
 
@@ -22,9 +23,9 @@ const EndSession = (props) => {
     const tokenValue = await Cookies.get("tumbleToken");
     await Cookies.remove("tumbleToken", tokenValue);
 
-    NextResponse.redirect(new URL("/", request.url));
+    redirect('/')
   }
-  
+
   return (
     <>
       <AlertDialog isOpen={props.isOpen}>
