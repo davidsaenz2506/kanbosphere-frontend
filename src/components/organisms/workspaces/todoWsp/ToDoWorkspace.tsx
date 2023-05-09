@@ -52,7 +52,6 @@ const ToDoWorkspace = () => {
         }px`;
 
         workSpaceContainer.style.width = "100%";
-
       }
     };
   }

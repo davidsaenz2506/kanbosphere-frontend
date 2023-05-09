@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 
+import { utils, writeFile } from "xlsx";
+
+import * as FileSaver from "file-saver";
+
 import { Button, Portal, useToast } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -7,8 +11,6 @@ import {
   PlusSquareIcon,
   DeleteIcon,
 } from "@chakra-ui/icons";
-import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
-import { getFirstName } from "@/utilities/getFirstName";
 
 import "@glideapps/glide-data-grid/dist/index.css";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
@@ -16,12 +18,16 @@ import GridDataEditor from "./Grid/DataEditor";
 import CreateColumn from "../../modals/Spread/AddColumn";
 
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
-import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
 
 import { deleteIndividualGridRow } from "./Grid/utils/functions/deleteIndividualGridRows";
 import { addGridRow } from "./Grid/utils/functions/addGridRow";
 import Loading from "@/components/molecules/Loading";
 import initResizer from "@/utilities/resizePage";
+import { forEach } from "lodash";
+
+interface ISpreadGrid {
+  wch: number;
+}
 
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
@@ -65,6 +71,57 @@ const Spreadsheet = () => {
         workSpaceContainer.style.width = "100%";
       }
     };
+  }
+
+  function exportToExcel() {
+    var workBook = utils.book_new();
+    var workSheet = utils.json_to_sheet(
+      currentWorkSpace.currentWorkSpace.spreadSheetData?.data ?? []
+    );
+
+    var widthColumnsForGrid: ISpreadGrid[] = [];
+    var objectWithProperties: object = {};
+
+    const newComputedColumnsForSheet =
+      currentWorkSpace.currentWorkSpace.spreadSheetData?.data.map(
+        (currentRow) => {
+          const lengthValues = Object.values(currentRow);
+          const numberValues: number[] = [];
+
+          lengthValues.forEach((individualStringBook: any) =>
+            numberValues.push(String(individualStringBook).length)
+          );
+
+          return numberValues;
+        }
+      );
+
+    newComputedColumnsForSheet?.forEach((item) => {
+      for (let currentVectorValue in item) {
+        if (!objectWithProperties.hasOwnProperty(currentVectorValue)) {
+          objectWithProperties[currentVectorValue] = [];
+        }
+
+        objectWithProperties[currentVectorValue].push(item[currentVectorValue]);
+      }
+    });
+
+    const propertiesToArrayFromExcel = Object.entries(objectWithProperties);
+
+    console.log(newComputedColumnsForSheet, propertiesToArrayFromExcel)
+
+    propertiesToArrayFromExcel.forEach((individualVector) => {
+      widthColumnsForGrid.push({
+        wch: Math.max(...individualVector[1]),
+      });
+    });
+
+    utils.book_append_sheet(workBook, workSheet, "userSheets");
+    workSheet["!cols"] = widthColumnsForGrid;
+
+    writeFile(workBook, `${currentWorkSpace.currentWorkSpace.name}.xlsx`, {
+      compression: true,
+    });
   }
 
   React.useEffect(() => {
@@ -165,7 +222,7 @@ const Spreadsheet = () => {
             </Button>
           </div>
           <div style={{ marginRight: "20px" }}>
-            <Button onClick={() => setAddTask(true)}>
+            <Button onClick={() => exportToExcel()}>
               <ExternalLinkIcon sx={{ marginRight: "10px" }} />
               Exportar excel
             </Button>
