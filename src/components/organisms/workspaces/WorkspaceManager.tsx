@@ -5,6 +5,9 @@ import UserWorkSpace from "./individualWsp/UserWorkSpace";
 import ToDoWorkSpace from "./todoWsp/ToDoWorkspace";
 import Spreadsheet from "./spreadSheet/SpreadSheet";
 import { MainLoad } from "@/components/portal/MainLoad";
+import { ContactUser } from "@/components/portal/ContactUser";
+import { CalendaryUser } from "@/components/portal/Calendary";
+import { BalanceUser } from "@/components/portal/Balance";
 
 const WorkspaceManager = ({ workspaceFlow }) => {
   return (
@@ -13,9 +16,9 @@ const WorkspaceManager = ({ workspaceFlow }) => {
       {workspaceFlow === "wspUser" && <UserWorkSpace />}
       {workspaceFlow === "To Do" && <ToDoWorkSpace />}
       {workspaceFlow === "Tumble Spreadsheet" && <Spreadsheet />}
-      {workspaceFlow === "chatUser" && <h1>Contact User</h1>}
-      {workspaceFlow === "calendarUser" && <h1>Calendar User</h1>}
-      {workspaceFlow === "balanceUser" && <h1>Balance User</h1>}
+      {workspaceFlow === "chatUser" && <ContactUser/>}
+      {workspaceFlow === "calendarUser" && <CalendaryUser/>}
+      {workspaceFlow === "balanceUser" && <BalanceUser/>}
       {workspaceFlow === "userConfig" && <UserConfig />}
     </>
   );

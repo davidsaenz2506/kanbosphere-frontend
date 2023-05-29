@@ -2,9 +2,32 @@ import React, { useState } from "react";
 
 import { utils, writeFile } from "xlsx";
 
-import * as FileSaver from "file-saver";
+import Select, { SingleValue } from "react-select";
 
-import { Button, Portal, useToast } from "@chakra-ui/react";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  useDimensions,
+  Divider,
+} from "@chakra-ui/react";
+
+import { EditIcon, Search2Icon, UnlockIcon } from "@chakra-ui/icons";
+
+import {
+  Button,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Portal,
+  useToast,
+  Checkbox,
+  CheckboxGroup,
+} from "@chakra-ui/react";
 import {
   AddIcon,
   ExternalLinkIcon,
@@ -23,21 +46,67 @@ import { deleteIndividualGridRow } from "./Grid/utils/functions/deleteIndividual
 import { addGridRow } from "./Grid/utils/functions/addGridRow";
 import Loading from "@/components/molecules/Loading";
 import initResizer from "@/utilities/resizePage";
-import { forEach } from "lodash";
+import { GetFilteredDataByQuery } from "@/services/spreadsheet/getQueryData";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+
+import styles from "./styles/spreadsheet.module.css";
+import { uniqBy } from "lodash";
+import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 
 interface ISpreadGrid {
   wch: number;
 }
 
+interface ISortColumn {
+  value: string;
+  label: string;
+  type: string;
+}
+
 const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
+  const currentSession = useCurrentUser();
+  const keyCodeFromEnterDown = 13;
+  const [optionsVector, setOptionsVector] = useState<any>([]);
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
   const [resizeListener, setResizeListener] = useState(0);
+  const [freezeColumns, setFreezeColums] = useState(0);
+  const [isDescendingActive, setIsDescendingActive] = useState(true);
+  const [internalTriggerPointer, setInternalTriggerPointer] = useState(0);
+  const [selectedColumnToSort, setSelectedColumnToSort] = useState<
+    ISortColumn[]
+  >([]);
+  const todoRefHTMLElement = React.createRef<HTMLElement>();
+  const [openSlider, setOpenSlider] = useState(false);
+  const [spreadSheetData, setSpreadSheetData] = useState(
+    currentWorkSpace.currentWorkSpace.spreadSheetData?.data
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number>();
+  const [typedQueryFromUser, setTypeQueryFromUser] = useState({
+    workspaceID: "",
+    query: "",
+  });
+  const [currentColumnMatrix, setCurrentColumnMatrix] = useState([]);
+  const [gridColumns, setGridColumns] = useState<
+    IColumnProjection[] | undefined
+  >([]);
 
   const isBrowser = () => typeof window !== "undefined";
+
+  const restrictedColumnsToQuery =
+    currentWorkSpace.currentWorkSpace.spreadSheetData?.columns.filter(
+      (useColumn) => {
+        if (useColumn.type === "string") return true;
+        if (useColumn.type === "number") return true;
+        if (useColumn.type === "date") return true;
+        if (useColumn.type === "datetime") return true;
+        if (useColumn.type === "cellphone") return true;
+        if (useColumn.type === "mail") return true;
+        if (useColumn.type === "boolean") return true;
+      }
+    );
 
   const toastNotification = useToast();
 
@@ -73,6 +142,19 @@ const Spreadsheet = () => {
     };
   }
 
+  async function handleUserQuery() {
+    const queryDataFromMongo = await GetFilteredDataByQuery(
+      typedQueryFromUser,
+      currentSession.currentUser.userID
+    );
+
+    if (queryDataFromMongo) setSpreadSheetData(queryDataFromMongo);
+    else
+      setSpreadSheetData(
+        currentWorkSpace.currentWorkSpace.spreadSheetData?.data
+      );
+  }
+
   function exportToExcel() {
     var workBook = utils.book_new();
     var workSheet = utils.json_to_sheet(
@@ -91,7 +173,6 @@ const Spreadsheet = () => {
           lengthValues.forEach((individualStringBook: any) =>
             numberValues.push(String(individualStringBook).length)
           );
-
           return numberValues;
         }
       );
@@ -101,14 +182,11 @@ const Spreadsheet = () => {
         if (!objectWithProperties.hasOwnProperty(currentVectorValue)) {
           objectWithProperties[currentVectorValue] = [];
         }
-
         objectWithProperties[currentVectorValue].push(item[currentVectorValue]);
       }
     });
 
     const propertiesToArrayFromExcel = Object.entries(objectWithProperties);
-
-    console.log(newComputedColumnsForSheet, propertiesToArrayFromExcel)
 
     propertiesToArrayFromExcel.forEach((individualVector) => {
       widthColumnsForGrid.push({
@@ -122,6 +200,137 @@ const Spreadsheet = () => {
     writeFile(workBook, `${currentWorkSpace.currentWorkSpace.name}.xlsx`, {
       compression: true,
     });
+  }
+
+  function sortRowsBySelection(spreadSheetData) {
+    const currentUnsortedSpreadData = spreadSheetData;
+
+    if (selectedColumnToSort.length === 0) {
+      setSpreadSheetData(
+        currentWorkSpace.currentWorkSpace.spreadSheetData?.data
+      );
+      return;
+    }
+
+    if (
+      selectedColumnToSort[selectedColumnToSort?.length - 1].type === "number"
+    ) {
+      if (isDescendingActive) {
+        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
+          return (
+            beforeIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
+            ] -
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
+            ]
+          );
+        });
+      } else {
+        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
+          return (
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
+            ] -
+            beforeIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
+            ]
+          );
+        });
+      }
+    }
+
+    if (
+      selectedColumnToSort[selectedColumnToSort?.length - 1].type === "boolean"
+    ) {
+      if (isDescendingActive) {
+        currentUnsortedSpreadData.sort(function (beforeIndex, currentIndex) {
+          return beforeIndex[
+            selectedColumnToSort[selectedColumnToSort?.length - 1].value
+          ] ===
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ]
+            ? 0
+            : beforeIndex[
+                selectedColumnToSort[selectedColumnToSort?.length - 1].value
+              ]
+            ? -1
+            : 1;
+        });
+      } else {
+        currentUnsortedSpreadData.sort(function (beforeIndex, currentIndex) {
+          return beforeIndex[
+            selectedColumnToSort[selectedColumnToSort?.length - 1].value
+          ] ===
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ]
+            ? 0
+            : beforeIndex[
+                selectedColumnToSort[selectedColumnToSort?.length - 1].value
+              ]
+            ? 1
+            : -1;
+        });
+      }
+    }
+
+    if (
+      selectedColumnToSort[selectedColumnToSort?.length - 1].type === "string"
+    ) {
+      if (isDescendingActive) {
+        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
+          if (
+            beforeIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ] <
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ]
+          ) {
+            return -1;
+          }
+          if (
+            beforeIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ] >
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ]
+          ) {
+            return 1;
+          }
+          return 0;
+        });
+      } else {
+        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
+          if (
+            beforeIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ] >
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ]
+          ) {
+            return -1;
+          }
+          if (
+            beforeIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ] <
+            currentIndex[
+              selectedColumnToSort[selectedColumnToSort?.length - 1].value
+            ]
+          ) {
+            return 1;
+          }
+          return 0;
+        });
+      }
+    }
+
+    setSpreadSheetData(currentUnsortedSpreadData);
   }
 
   React.useEffect(() => {
@@ -145,9 +354,26 @@ const Spreadsheet = () => {
     initResizer(resizerTool, toolSpace, workSpace);
   });
 
+  React.useEffect(() => {
+    setGridColumns(
+      currentWorkSpace?.currentWorkSpace?.spreadSheetData?.columns
+    );
+    if (gridColumns?.length) {
+      setOptionsVector(
+        gridColumns.map((value: IColumnProjection, index: number) => {
+          return {
+            value: index + 1,
+            label: index + 1,
+          };
+        })
+      );
+    }
+  }, [gridColumns]);
+
   return (
     <div
       className="todoContainer"
+      ref={todoRefHTMLElement as React.RefObject<HTMLDivElement>}
       style={{
         width: "100%",
         overflowX: "scroll",
@@ -156,6 +382,106 @@ const Spreadsheet = () => {
           "linear-gradient(90deg, rgba(127,179,216,1) 2%, rgba(78,199,223,1) 48%, rgba(170,160,223,1) 97%)",
       }}
     >
+      <Drawer
+        isOpen={openSlider}
+        placement="right"
+        onClose={() => setOpenSlider(false)}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Ordenar por columna</DrawerHeader>
+
+          <DrawerBody>
+            <Select
+              options={
+                restrictedColumnsToQuery?.map((userColumn) => {
+                  return {
+                    value: userColumn.title,
+                    type: userColumn.type,
+                    label: userColumn.title,
+                  };
+                }) ?? []
+              }
+              onChange={(e: any) => {
+                if (e) {
+                  if (e.value && selectedColumnToSort.length <= 2)
+                    setSelectedColumnToSort(uniqBy([e], "label"));
+                }
+              }}
+              placeholder="Seleccione una columna"
+            />
+
+            {selectedColumnToSort.map((uniqResort, index) => {
+              if (index == selectedColumnToSort.length - 1)
+                return (
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <Input
+                      value={uniqResort.label}
+                      style={{ marginTop: "60px" }}
+                      size="lg"
+                    />
+                    <Checkbox
+                      sx={{ marginTop: "15px", marginLeft: "10px" }}
+                      isChecked={isDescendingActive}
+                      onChange={() => {
+                        setIsDescendingActive(!isDescendingActive);
+                        sortRowsBySelection(spreadSheetData);
+                      }}
+                    >
+                      Orden descendiente
+                    </Checkbox>
+                    <Button
+                      sx={{ marginTop: "20px" }}
+                      onClick={() => {
+                        setSelectedColumnToSort([]);
+                      }}
+                      colorScheme="red"
+                    >
+                      Limpiar filtro
+                    </Button>
+                  </div>
+                );
+            })}
+
+            <Divider style={{ marginTop: "40px" }} />
+
+            <div style={{ marginTop: "30px" }}>
+              <h4 style={{ marginBottom: "20px" }}>Congelar columnas</h4>
+              <Select
+                options={optionsVector ?? []}
+                value={freezeColumns}
+                onChange={(e: any) => {
+                  if (e) {
+                    if (e.value) setFreezeColums(e);
+                  }
+                }}
+                placeholder="Congelar columnas"
+              />
+            </div>
+          </DrawerBody>
+
+          <DrawerFooter>
+            <Button
+              variant="outline"
+              mr={3}
+              onClick={() => setOpenSlider(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
+                sortRowsBySelection(spreadSheetData);
+                setOpenSlider(false);
+              }}
+              colorScheme="blue"
+            >
+              Guardar
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
       <CreateColumn
         isOpen={addTask}
         onClose={setAddTask}
@@ -166,81 +492,94 @@ const Spreadsheet = () => {
           <Loading message="Agregando nueva columna" />
         </Portal>
       )}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          position: "sticky",
-          left: 0,
-          height: "10%",
-          marginTop: "10px",
-        }}
-      >
+      <div className={styles.toolbarsect}>
         <div className="header">
-          <h2
-            style={{
-              textAlign: "start",
-              marginTop: "20px",
-              marginLeft: "30px",
-              color: "whitesmoke",
-            }}
-          >
+          <h2 className={styles.mainText}>
             {currentWorkSpace.currentWorkSpace.name}
           </h2>
         </div>
-        <div style={{ display: "flex" }}>
-          <div style={{ marginRight: "20px" }}>
-            <Button
-              onClick={() => {
-                setAddTask(true);
-              }}
-            >
-              <AddIcon sx={{ marginRight: "10px" }} />
-              Añadir Columna
-            </Button>
+
+        <div>
+          <div
+            style={{ marginBottom: "20px", marginTop: "20px", width: "100%" }}
+          >
+            <InputGroup>
+              <InputLeftElement>
+                <Search2Icon />
+              </InputLeftElement>
+              <Input
+                sx={{ backgroundColor: "white", width: "97%" }}
+                type="text"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setTypeQueryFromUser({
+                    workspaceID: currentWorkSpace.currentWorkSpace._id ?? "",
+                    query: e.currentTarget.value,
+                  })
+                }
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (e.keyCode === keyCodeFromEnterDown) handleUserQuery();
+                }}
+                placeholder="Filtra tus datos aquí"
+              />
+            </InputGroup>
           </div>
-          <div style={{ marginRight: "20px" }}>
-            <Button onClick={() => addGridRow(currentWorkSpace)}>
-              <PlusSquareIcon sx={{ marginRight: "10px" }} />
-              Añadir fila
-            </Button>
-          </div>
-          <div style={{ marginRight: "20px" }}>
-            <Button
-              onClick={() =>
-                deleteIndividualGridRow(
-                  currentRowsSelected,
-                  currentWorkSpace,
-                  toastNotification
-                )
-              }
-              isDisabled={currentRowsSelected !== undefined ? false : true}
-            >
-              <DeleteIcon sx={{ marginRight: "10px" }} />
-              Eliminar fila
-            </Button>
-          </div>
-          <div style={{ marginRight: "20px" }}>
-            <Button onClick={() => exportToExcel()}>
-              <ExternalLinkIcon sx={{ marginRight: "10px" }} />
-              Exportar excel
-            </Button>
+          <div style={{ display: "flex" }}>
+            <div style={{ marginRight: "20px" }}>
+              <Button
+                onClick={() => {
+                  setAddTask(true);
+                }}
+              >
+                <AddIcon sx={{ marginRight: "10px" }} />
+                Añadir Columna
+              </Button>
+            </div>
+            <div style={{ marginRight: "20px" }}>
+              <Button onClick={() => addGridRow(currentWorkSpace)}>
+                <PlusSquareIcon sx={{ marginRight: "10px" }} />
+                Añadir fila
+              </Button>
+            </div>
+            <div style={{ marginRight: "20px" }}>
+              <Button
+                onClick={() =>
+                  deleteIndividualGridRow(
+                    currentRowsSelected,
+                    currentWorkSpace,
+                    toastNotification
+                  )
+                }
+                isDisabled={currentRowsSelected !== undefined ? false : true}
+              >
+                <DeleteIcon sx={{ marginRight: "10px" }} />
+                Eliminar fila
+              </Button>
+            </div>
+            <div style={{ marginRight: "20px" }}>
+              <Button onClick={() => exportToExcel()}>
+                <ExternalLinkIcon sx={{ marginRight: "10px" }} />
+                Exportar excel
+              </Button>
+            </div>
+            <div style={{ marginRight: "20px" }}>
+              <Button
+                onClick={() => {
+                  setOpenSlider(true);
+                }}
+              >
+                <EditIcon sx={{ marginRight: "10px" }} />
+                Grid config
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-      <div
-        className="GridContainer"
-        style={{
-          height: "90%",
-          marginTop: "20px",
-          padding: "20px",
-          paddingBottom: "40px",
-        }}
-      >
+      <div className={styles.GridContainer}>
         <GridDataEditor
-          data={currentWorkSpace.currentWorkSpace.spreadSheetData?.data ?? []}
+          data={spreadSheetData ?? []}
+          internalTriggerPointer={internalTriggerPointer}
           setCurrentRowsSelected={setCurrentRowsSelected}
+          freezeColumns={freezeColumns}
         />
       </div>
     </div>

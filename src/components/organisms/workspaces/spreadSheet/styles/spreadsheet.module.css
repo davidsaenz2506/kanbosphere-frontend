@@ -1,0 +1,51 @@
+.GridContainer {
+  height: 90%;
+  margin-top: 20px;
+  padding: 20px;
+  padding-bottom: 40px;
+}
+
+.mainText {
+  text-align: start;
+  margin-top: 20px;
+  margin-left: 30px;
+  color: whitesmoke;
+}
+
+.toolbarsect {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  left: 0;
+  height: 10%;
+  margin-top: 10px;
+}
+
+@media (max-width: 1550px) {
+  .toolbarsect {
+    flex-direction: column;
+    height: 20%;
+    margin-top: -10px;
+    align-items: start;
+    margin-left: 25px;
+    position: inherit;
+  }
+
+  .mainText {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    margin-left: 0px;
+
+  }
+
+  .GridContainer {
+    height: 82%;
+  }
+}
+
+@media (max-width: 1205px) {
+  .GridContainer {
+    width: 100vh;
+  }
+}

@@ -26,11 +26,13 @@ import { useToast } from "@chakra-ui/react";
 
 interface ISpreadProps {
   data: any;
+  internalTriggerPointer: number;
   setCurrentRowsSelected: any;
+  freezeColumns: any
 }
 
 const GridDataEditor = (Props: ISpreadProps) => {
-  const { data, setCurrentRowsSelected } = Props;
+  const { data, setCurrentRowsSelected, internalTriggerPointer, freezeColumns } = Props;
   const currentUserWsp = useCurrentWorkspace();
   const currentUser = useCurrentUser();
   const toastNotification = useToast();
@@ -57,7 +59,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   const getUserData = useCallback(
     ([col, row]: Item): GridCell => getCellData([col, row], data, userColumns),
-    [data, userColumns]
+    [data, userColumns, internalTriggerPointer]
   );
 
   function handleStateForNotificationSnack(staticValueFromServer: boolean) {
@@ -142,6 +144,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
         height={"100%"}
         smoothScrollX={true}
         smoothScrollY={true}
+        freezeColumns={freezeColumns.value}
         gridSelection={userSelection}
       />
       <div id="portal" />

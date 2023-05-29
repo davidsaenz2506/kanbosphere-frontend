@@ -94,6 +94,7 @@ const Cards = () => {
           <CardFooter>
             <Button
               variant="solid"
+              isDisabled={true}
               colorScheme="blue"
               onClick={() => {
                 setTitle("Fast Notes");

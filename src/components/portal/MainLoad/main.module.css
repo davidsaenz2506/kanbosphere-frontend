@@ -10,10 +10,10 @@
 .weatherCard {
   padding: 20px;
   border: none;
-  border-radius: 30px;
+  border-radius: 20px;
   display: flex;
   flex-direction: row;
-  background-color: #7c9bb8;
+  background-color: #233237;
   color: white;
   height: 100%;
   animation-name: inEase;
@@ -58,24 +58,21 @@
   display: flex;
 }
 
-.userNewsSection {
-}
 
 .mainContainer {
   padding: 40px;
   width: 100%;
   overflow-y: scroll;
-  background-color: #002c49;
   height: 100vh;
 }
 
 .userCard {
   padding: 20px;
   border: none;
-  border-radius: 30px;
+  border-radius: 20px;
   display: flex;
   flex-direction: row;
-  background-color: #536079;
+  background-color: #1d2731;
   color: white;
   height: 100%;
   margin-left: 20px;

@@ -12,7 +12,10 @@
 }
 
 .workSpace {
-  background-color: rgb(255, 255, 255);
+  background-image: url(./../../public/assets/b9fc9147-59cf-4ba9-8b48-605f53e4a88d.png);
+  background-color: #1D2731;
+  background-size: cover;
+  animation: animateBackground 30s infinite alternate;
   z-index: 100;
   height: fit-content;
   max-width: initial;
@@ -33,10 +36,18 @@
   width: 99%;
   background-color: #263849;
   height: 100vh;
-  color: whitesmoke
+  color: whitesmoke;
 }
 
 .hrElement {
   width: 95%;
 }
 
+@keyframes animateBackground {
+  0% {
+    background-size: 2296px;
+  }
+  100% {
+    background-size: 2000px;
+  }
+}

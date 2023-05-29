@@ -5,6 +5,9 @@ import { useState } from "react";
 import WrongLogin from "@/components/organisms/modals/WrongLogin";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
+import { Spinner } from "@chakra-ui/react";
+import { debounce } from "lodash";
+
 export default function Home() {
   const [userCredentials, setUserCredentials] = useState({
     username: "",
@@ -12,14 +15,18 @@ export default function Home() {
   });
   const userOperationsComputed = useCurrentUser();
   const [openAlert, setOpenAlert] = useState(false);
+  const [isLoginSession, setIsLoginSession] = useState(false);
 
   function handleLogin() {
+    setIsLoginSession(true);
     LoginUser(userCredentials)
       .then((res) => {
         userOperationsComputed.fetchCurrentUser(res);
         window.open("/portalUser", "_self");
+        debounce(() => setIsLoginSession(false), 10000);
       })
       .catch((err) => {
+        setIsLoginSession(false);
         setOpenAlert(true);
       });
   }
@@ -67,21 +74,24 @@ export default function Home() {
                   });
                 }}
               />
-              <button
-                type="button"
-                style={{
-                  marginTop: "30px",
-                  width: "100%",
-                  color: "white",
-                  fontWeight: 500,
-                }}
-                className="btn btn-info"
-                onClick={() => {
-                  handleLogin();
-                }}
-              >
-                Iniciar sesion
-              </button>
+              {!isLoginSession && (
+                <button
+                  type="button"
+                  style={{
+                    marginTop: "20px",
+                    width: "100%",
+                    color: "white",
+                    fontWeight: 500,
+                  }}
+                  className="btn btn-info"
+                  onClick={() => {
+                    handleLogin();
+                  }}
+                >
+                  Iniciar sesion
+                </button>
+              )}
+              {isLoginSession && <Spinner sx={{ marginTop: "30px" }} />}
             </form>
           </div>
         </div>

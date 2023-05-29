@@ -27,6 +27,7 @@ const PortalUser = () => {
   const [resizeListener, setResizeListener] = useState(0);
   const computedUserItems = useCurrentUser();
   const cookies = new Cookies();
+
   const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
   const isBrowser = () => typeof window !== "undefined";

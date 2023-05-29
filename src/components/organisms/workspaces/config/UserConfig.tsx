@@ -1,12 +1,27 @@
-import React from 'react'
-import styles from "../../../../styles/userconfig.module.css"
+import Image from "next/image";
+import React from "react";
+
+import OutOfService from "../../../../../public/assets/outservices.png";
 
 const UserConfig = () => {
   return (
-    <div>
-        <h1>User config</h1>
-    </div>
-  )
-}
+    <React.Fragment>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Image
+          style={{ marginBottom: "90px" }}
+          src={OutOfService}
+          alt="Out of service data"
+        />
+      </div>
+    </React.Fragment>
+  );
+};
 
-export default UserConfig
+export default UserConfig;
