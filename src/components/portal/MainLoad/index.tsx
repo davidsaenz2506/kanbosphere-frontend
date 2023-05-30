@@ -23,8 +23,11 @@ import styles from "./main.module.css";
 import WeatherComponent from "./WeatherComponent";
 import UserComponent from "./UserComponent";
 
+import { DateTime } from "luxon";
+
 export const MainLoad = () => {
   const { currentUser }: ICurrentUserContext = useCurrentUser();
+  const currentDateTime = DateTime.now().toFormat("DDD").toString();
 
   return (
     <React.Fragment>
@@ -72,6 +75,9 @@ export const MainLoad = () => {
               </Flex>
             </CardHeader>
             <CardBody sx={{ marginTop: "-20px" }}>
+              <Text sx={{ fontWeight: "bold", marginBottom: "10px" }}>
+                {currentDateTime}
+              </Text>
               <Text>
                 Nos alegra comunicarte que se está implementando la versión 4.5
                 de Tumble Tasks, te ofreceremos muchas novedades para que puedas
@@ -122,6 +128,9 @@ export const MainLoad = () => {
               </Flex>
             </CardHeader>
             <CardBody sx={{ marginTop: "-20px" }}>
+              <Text sx={{ fontWeight: "bold", marginBottom: "10px" }}>
+                {currentDateTime}
+              </Text>
               <Text>
                 Tumble Tasks ampliará sus plataformas para dar servicios de
                 administración y gestión documental en agosto, no te lo pierdas,
@@ -170,6 +179,9 @@ export const MainLoad = () => {
               </Flex>
             </CardHeader>
             <CardBody sx={{ marginTop: "-20px" }}>
+              <Text sx={{ fontWeight: "bold", marginBottom: "10px" }}>
+                {currentDateTime}
+              </Text>
               <Text>
                 Actualmente, en el desarrollo de Tumble Tasks, estamos
                 desarrollando nuevas funciones en la hoja de cálculo de datos,

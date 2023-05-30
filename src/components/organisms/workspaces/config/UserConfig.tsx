@@ -15,7 +15,7 @@ const UserConfig = () => {
         }}
       >
         <Image
-          style={{ marginBottom: "90px" }}
+          style={{ marginBottom: "90px", borderRadius: "10px" }}
           src={OutOfService}
           alt="Out of service data"
         />

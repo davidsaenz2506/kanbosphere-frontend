@@ -13,9 +13,14 @@
 
 .workSpace {
   background-image: url(./../../public/assets/b9fc9147-59cf-4ba9-8b48-605f53e4a88d.png);
-  background-color: #1D2731;
+  background-color: #1d2731;
   background-size: cover;
-  animation: animateBackground 30s infinite alternate;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center-top;
+  animation: animateBackground 40s infinite alternate;
+  background-position-x: 50%;
+  background-position-y: 0%;
   z-index: 100;
   height: fit-content;
   max-width: initial;
@@ -45,9 +50,9 @@
 
 @keyframes animateBackground {
   0% {
-    background-size: 2296px;
+    background-size: 100%;
   }
   100% {
-    background-size: 2000px;
+    background-size: 150%;
   }
 }
