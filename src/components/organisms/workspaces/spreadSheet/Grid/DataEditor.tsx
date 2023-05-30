@@ -6,6 +6,7 @@ import {
   GridColumn,
   CompactSelection,
   GridSelection,
+  Theme,
 } from "@glideapps/glide-data-grid";
 import { DataEditor } from "@glideapps/glide-data-grid";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
@@ -28,11 +29,18 @@ interface ISpreadProps {
   data: any;
   internalTriggerPointer: number;
   setCurrentRowsSelected: any;
-  freezeColumns: any
+  freezeColumns: any;
+  useTheme: Partial<Theme>
 }
 
 const GridDataEditor = (Props: ISpreadProps) => {
-  const { data, setCurrentRowsSelected, internalTriggerPointer, freezeColumns } = Props;
+  const {
+    data,
+    setCurrentRowsSelected,
+    internalTriggerPointer,
+    freezeColumns,
+    useTheme
+  } = Props;
   const currentUserWsp = useCurrentWorkspace();
   const currentUser = useCurrentUser();
   const toastNotification = useToast();
@@ -97,17 +105,15 @@ const GridDataEditor = (Props: ISpreadProps) => {
     [userColumns, data]
   );
 
-  React.useEffect(() => { 
-      // @ts-ignore
-      setCurrentRowsSelected(userSelection.rows?.items.length ? userSelection.rows?.items[0][0] : undefined);
+  React.useEffect(() => {
+    // @ts-ignore
+    setCurrentRowsSelected(userSelection.rows?.items.length ? userSelection.rows?.items[0][0] : undefined);
   }, [userSelection.rows]);
-
 
   return (
     <div
       style={{
         border: "2px solid #577080",
-        borderRadius: "10px",
         overflow: "auto",
         height: "100%",
       }}
@@ -141,6 +147,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
         rows={data.length}
         getCellContent={getUserData}
         width={"100%"}
+        theme={useTheme}
         height={"100%"}
         smoothScrollX={true}
         smoothScrollY={true}

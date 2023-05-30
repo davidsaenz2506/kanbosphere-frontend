@@ -12,6 +12,7 @@ interface IHeaderProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   colorObject: object;
   setCurrentColor: React.Dispatch<React.SetStateAction<string>>;
+  currentColor: string;
   setAddTask: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
 }
@@ -23,6 +24,7 @@ const Header = (Props: IHeaderProps) => {
     setCurrentColor,
     setIsOpen,
     colorObject,
+    currentColor,
     isOpen,
   } = Props;
 
@@ -34,7 +36,7 @@ const Header = (Props: IHeaderProps) => {
             textAlign: "start",
             marginTop: "20px",
             marginLeft: "30px",
-            color: "whitesmoke",
+            color: currentColor === "#dfeeee" ? "#0E0B16" : "whitesmoke",
             fontWeight: "bold",
           }}
         >
@@ -45,6 +47,7 @@ const Header = (Props: IHeaderProps) => {
         <Popover isBordered disableShadow>
           <Popover.Trigger>
             <Button
+              sx={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
               onClick={() => setIsOpen(!isOpen)}
               style={{ marginRight: "20px" }}
             >
@@ -94,7 +97,10 @@ const Header = (Props: IHeaderProps) => {
           </Popover.Content>
         </Popover>
 
-        <Button onClick={() => setAddTask(true)}>
+        <Button
+          sx={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
+          onClick={() => setAddTask(true)}
+        >
           <AddIcon sx={{ marginRight: "10px" }} />
           Añadir pendiente
         </Button>

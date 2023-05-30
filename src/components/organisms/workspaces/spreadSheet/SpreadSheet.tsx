@@ -16,7 +16,12 @@ import {
   Divider,
 } from "@chakra-ui/react";
 
-import { EditIcon, Search2Icon, UnlockIcon } from "@chakra-ui/icons";
+import {
+  EditIcon,
+  HamburgerIcon,
+  Search2Icon,
+  UnlockIcon,
+} from "@chakra-ui/icons";
 
 import {
   Button,
@@ -52,6 +57,8 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import styles from "./styles/spreadsheet.module.css";
 import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
+import { Theme } from "@glideapps/glide-data-grid";
+import ResponsiveSliderPanel from "./Grid/components/ResponsiveSliderPanel";
 
 interface ISpreadGrid {
   wch: number;
@@ -74,6 +81,8 @@ const Spreadsheet = () => {
   const [freezeColumns, setFreezeColums] = useState(0);
   const [isDescendingActive, setIsDescendingActive] = useState(true);
   const [internalTriggerPointer, setInternalTriggerPointer] = useState(0);
+  const [isNightThemeActive, setIsNightThemeActive] = useState<boolean>(false);
+  const [isMenuGridOpen, setIsMenuGridOpen] = useState<boolean>(false);
   const [selectedColumnToSort, setSelectedColumnToSort] = useState<
     ISortColumn[]
   >([]);
@@ -83,12 +92,16 @@ const Spreadsheet = () => {
     currentWorkSpace.currentWorkSpace.spreadSheetData?.data
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [currentWindowSize, setCurrentWindowSize] = useState<
+    number | undefined
+  >(0);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number>();
   const [typedQueryFromUser, setTypeQueryFromUser] = useState({
     workspaceID: "",
     query: "",
   });
-  const [currentColumnMatrix, setCurrentColumnMatrix] = useState([]);
+
+  const [useCurrentTheme, setUseCurrentTheme] = useState<Partial<Theme>>({});
   const [gridColumns, setGridColumns] = useState<
     IColumnProjection[] | undefined
   >([]);
@@ -124,6 +137,7 @@ const Spreadsheet = () => {
         document.getElementById("resizerTool");
 
       setResizeListener(Math.random() * 10 - 1 + 1);
+      setCurrentWindowSize(todoDocument?.getBoundingClientRect()?.width);
 
       if (
         todoDocument &&
@@ -336,6 +350,13 @@ const Spreadsheet = () => {
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
       document.querySelector(".todoContainer");
+
+    setCurrentWindowSize(InitialTodoDocument?.getBoundingClientRect()?.width);
+  }, []);
+
+  React.useEffect(() => {
+    const InitialTodoDocument: HTMLDivElement | null =
+      document.querySelector(".todoContainer");
     const InitialNavBarDocument: any = document.getElementById("navbarHome");
 
     if (InitialTodoDocument && bodyDocument) {
@@ -378,10 +399,54 @@ const Spreadsheet = () => {
         width: "100%",
         overflowX: "scroll",
         overflowY: "hidden",
-        background:
-          "linear-gradient(90deg, rgba(127,179,216,1) 2%, rgba(78,199,223,1) 48%, rgba(170,160,223,1) 97%)",
+        background: "#375871",
       }}
     >
+      <Drawer
+        isOpen={isMenuGridOpen}
+        placement="right"
+        onClose={() => setIsMenuGridOpen(false)}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Opciones de cuadrícula</DrawerHeader>
+
+          <DrawerBody>
+            <ResponsiveSliderPanel
+              setTypeQueryFromUser={setTypeQueryFromUser}
+              currentWorkSpace={currentWorkSpace}
+              keyCodeFromEnterDown={keyCodeFromEnterDown}
+              handleUserQuery={handleUserQuery}
+              setAddTask={setAddTask}
+              currentRowsSelected={currentRowsSelected}
+              toastNotification={toastNotification}
+              exportToExcel={exportToExcel}
+              setOpenSlider={setOpenSlider}
+            />
+          </DrawerBody>
+
+          <DrawerFooter>
+            <Button
+              variant="outline"
+              mr={3}
+              onClick={() => setIsMenuGridOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
+                sortRowsBySelection(spreadSheetData);
+                setIsMenuGridOpen(false);
+              }}
+              colorScheme="blue"
+            >
+              Guardar
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
       <Drawer
         isOpen={openSlider}
         placement="right"
@@ -458,6 +523,55 @@ const Spreadsheet = () => {
                 }}
                 placeholder="Congelar columnas"
               />
+            </div>
+
+            <div style={{ marginTop: "30px" }}>
+              <h4 style={{ marginBottom: "20px" }}>Modo oscuro</h4>
+              <Checkbox
+                defaultChecked={isNightThemeActive}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setIsNightThemeActive(e.target.checked);
+                  if (e.target.checked) {
+                    setUseCurrentTheme({
+                      accentColor: "#8c96ff",
+                      accentLight: "rgba(202, 206, 255, 0.253)",
+
+                      textDark: "#ffffff",
+                      textMedium: "#b8b8b8",
+                      textLight: "#a0a0a0",
+                      textBubble: "#ffffff",
+
+                      bgIconHeader: "#b8b8b8",
+                      fgIconHeader: "#000000",
+                      textHeader: "#a1a1a1",
+                      textHeaderSelected: "#000000",
+
+                      bgCell: "#16161b",
+                      bgCellMedium: "#202027",
+                      bgHeader: "#212121",
+                      bgHeaderHasFocus: "#474747",
+                      bgHeaderHovered: "#404040",
+
+                      bgBubble: "#212121",
+                      bgBubbleSelected: "#000000",
+
+                      bgSearchResult: "#423c24",
+
+                      borderColor: "rgba(225,225,225,0.2)",
+                      drilldownBorder: "rgba(225,225,225,0.4)",
+
+                      linkColor: "#4F5DFF",
+
+                      headerFontStyle: "bold 14px",
+                      baseFontStyle: "13px",
+                      fontFamily:
+                        "Inter, Roboto, -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, noto, arial, sans-serif",
+                    });
+                  } else setUseCurrentTheme({});
+                }}
+              >
+                Activar modo oscuro
+              </Checkbox>
             </div>
           </DrawerBody>
 
@@ -574,12 +688,32 @@ const Spreadsheet = () => {
           </div>
         </div>
       </div>
+      {currentWindowSize && currentWindowSize <= 1200 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingTop: "20px",
+            paddingRight: "20px",
+          }}
+        >
+          <h2 className={styles.mainText}>
+            {currentWorkSpace.currentWorkSpace.name}
+          </h2>
+          <Button onClick={() => setIsMenuGridOpen(true)}>
+            <HamburgerIcon sx={{ marginRight: "10px" }} />
+            Grid Menu
+          </Button>
+        </div>
+      )}
       <div className={styles.GridContainer}>
         <GridDataEditor
           data={spreadSheetData ?? []}
           internalTriggerPointer={internalTriggerPointer}
           setCurrentRowsSelected={setCurrentRowsSelected}
           freezeColumns={freezeColumns}
+          useTheme={useCurrentTheme}
         />
       </div>
     </div>
