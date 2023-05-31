@@ -26,6 +26,11 @@ import { setSpreadColumns } from "@/utilities/spreadsheet/setSpreadColumns";
 
 import { Tooltip } from "@chakra-ui/react";
 import { getColor } from "@/utilities/spreadsheet/getTagColor";
+import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
+import { debounce } from "lodash";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+import { getAllWorkSpaces } from "@/services/workspaces/getAll";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 export interface IPicklistOptions {
   value: string;
@@ -41,6 +46,8 @@ export interface ISelectColorOptions {
 const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
+  const performanceWorkspaces = useWorkspace();
+  const currentSession = useCurrentUser();
   const [columnName, setColumnName] = useState("");
   const [columnType, setColumnType] = useState("");
   const [newColumn, setNewColumn] = useState<IColumnProjection>({
@@ -86,6 +93,15 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   async function addColumn() {
     setUserTasks({ ...data, spreadSheetData: currentSpreadData });
     await UpdateWorkSpace(data);
+
+    const currentWorkspaces: IWspUser[] = performanceWorkspaces.userWsps;
+    const updatedWorkspaces = currentWorkspaces.map((bookRow: IWspUser) => {
+      if (bookRow._id === data._id) {
+        return data;
+      } else return bookRow;
+    });
+
+    performanceWorkspaces.setUsersWsps(updatedWorkspaces);
 
     setColumnType("");
     setUserPicklistValues([]);

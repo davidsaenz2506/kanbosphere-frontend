@@ -352,7 +352,12 @@ const Spreadsheet = () => {
       document.querySelector(".todoContainer");
 
     setCurrentWindowSize(InitialTodoDocument?.getBoundingClientRect()?.width);
+    setSpreadSheetData(currentWorkSpace.currentWorkSpace.spreadSheetData?.data);
   }, []);
+
+  React.useEffect(() => {
+    setSpreadSheetData(currentWorkSpace.currentWorkSpace.spreadSheetData?.data);
+  }, [currentWorkSpace.currentWorkSpace.spreadSheetData?.data]);
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =

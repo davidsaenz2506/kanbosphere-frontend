@@ -149,7 +149,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                     {todoWorkspace.type} {todoWorkspace.name}
                   </div>
 
-                  <div style={{display: "flex"}}>
+                  <div style={{ display: "flex" }}>
                     <EditIcon
                       sx={{ marginRight: "15px", marginBottom: "5px" }}
                       onClick={() => {

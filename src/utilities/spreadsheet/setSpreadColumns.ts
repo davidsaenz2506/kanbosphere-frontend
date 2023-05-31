@@ -1,4 +1,4 @@
-import { ISelectColorOptions } from "@/components/organisms/modals/Spread/AddColumn";
+
 import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
 export function setSpreadColumns(
