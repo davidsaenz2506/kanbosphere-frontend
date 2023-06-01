@@ -15,7 +15,7 @@ const UserComponent = () => {
     <div className={styles.currentUserSection}>
       <div className={styles.userCard}>
         <div className={styles.currentUser}>
-          <h3 style={{ fontWeight: "bold" }}>Tarjeta de usuario</h3>
+          <h3 style={{ fontWeight: "bold" }}>User card</h3>
 
           {!currentUser.fullname ? (
             <Stack
@@ -29,8 +29,8 @@ const UserComponent = () => {
             <>
               {" "}
               <p style={{ fontSize: "30px" }}>{currentUser.fullname}</p>
-              <p>{currentUser.email}</p>
-              <p>{currentUser.userID} </p>
+              <p>Correo electronico: {currentUser.email}</p>
+              <p>ID: {currentUser.userID} </p>
               <p style={{ marginTop: "20px" }}>
                 Total de workspaces: {wspUser.userWsps.length}
               </p>

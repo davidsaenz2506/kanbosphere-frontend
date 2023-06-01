@@ -225,7 +225,8 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
                 data,
                 setUserTasks,
                 setCurrentSpreadData,
-                newColumn
+                newColumn,
+                performanceWorkspaces
               );
             }}
           >

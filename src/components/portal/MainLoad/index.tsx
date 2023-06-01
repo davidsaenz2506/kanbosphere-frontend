@@ -53,6 +53,7 @@ export const MainLoad = () => {
               marginBottom: "40px",
               marginRight: "20px",
               backgroundColor: "#3E5F8A",
+              boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
               color: "white",
             }}
             maxW="md"
@@ -107,6 +108,7 @@ export const MainLoad = () => {
               marginRight: "20px",
               backgroundColor: "#3E5F8A",
               color: "white",
+              boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
             }}
             maxW="md"
           >
@@ -158,6 +160,7 @@ export const MainLoad = () => {
               marginBottom: "40px",
               backgroundColor: "#3E5F8A",
               color: "white",
+              boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
             }}
             maxW="md"
           >

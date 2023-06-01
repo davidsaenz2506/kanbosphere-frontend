@@ -13,7 +13,8 @@
   border-radius: 20px;
   display: flex;
   flex-direction: row;
-  background-color: #233237;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  background-color: #3E5F8A;
   color: white;
   height: 100%;
   animation-name: inEase;
@@ -72,7 +73,8 @@
   border-radius: 20px;
   display: flex;
   flex-direction: row;
-  background-color: #1d2731;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  background-color: #3E5F8A;
   color: white;
   height: 100%;
   margin-left: 20px;
