@@ -9,7 +9,11 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
 
     try {
         const toCreate: IWspUser = req.body;
-        const { data: createWorkspace } = await axios.post<IWspUser>(`${process.env.WORKSPACE_API}/workspaces`, toCreate);
+        const { data: createWorkspace } = await axios.post<IWspUser>(`${process.env.WORKSPACE_API}/workspaces`, toCreate, {
+            headers: {
+                Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`
+            }
+        });
 
         return res.status(200).send(createWorkspace)
     } catch (err: any) {
