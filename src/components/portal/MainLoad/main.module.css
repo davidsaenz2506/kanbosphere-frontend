@@ -4,22 +4,24 @@
 
 .weatherSection {
   margin-top: 30px;
-  width: 50%;
+  width: 100%;
 }
 
 .weatherCard {
   padding: 20px;
   border: none;
-  border-radius: 20px;
   display: flex;
   flex-direction: row;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  background-color: #3E5F8A;
-  color: white;
+  background-color: rgba(247, 247, 248, 0.1);
+  color: #1c1c1c;
   height: 100%;
+  margin-left: 40px;
   animation-name: inEase;
   animation-duration: 1s;
   animation-fill-mode: forwards;
+  min-width: 450px;
+  max-width: 450px;
 }
 
 .weatherImage {
@@ -42,50 +44,41 @@
 }
 
 .currentUserSection {
-  width: 50%;
-  margin-top: 30px;
-}
-
-.userInfo {
-  text-align: center;
-  margin-top: -20px;
-  margin-bottom: 10px;
-  animation-name: inEaseUser;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
+  width: 100%;
 }
 
 .userProps {
   display: flex;
+  flex-direction: row-reverse;
 }
 
-
 .mainContainer {
-  padding: 40px;
+  padding: 0 40px 0 40px;
   width: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 100vh;
 }
 
 .userCard {
   padding: 20px;
   border: none;
-  border-radius: 20px;
   display: flex;
   flex-direction: row;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  background-color: #3E5F8A;
-  color: white;
+  background-color: rgba(247, 247, 248, 0.1);
+  color: #1c1c1c;
   height: 100%;
-  margin-left: 20px;
+  margin-left: 40px;
   animation-name: outEase;
   animation-duration: 1s;
   animation-fill-mode: forwards;
+  min-width: 450px;
+  max-width: 450px;
 }
 
 .userImage {
-  width: 50%;
   display: flex;
+  padding: 20px;
   justify-content: center;
   flex-direction: column;
   align-items: center;
@@ -96,7 +89,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  width: 50%;
   text-align: start;
   padding: 20px;
 }
@@ -104,6 +96,16 @@
 .currentUser p {
   font-size: 16px;
   font-weight: 500;
+}
+
+.disableTitle {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.enableTitle {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 
 @keyframes inEaseUser {

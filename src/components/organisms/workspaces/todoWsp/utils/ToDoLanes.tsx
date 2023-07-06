@@ -5,12 +5,13 @@ import LaneComponent from "./LaneComponent";
 
 const ToDoLanes = () => {
   const { currentWorkSpace: data } = useCurrentWorkspace();
-  const backGroundLaneColor = "#f8f8f8";
+  const backGroundLaneColor = "#f5f6fA";
 
   return (
     <div
       style={{
         display: "flex",
+        justifyContent: "space-between",
         flexDirection: "row",
         marginTop: "30px",
         height: "90%"

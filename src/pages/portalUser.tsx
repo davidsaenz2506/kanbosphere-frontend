@@ -114,19 +114,6 @@ const PortalUser = () => {
         <div className={styles.principalContainer}>
           <div className={styles.toolSpace}>
             <div id="toolSpace" className={styles.toolContainer}>
-              <h5
-                style={{
-                  textAlign: "left",
-                  marginTop: "20px",
-                  marginBottom: "20px",
-                  fontSize: "30px",
-                  marginLeft: "20px",
-                  fontWeight: 500,
-                }}
-              >
-                Barra de herramientas
-              </h5>
-              <hr className={styles.hrElement}></hr>
               <ToolButtons
                 workspaceFlow={workspaceFlow}
                 setWorkSpaceFlow={setWorkspaceFlow}

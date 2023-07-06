@@ -20,41 +20,47 @@ import { CreateWorkSpaces } from "@/services/workspaces/createWorkSpace";
 import { getAllWorkSpaces } from "@/services/workspaces/getAll";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
+import { IWspContext } from "@/context/usersWorkSpaces/wsp.context";
+import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
 
 interface IWspUser {
   name: string;
+  prefix: string;
   createdDate: Date;
   createdById: string;
   type: string;
-  wspData: IDataToDo[];
-  spreadSheetData: ISpreadSheet;
+  wspData?: IDataToDo[];
+  spreadSheetData?: ISpreadSheet;
 }
 
 const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
-  const [nameValue, setNameValue] = useState("");
-
-  const wspUser = useWorkspace();
-
-  const currentUserInfo = useCurrentUser();
-
+  const [nameValue, setNameValue] = useState<string>("");
+  const [currentPrefix, setCurrentPrefix] = useState<string>("");
+  const wspUser: IWspContext = useWorkspace();
+  const currentUserInfo: ICurrentUserContext = useCurrentUser();
   const computedUserDataField = useCurrentUser();
 
   const [newWorkSpace, setNewWorkSpace] = useState<IWspUser>({
     name: "",
+    prefix: "",
     createdDate: DateTime.now().toISO(),
     createdById: "",
     type: "",
-    wspData: [],
-    spreadSheetData: {
-      columns: [],
-      data: [],
-      userId: currentUserInfo.currentUser.userID,
-    },
+    ...(title === "To Do"
+      ? { wspData: [] }
+      : {
+          spreadSheetData: {
+            columns: [],
+            data: [],
+            userId: currentUserInfo.currentUser.userID,
+          },
+        }),
   });
 
   async function handleCreate() {
     setIsLoading(true);
 
+    console.log(newWorkSpace);
     await CreateWorkSpaces(newWorkSpace);
     const response = await getAllWorkSpaces(
       computedUserDataField.currentUser.userID
@@ -69,18 +75,33 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
 
   React.useEffect(() => {
     setNewWorkSpace({
+      ...newWorkSpace,
       name: nameValue,
+      prefix: currentPrefix,
       createdDate: DateTime.now().toISO(),
       createdById: currentUserInfo.currentUser.userID,
       type: title,
-      wspData: [],
-      spreadSheetData: {
-        columns: [],
-        data: [],
-        userId: currentUserInfo.currentUser.userID,
-      },
     });
-  }, [nameValue]);
+  }, [nameValue, currentPrefix]);
+
+  React.useEffect(() => {
+    setNewWorkSpace({
+      name: "",
+      prefix: "",
+      createdDate: DateTime.now().toISO(),
+      createdById: "",
+      type: "",
+      ...(title === "To Do"
+        ? { wspData: [] }
+        : {
+            spreadSheetData: {
+              columns: [],
+              data: [],
+              userId: currentUserInfo.currentUser.userID,
+            },
+          }),
+    });
+  }, [title]);
 
   return (
     <>
@@ -99,6 +120,17 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
                 }
               />
             </FormControl>
+            {title === "To Do" && (
+              <FormControl pt={6}>
+                <FormLabel>Escribe el prefijo de tus objetivos</FormLabel>
+                <Input
+                  placeholder="Ej: TMS, TD, DSW"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCurrentPrefix(e.target.value)
+                  }
+                />
+              </FormControl>
+            )}
           </ModalBody>
 
           <ModalFooter>

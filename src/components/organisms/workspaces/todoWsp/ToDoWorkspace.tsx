@@ -10,18 +10,14 @@ const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const { currentWorkSpace } = useCurrentWorkspace();
-  const [currentColor, setCurrentColor] = useState<string>("#dfeeee");
+  const [currentColor, setCurrentColor] = useState<string>("#FAFAFA");
   const [resizeListener, setResizeListener] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const isBrowser = () => typeof window !== "undefined";
   const colorObject = {
-    "Default color": "#dfeeee",
-    "Blue gradient":
-      "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
-    "Spreadsheet wallpaper":
-      "linear-gradient(90deg, rgba(127,179,216,1) 2%, rgba(78,199,223,1) 48%, rgba(170,160,223,1) 97%)",
-    "Sunrise":
-      "linear-gradient(90deg, rgba(32,44,57,1) 0%, rgba(66,97,104,1) 100%)",
+    "Default color": "#FAFAFA",
+    Bone: "#F8F8F8",
+    Marfil: "#FAFAFA",
   };
 
   if (isBrowser()) {

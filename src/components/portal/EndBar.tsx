@@ -16,15 +16,15 @@ const EndBar = ({ setWorkSpaceFlow }) => {
   return (
     <>
       <EndSession isOpen={isOpen} setIsOpen={setIsOpen} router={router} />
-      <div style={{ position: "absolute", bottom: 0, marginBottom: "20px" }}>
+      <div style={{ position: "absolute", bottom: 0, marginBottom: "20px", color: "#252525" }}>
         <SettingsIcon sx={{ marginLeft: "20px" }} />
         <button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#263849",
+            backgroundColor: "transparent",
             border: "none",
-            color: "whitesmoke",
+            color: "#1C1C1C",
             marginLeft: "5px",
           }}
           onClick={() => setWorkSpaceFlow("userConfig")}
@@ -37,9 +37,9 @@ const EndBar = ({ setWorkSpaceFlow }) => {
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#263849",
+            backgroundColor: "transparent",
             border: "none",
-            color: "whitesmoke",
+            color: "#1C1C1C",
             marginLeft: "5px",
           }}
           onClick={() => setIsOpen(true)}

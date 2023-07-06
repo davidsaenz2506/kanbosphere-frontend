@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Tooltip } from "@chakra-ui/react";
 import { AddIcon, RepeatIcon } from "@chakra-ui/icons";
 
 import { Popover } from "@nextui-org/react";
@@ -36,24 +36,30 @@ const Header = (Props: IHeaderProps) => {
             textAlign: "start",
             marginTop: "20px",
             marginLeft: "30px",
-            color: currentColor === "#dfeeee" ? "#0E0B16" : "whitesmoke",
-            fontWeight: "bold",
+            color: "#0F0F0F",
           }}
         >
-          {currentWorkSpace.name}
+          {currentWorkSpace.name} / Sprints
         </h2>
       </div>
       <div style={{ marginRight: "20px" }}>
         <Popover isBordered disableShadow>
           <Popover.Trigger>
-            <Button
-              sx={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
-              onClick={() => setIsOpen(!isOpen)}
-              style={{ marginRight: "20px" }}
+            <Tooltip
+              label="Sorry, this feature is currently disabled"
+              aria-label="A tooltip"
+              placement="right"
             >
-              <RepeatIcon sx={{ marginRight: "10px" }} />
-              Cambiar fondo
-            </Button>
+              <Button
+                sx={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
+                onClick={() => setIsOpen(!isOpen)}
+                style={{ marginRight: "20px" }}
+                isDisabled={true}
+              >
+                <RepeatIcon sx={{ marginRight: "10px" }} />
+                Cambiar fondo
+              </Button>
+            </Tooltip>
           </Popover.Trigger>
           <Popover.Content>
             <Box style={{ padding: "20px" }}>

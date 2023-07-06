@@ -44,16 +44,16 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
         data={item}
       />
       <EditWorkSpaceName isOpen={openEdit} onClose={setOpenEdit} data={item} />
-      <div style={{ marginTop: "10px" }}>
+      <div style={{ marginTop: "10px", color: "#252525" }}>
         <div>
           <HamburgerIcon sx={{ marginLeft: "20px" }} />
           <button
             type="button"
             className="btn btn-secondary btn-lg btn-block"
             style={{
-              backgroundColor: "#263849",
+              backgroundColor: "transparent",
               border: "none",
-              color: "whitesmoke",
+              color: "#1C1C1C",
               marginLeft: "5px",
               fontWeight: workspaceFlow == "mainMenu" ? "bolder" : "normal",
             }}
@@ -78,9 +78,9 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
               type="button"
               className="btn btn-secondary btn-lg btn-block"
               style={{
-                backgroundColor: "#263849",
+                backgroundColor: "transparent",
                 border: "none",
-                color: "whitesmoke",
+                color: "#1C1C1C",
                 marginLeft: "5px",
                 fontWeight: workspaceFlow == "wspUser" ? "bolder" : "normal",
               }}
@@ -129,7 +129,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: " center",
-                    color: "whitesmoke",
+                    color: "#1C1C1C",
                     fontWeight:
                       currentSelected === todoWorkspace._id
                         ? "bolder"
@@ -173,14 +173,14 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
       </div>
 
       <div>
-        <ChatIcon sx={{ marginLeft: "20px" }} />
+        <ChatIcon sx={{ marginLeft: "20px", color: "#252525" }} />
         <button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#263849",
+            backgroundColor: "transparent",
             border: "none",
-            color: "whitesmoke",
+            color: "#252525",
             marginLeft: "5px",
             fontWeight: workspaceFlow == "chatUser" ? "bolder" : "normal",
           }}
@@ -194,15 +194,15 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
       </div>
 
       <div>
-        <CalendarIcon sx={{ marginLeft: "20px" }} />
+        <CalendarIcon sx={{ marginLeft: "20px", color: "#252525" }} />
         <button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#263849",
+            backgroundColor: "transparent",
             border: "none",
-            color: "whitesmoke",
             marginLeft: "5px",
+            color: "#1C1C1C",
             fontWeight: workspaceFlow == "calendarUser" ? "bolder" : "normal",
           }}
           onClick={() => {
@@ -215,15 +215,15 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
       </div>
 
       <div>
-        <StarIcon sx={{ marginLeft: "20px" }} />
+        <StarIcon sx={{ marginLeft: "20px", color: "#252525" }} />
         <button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
-            backgroundColor: "#263849",
+            backgroundColor: "transparent",
             border: "none",
-            color: "whitesmoke",
             marginLeft: "5px",
+            color: "#1C1C1C",
             fontWeight: workspaceFlow == "balanceUser" ? "bolder" : "normal",
           }}
           onClick={() => {

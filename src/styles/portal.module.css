@@ -12,8 +12,7 @@
 }
 
 .workSpace {
-  background-image: url(./../../public/assets/b9fc9147-59cf-4ba9-8b48-605f53e4a88d.png);
-  background-color: #1d2731;
+  background-color: #EAEAEA;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -30,16 +29,16 @@
 
 .resizerParticle {
   user-select: none;
-  width: 1%;
+  width: 5px;
   height: 100vh;
   cursor: col-resize;
-  background-color: #233142;
+  background-color: #D3D3D3;
   z-index: 100;
 }
 
 .toolContainer {
   width: 99%;
-  background-color: #263849;
+  background-color: #EAEAEA;
   height: 100vh;
   color: whitesmoke;
 }

@@ -27,9 +27,6 @@ import { setSpreadColumns } from "@/utilities/spreadsheet/setSpreadColumns";
 import { Tooltip } from "@chakra-ui/react";
 import { getColor } from "@/utilities/spreadsheet/getTagColor";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
-import { debounce } from "lodash";
-import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
-import { getAllWorkSpaces } from "@/services/workspaces/getAll";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 export interface IPicklistOptions {
@@ -47,7 +44,6 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const performanceWorkspaces = useWorkspace();
-  const currentSession = useCurrentUser();
   const [columnName, setColumnName] = useState("");
   const [columnType, setColumnType] = useState("");
   const [newColumn, setNewColumn] = useState<IColumnProjection>({

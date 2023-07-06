@@ -11,7 +11,7 @@ import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook"
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import FileViewer from "./FileViewer";
 import Loading from "@/components/molecules/Loading";
-import { Portal } from "@chakra-ui/react";
+import { Box, FormLabel, Portal, Textarea } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
 
@@ -25,6 +25,12 @@ const EditTask = ({ isOpen, onClose, data }) => {
     { value: "Blocked", label: "Blocked" },
     { value: "New", label: "New" },
   ];
+  const priorityOptions: IPicklistOptions[] = [
+    { label: "Baja", value: "low", color: "#C7E9FF" },
+    { label: "Media", value: "half", color: "#FFE6B3" },
+    { label: "Alta", value: "high", color: "#FFC6A5" },
+    { label: "Crítica", value: "critical", color: "#FFC1F3" },
+  ];
   const [newDate, setNewDate] = useState(
     DateTime.fromISO(data.createDate).toISODate()
   );
@@ -35,12 +41,19 @@ const EditTask = ({ isOpen, onClose, data }) => {
     value: data.status,
     label: data.status,
   });
+  const [priority, setPriority] = useState({
+    value: data.priority?.value,
+    label: data.priority?.value,
+    color: data.priority?.color,
+  });
+  const [description, setDescription] = useState<string>(data?.description);
   const [taskInfo, setTaskInfo] = useState(data.info);
   const [pathImage, setPathImage] = useState(data.file);
   const [openModalForFiles, setOpenModalForFiles] = useState(false);
   const [loadingAsyncEdit, setLoadingAsyncEdit] = useState(false);
   const ref = useRef<Element | null>(null);
   const toastNotification = useToast();
+  const marginStatusValue = 4;
 
   useEffect(() => {
     ref.current = document.querySelector<HTMLElement>("#root");
@@ -50,6 +63,8 @@ const EditTask = ({ isOpen, onClose, data }) => {
     userId: data.userId,
     taskId: data.taskId,
     status: status.label,
+    priority: priority,
+    description: description,
     info: taskInfo,
     title: data.title,
     file: pathImage,
@@ -64,6 +79,11 @@ const EditTask = ({ isOpen, onClose, data }) => {
         value: data.status,
         label: data.status,
       });
+      setPriority({
+        value: data.priority?.value,
+        label: data.priority?.value,
+        color: data.priority?.color,
+      });
       setPathImage(data.file);
       setNewDate(DateTime.fromISO(data.createDate).toISODate());
     }, 300);
@@ -76,13 +96,15 @@ const EditTask = ({ isOpen, onClose, data }) => {
       userId: data.userId,
       taskId: data.taskId,
       status: status.label,
+      description: description,
+      priority: priority,
       info: taskInfo,
       title: data.title,
       file: pathImage,
       createDate: DateTime.fromISO(newDate).toISO(),
       finishDate: finishDate,
     });
-  }, [status, newDate, taskInfo, pathImage, finishDate]);
+  }, [status, newDate, taskInfo, pathImage, finishDate, priority, description]);
 
   function handlePathImage(argument: string | ArrayBuffer | null) {
     setPathImage(argument);
@@ -90,6 +112,8 @@ const EditTask = ({ isOpen, onClose, data }) => {
       userId: data.userId,
       taskId: data.taskId,
       status: status.label,
+      description: description,
+      priority: priority,
       info: taskInfo,
       title: data.title,
       file: argument,
@@ -135,6 +159,8 @@ const EditTask = ({ isOpen, onClose, data }) => {
       userId: data.userId,
       taskId: data.taskId,
       status: status.label,
+      priority: priority,
+      description: description,
       info: taskInfo,
       title: data.title,
       file: "",
@@ -163,68 +189,106 @@ const EditTask = ({ isOpen, onClose, data }) => {
         style={{ height: "80vh" }}
         open={isOpen}
         onClose={() => onClose(false)}
+        width="1000px"
       >
         <Modal.Header>
           {" "}
-          <Text id="modal-title" size={18}>
+          <Text id="modal-title" size={25} style={{ marginBottom: "-10px" }}>
             Editar Tarea
           </Text>
         </Modal.Header>
-        <Modal.Body>
-          <Input
-            type="text"
-            initialValue={taskInfo}
-            onChange={(e) => setTaskInfo(e.target.value)}
-          />
-          <Select
-            value={status}
-            options={statusOptions}
-            onChange={(e: SingleValue<IPicklistOptions>) => {
-              if (e) {
-                if (e.value === "Finished" || e.value === "For Review")
-                  setFinishDate(DateTime.now().toISO());
-                setStatus({ value: e.value, label: e.label });
+        <Modal.Body style={{ display: "flex", flexDirection: "row" }}>
+          <Box
+            style={{ width: "60%", paddingRight: "20px", paddingLeft: "20px" }}
+          >
+            <FormLabel mt={marginStatusValue}>Título</FormLabel>
+            <Input
+              value={description}
+              width="100%"
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <FormLabel mt={marginStatusValue}>Información</FormLabel>
+            <Textarea
+              value={taskInfo}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setTaskInfo(e.target.value)
               }
-            }}
-          />
-          <Input
-            type="date"
-            initialValue={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-          />
+              minHeight={250}
+            />
 
-          <div className="mb-4">
-            <input
-              onChange={(e: any) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  const userFiles: any = e.target.files[0];
-
-                  if (userFiles.type.includes("image")) {
-                    const inputComputedReader = new FileReader();
-                    inputComputedReader.readAsDataURL(userFiles);
-
-                    inputComputedReader.onload = () => {
-                      handlePathImage(inputComputedReader.result);
-                    };
-                  }
+            <FormLabel mt={marginStatusValue}>Status</FormLabel>
+            <Select
+              value={status}
+              options={statusOptions}
+              onChange={(e: SingleValue<IPicklistOptions>) => {
+                if (e) {
+                  if (e.value === "Finished" || e.value === "For Review")
+                    setFinishDate(DateTime.now().toISO());
+                  setStatus({ value: e.value, label: e.label });
                 }
               }}
-              className="form-control"
-              type="file"
-              id="formFile"
             />
-          </div>
+            <FormLabel mt={marginStatusValue}>Priority</FormLabel>
+            <Select
+              value={priority}
+              options={priorityOptions}
+              onChange={(e: SingleValue<IPicklistOptions>) => {
+                if (e) {
+                  // @ts-ignore
+                  setPriority({
+                    value: e.label,
+                    label: e.label,
+                    color: e.color,
+                  });
+                }
+              }}
+            />
+            <FormLabel mt={marginStatusValue}>Fecha de inicio</FormLabel>
+            <Input
+              type="date"
+              width="100%"
+              initialValue={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+            />
+          </Box>
 
-          {pathImage && modifiedTask.file && (
-            <React.Fragment>
-              <label style={{ textAlign: "center" }}>Archivos adjuntos</label>
-              <Image
-                onClick={() => setOpenModalForFiles(true)}
-                style={{ borderRadius: "20px" }}
-                src={pathImage}
+          <Box style={{ width: "40%", padding: "20px" }}>
+            <FormLabel>Imagenes y documentos</FormLabel>
+            <div className="mb-4">
+              <input
+                onChange={(e: any) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    const userFiles: any = e.target.files[0];
+
+                    if (userFiles.type.includes("image")) {
+                      const inputComputedReader = new FileReader();
+                      inputComputedReader.readAsDataURL(userFiles);
+
+                      inputComputedReader.onload = () => {
+                        handlePathImage(inputComputedReader.result);
+                      };
+                    }
+                  }
+                }}
+                className="form-control"
+                type="file"
+                id="formFile"
               />
-            </React.Fragment>
-          )}
+            </div>
+
+            {pathImage && modifiedTask.file && (
+              <React.Fragment>
+                <label style={{ textAlign: "center", marginBottom: "10px" }}>
+                  Archivos adjuntos
+                </label>
+                <Image
+                  onClick={() => setOpenModalForFiles(true)}
+                  style={{ borderRadius: "20px" }}
+                  src={pathImage}
+                />
+              </React.Fragment>
+            )}
+          </Box>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={() => onClose(false)} auto flat color="error">

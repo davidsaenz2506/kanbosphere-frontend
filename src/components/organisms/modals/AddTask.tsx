@@ -11,10 +11,11 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Textarea,
 } from "@chakra-ui/react";
 
 import Select, { SingleValue } from "react-select";
-import { IDataToDo } from "@/domain/entities/todo.entity";
+import { IDataToDo, IPriority } from "@/domain/entities/todo.entity";
 
 import { DateTime } from "luxon";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
@@ -23,23 +24,37 @@ import { UpdateWorkSpace } from "@/services/workspaces/update";
 export interface IPicklistOptions {
   value: string;
   label: string;
+  color?: string;
 }
 
 const AddTask = ({ isOpen, onClose }) => {
   const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const [status, setStatus] = useState<string>("");
+  const mathRandomValue = React.useMemo(
+    () => Math.floor(Math.random() * 999) + 1,
+    [data]
+  );
+  const formatedValue = mathRandomValue.toString().padStart(3, "0");
   const [taskInfo, setTaskInfo] = useState<string>("");
-  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [file, setFile] = useState<string>("");
   const [taskId, setTaskId] = useState<string>(
     Math.random().toString(36).substr(2, 18)
   );
+  const [selectedPriority, setSelectedPriority] = useState<IPriority>({
+    value: "",
+    color: "",
+  });
+
+  const title = `${data.prefix}-${formatedValue}`;
 
   const [task, setTask] = useState<IDataToDo>({
     userId: "1000933190",
     taskId: "",
     status: "",
+    priority: selectedPriority,
+    description: description,
     info: "",
     title: "",
     file: "",
@@ -54,17 +69,27 @@ const AddTask = ({ isOpen, onClose }) => {
     { value: "New", label: "New" },
   ];
 
+  const priorityOptions: IPicklistOptions[] = [
+    { label: "Baja", value: "low", color: "#C7E9FF" },
+    { label: "Media", value: "half", color: "#FFE6B3" },
+    { label: "Alta", value: "high", color: "#FFC6A5" },
+
+    { label: "Crítica", value: "critical", color: "#FFC1F3" },
+  ];
+
   useEffect(() => {
     setTask({
       userId: "1000933190",
       taskId: taskId,
       status: status,
+      description: description,
+      priority: selectedPriority,
       info: taskInfo,
       title: title,
       file: file,
       createDate: DateTime.now().toISO(),
     });
-  }, [status, taskInfo, title]);
+  }, [status, taskInfo, title, selectedPriority]);
 
   async function addTaskToWorkSpace(userTask: IDataToDo) {
     let workspaceData: IDataToDo[] | undefined = data.wspData;
@@ -81,24 +106,28 @@ const AddTask = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={() => onClose(false)}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Añadir tarea</ModalHeader>
+        <ModalHeader>Añadir tarea {title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <FormControl style={{ marginBottom: "20px" }}>
-            <FormLabel>Titulo</FormLabel>
+          <FormControl>
+            <FormLabel>Título</FormLabel>
             <Input
               type="text"
+              sx={{marginBottom: "20px"}}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setTitle(e.target.value)
+                setDescription(e.target.value)
               }
             />
           </FormControl>
-
           <FormControl>
             <FormLabel>Información</FormLabel>
-            <Input
-              type="text"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            <Textarea
+              size="lg"
+              sx={{
+                height: "120px",
+                fontSize: "1rem",
+              }}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setTaskInfo(e.target.value)
               }
             />
@@ -110,6 +139,17 @@ const AddTask = ({ isOpen, onClose }) => {
               options={statusOptions}
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) setStatus(e.label);
+              }}
+            />
+          </FormControl>
+
+          <FormControl mt={4}>
+            <FormLabel>Priority</FormLabel>
+            <Select
+              options={priorityOptions}
+              onChange={(e: SingleValue<IPicklistOptions>) => {
+                // @ts-ignore
+                if (e) setSelectedPriority({ value: e.label, color: e.color });
               }}
             />
           </FormControl>

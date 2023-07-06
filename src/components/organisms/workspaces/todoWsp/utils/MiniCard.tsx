@@ -35,7 +35,7 @@ const MiniCard = (Props: IMiniCardProps) => {
         borderRadius: "5px",
         cursor: isClicked ? "default" : "pointer",
         border: isClicked ? "1px solid black" : "none",
-        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"
+        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
       }}
     >
       <EditTask isOpen={openEdit} onClose={setOpenEdit} data={item} />
@@ -46,7 +46,7 @@ const MiniCard = (Props: IMiniCardProps) => {
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            marginBottom: "5px",
+            marginBottom: "15px",
             transition: "all .5s",
           }}
         >
@@ -67,8 +67,32 @@ const MiniCard = (Props: IMiniCardProps) => {
         </div>
       )}
       <div onClick={() => setIsClicked(isClicked ? false : true)}>
-        <p style={{ fontWeight: "bold" }}>{item.title}</p>
-        <p>{item.info}</p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <p style={{ fontWeight: "bold" }}>{item.title}</p>
+          <div
+            style={{
+              backgroundColor: item.priority?.color,
+              width: "max-content",
+              paddingLeft: "10px",
+              paddingRight: "10px",
+              borderRadius: "10px",
+              cursor: "pointer",
+            }}
+          >
+            <p style={{ fontWeight: "bold" }}>
+              Prioridad: {item.priority?.value}
+            </p>
+          </div>
+        </div>
+
+        <p style={{ marginTop: "5px" }}>{item.description}</p>
+
         <div
           style={{
             height: "max-content",
@@ -80,7 +104,7 @@ const MiniCard = (Props: IMiniCardProps) => {
             cursor: "pointer",
           }}
         >
-          <p style={{ marginTop: "15px" }}>{item.status}</p>
+          <p style={{ marginTop: "5px" }}>{item.status}</p>
         </div>
         <p style={{ marginTop: "5px" }}>
           <strong> Fecha de inicio: </strong>

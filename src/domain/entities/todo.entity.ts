@@ -1,9 +1,14 @@
-
+export interface IPriority {
+    value: string;
+    color: string;
+}
 export interface IDataToDo {
     userId: string,
     taskId: string,
     status: string,
+    priority: IPriority,
     info: string,
+    description: string,
     title: string,
     createDate: Date,
     file: string,

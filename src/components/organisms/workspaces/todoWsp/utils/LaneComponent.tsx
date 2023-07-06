@@ -10,17 +10,21 @@ const LaneComponent = ({ title, bgColor, data, targetColor }) => {
       <Card
         className={styles.container}
         sx={{
-          minWidth: "350px",
+          minWidth: "300px",
           backgroundColor: bgColor,
           marginLeft: "20px",
           overflowY: "auto",
-          zIndex: 1
+          zIndex: 1,
+          boxShadow: "rgba(0, 0, 0, 0.15) 0px 3px 8px;",
         }}
       >
         <CardHeader>
-          <Heading size="md" sx={{ color: "#182433", textAlign: "center" }}>
+          <Heading
+            size="md"
+            sx={{ color: "#182433", textAlign: "center", fontWeight: 0 }}
+          >
             {" "}
-            {title}: {data.length}{" "} Records
+            {title}: {data.length} Records
           </Heading>
         </CardHeader>
         <CardBody sx={{ marginTop: "-20px", cursor: "default" }}>

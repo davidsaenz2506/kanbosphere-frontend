@@ -12,6 +12,7 @@ type PropTypes = {
 export const CurrentWorkSpaceProvider: FC<PropTypes> = ({ children }: any) => {
   const [currentWorkSpace, setCurrentWorkSpace] = React.useState({
     name: "",
+    prefix: "",
     createdDate: DateTime.now(),
     createdById: "",
     type: "",

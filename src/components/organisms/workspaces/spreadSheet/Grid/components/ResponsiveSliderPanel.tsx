@@ -17,7 +17,6 @@ import React from "react";
 import { addGridRow } from "../utils/functions/addGridRow";
 import { deleteIndividualGridRow } from "../utils/functions/deleteIndividualGridRows";
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
-import { AnyMxRecord } from "dns";
 
 interface ISlideProps {
   setTypeQueryFromUser: any;

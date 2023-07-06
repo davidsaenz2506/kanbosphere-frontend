@@ -88,12 +88,9 @@ const WeatherComponent = () => {
       <div className={styles.weatherCard}>
         <div className={styles.currentLocation}>
           <h3 style={{ fontWeight: "bold" }}>Tumble weather</h3>
-
-          <p style={{ fontSize: "80px" }}>{currentUserWeather?.main?.temp}° </p>
-
+          <p style={{ fontSize: "50px" }}>{currentUserWeather?.main?.temp}° </p>
           <p>{currentUserWeather?.name}</p>
           <p>Humedad {currentUserWeather?.main?.humidity}% </p>
-
           <p>Temperatura maxima {currentUserWeather?.main?.temp_max}° C </p>
         </div>
         <div className={styles.weatherImage}>

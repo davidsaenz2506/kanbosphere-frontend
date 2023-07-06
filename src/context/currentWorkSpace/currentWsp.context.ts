@@ -12,6 +12,7 @@ export interface ICurrentWspContext {
 export const CurrentWorkSpaceContext = createContext<ICurrentWspContext>({
     currentWorkSpace: {
         name: "",
+        prefix: "",
         createdDate: DateTime.now(),
         createdById: "",
         type: "",
