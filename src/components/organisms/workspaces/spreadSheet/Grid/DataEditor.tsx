@@ -24,6 +24,7 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { sendNewColumnsToServer } from "./utils/functions/sendColumnsToServet";
 
 import { useToast } from "@chakra-ui/react";
+import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
 interface ISpreadProps {
   data: any;
@@ -42,6 +43,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
     useTheme
   } = Props;
   const currentUserWsp = useCurrentWorkspace();
+  const currentUserWorkspaces = useWorkspace();
   const currentUser = useCurrentUser();
   const toastNotification = useToast();
   const columns: IColumnProjection[] =
@@ -67,7 +69,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   const getUserData = useCallback(
     ([col, row]: Item): GridCell => getCellData([col, row], data, userColumns),
-    [data, userColumns, internalTriggerPointer]
+    [data, userColumns, internalTriggerPointer, currentUserWorkspaces.userWsps, currentUserWsp.currentWorkSpace]
   );
 
   function handleStateForNotificationSnack(staticValueFromServer: boolean) {
@@ -76,15 +78,6 @@ const GridDataEditor = (Props: ISpreadProps) => {
         title: "Ups, algo ha ocurrido...",
         description: "Asegúrate de ingresar los datos correctamente",
         status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
-    else
-      toastNotification({
-        title: "Correcto",
-        description:
-          "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
-        status: "success",
         duration: 4000,
         isClosable: true,
       });
@@ -105,10 +98,28 @@ const GridDataEditor = (Props: ISpreadProps) => {
     [userColumns, data]
   );
 
+
   React.useEffect(() => {
     // @ts-ignore
-    setCurrentRowsSelected(userSelection.rows?.items.length ? userSelection.rows?.items[0][0] : undefined);
+    const transformItemObjectToArray = userSelection.rows?.items.length ? userSelection.rows?.items : undefined;
+    const iterateObjectPlanning: number[][] = transformItemObjectToArray?.map((currentMappedBox) => {
+          const indexValues: number[] = [];
+          
+          for (let i = currentMappedBox[0]; i < currentMappedBox[1]; i++) {
+            indexValues.push(i);
+          }
+
+          return indexValues
+    });
+
+    if (iterateObjectPlanning === undefined) return
+    
+    
+    const reducedObject : number[] = ([] as number[]).concat(...iterateObjectPlanning);
+
+    setCurrentRowsSelected(reducedObject);
   }, [userSelection.rows]);
+  
 
   return (
     <div

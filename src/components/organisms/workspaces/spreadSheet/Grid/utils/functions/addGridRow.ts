@@ -24,6 +24,4 @@ export async function addGridRow(currentWorkSpace: ICurrentWspContext) {
         ...currentWorkSpace.currentWorkSpace,
         spreadSheetData: newSpreadData,
     });
-
-    await UpdateWorkSpace(currentWorkSpace.currentWorkSpace);
 }

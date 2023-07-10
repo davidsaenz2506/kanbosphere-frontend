@@ -3,8 +3,9 @@ import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import EditTask from "@/components/organisms/modals/EditTask";
 import { DateTime } from "luxon";
 import DeleteTask from "../../../modals/DeleteTask";
-import { useOutsideClick } from "@chakra-ui/react";
+import { Portal, useOutsideClick } from "@chakra-ui/react";
 import { IDataToDo } from "@/domain/entities/todo.entity";
+import Loading from "@/components/molecules/Loading";
 
 interface IMiniCardProps {
   item: IDataToDo;
@@ -16,6 +17,7 @@ const MiniCard = (Props: IMiniCardProps) => {
   const { item, key, targetColor } = Props;
   const [isClicked, setIsClicked] = React.useState(false);
   const [openEdit, setOpenEdit] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const ref: any = React.useRef();
   useOutsideClick({
@@ -38,8 +40,23 @@ const MiniCard = (Props: IMiniCardProps) => {
         boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
       }}
     >
-      <EditTask isOpen={openEdit} onClose={setOpenEdit} data={item} />
-      <DeleteTask isOpen={openDelete} onClose={setOpenDelete} data={item} />
+      {isLoading && (
+        <Portal>
+          <Loading message="Actualizando base de datos" />
+        </Portal>
+      )}
+      <EditTask
+        isOpen={openEdit}
+        onClose={setOpenEdit}
+        data={item}
+        setIsLoading={setIsLoading}
+      />
+      <DeleteTask
+        isOpen={openDelete}
+        onClose={setOpenDelete}
+        data={item}
+        setIsLoading={setIsLoading}
+      />
       {isClicked && (
         <div
           className="options"

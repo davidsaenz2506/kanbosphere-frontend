@@ -47,6 +47,6 @@ export const editGridCell = async (
         } else data[row][key] = newValue.data;
     }
 
-    await UpdateWorkSpace(currentUserWsp.currentWorkSpace);
     return true;
+
 };

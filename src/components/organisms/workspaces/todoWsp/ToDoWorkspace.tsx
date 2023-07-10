@@ -5,13 +5,16 @@ import AddTask from "../../modals/AddTask";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import Header from "./utils/Header";
 import initResizer from "@/utilities/resizePage";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
+  const currentSession = useCurrentUser();
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
-  const { currentWorkSpace } = useCurrentWorkspace();
+  const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const [currentColor, setCurrentColor] = useState<string>("#FAFAFA");
   const [resizeListener, setResizeListener] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const isBrowser = () => typeof window !== "undefined";
   const colorObject = {
@@ -83,8 +86,12 @@ const ToDoWorkspace = () => {
         background: currentColor,
       }}
     >
-      <AddTask isOpen={addTask} onClose={setAddTask} />
-
+      <AddTask
+        isOpen={addTask}
+        onClose={setAddTask}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+      />
       <div
         style={{
           display: "flex",

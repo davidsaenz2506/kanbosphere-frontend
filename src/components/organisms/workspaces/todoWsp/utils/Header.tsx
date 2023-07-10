@@ -39,7 +39,7 @@ const Header = (Props: IHeaderProps) => {
             color: "#0F0F0F",
           }}
         >
-          {currentWorkSpace.name} / Sprints
+          {currentWorkSpace?.name} / Sprints
         </h2>
       </div>
       <div style={{ marginRight: "20px" }}>

@@ -12,6 +12,7 @@ import {
   FormLabel,
   Input,
   Textarea,
+  Portal,
 } from "@chakra-ui/react";
 
 import Select, { SingleValue } from "react-select";
@@ -20,6 +21,9 @@ import { IDataToDo, IPriority } from "@/domain/entities/todo.entity";
 import { DateTime } from "luxon";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
+import currentBiridectionalCommunication from "@/services/socket";
+import { AddCard } from "@/services/workspaces/addCard";
+import Loading from "@/components/molecules/Loading";
 
 export interface IPicklistOptions {
   value: string;
@@ -27,7 +31,7 @@ export interface IPicklistOptions {
   color?: string;
 }
 
-const AddTask = ({ isOpen, onClose }) => {
+const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
   const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const [status, setStatus] = useState<string>("");
@@ -47,7 +51,7 @@ const AddTask = ({ isOpen, onClose }) => {
     color: "",
   });
 
-  const title = `${data.prefix}-${formatedValue}`;
+  const title = `${data?.prefix}-${formatedValue}`;
 
   const [task, setTask] = useState<IDataToDo>({
     userId: "1000933190",
@@ -92,6 +96,7 @@ const AddTask = ({ isOpen, onClose }) => {
   }, [status, taskInfo, title, selectedPriority]);
 
   async function addTaskToWorkSpace(userTask: IDataToDo) {
+    setIsLoading(true);
     let workspaceData: IDataToDo[] | undefined = data.wspData;
     let newTask: IDataToDo = userTask;
 
@@ -99,78 +104,86 @@ const AddTask = ({ isOpen, onClose }) => {
 
     setUserTasks({ ...data, wspData: workspaceData });
 
-    await UpdateWorkSpace(data);
+    await AddCard(data._id, newTask);
+    setIsLoading(false);
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose(false)}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Añadir tarea {title}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <FormControl>
-            <FormLabel>Título</FormLabel>
-            <Input
-              type="text"
-              sx={{marginBottom: "20px"}}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDescription(e.target.value)
-              }
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Información</FormLabel>
-            <Textarea
-              size="lg"
-              sx={{
-                height: "120px",
-                fontSize: "1rem",
-              }}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setTaskInfo(e.target.value)
-              }
-            />
-          </FormControl>
+    <React.Fragment>
+      {isLoading && (
+        <Portal>
+          <Loading message="Agregando nueva tarea" />
+        </Portal>
+      )}
+      <Modal isOpen={isOpen} onClose={() => onClose(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Añadir tarea {title}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel>Título</FormLabel>
+              <Input
+                type="text"
+                sx={{ marginBottom: "20px" }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setDescription(e.target.value)
+                }
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Información</FormLabel>
+              <Textarea
+                size="lg"
+                sx={{
+                  height: "120px",
+                  fontSize: "1rem",
+                }}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setTaskInfo(e.target.value)
+                }
+              />
+            </FormControl>
 
-          <FormControl mt={4}>
-            <FormLabel>Status</FormLabel>
-            <Select
-              options={statusOptions}
-              onChange={(e: SingleValue<IPicklistOptions>) => {
-                if (e) setStatus(e.label);
-              }}
-            />
-          </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Status</FormLabel>
+              <Select
+                options={statusOptions}
+                onChange={(e: SingleValue<IPicklistOptions>) => {
+                  if (e) setStatus(e.label);
+                }}
+              />
+            </FormControl>
 
-          <FormControl mt={4}>
-            <FormLabel>Priority</FormLabel>
-            <Select
-              options={priorityOptions}
-              onChange={(e: SingleValue<IPicklistOptions>) => {
-                // @ts-ignore
-                if (e) setSelectedPriority({ value: e.label, color: e.color });
-              }}
-            />
-          </FormControl>
-        </ModalBody>
+            <FormControl mt={4}>
+              <FormLabel>Priority</FormLabel>
+              <Select
+                options={priorityOptions}
+                onChange={(e: SingleValue<IPicklistOptions>) => {
+                  if (e)
+                    setSelectedPriority({ value: e.label, color: e.color });
+                }}
+              />
+            </FormControl>
+          </ModalBody>
 
-        <ModalFooter>
-          <Button
-            colorScheme="blue"
-            mr={3}
-            onClick={() => {
-              addTaskToWorkSpace(task);
-              setTaskId(Math.random().toString(36).substr(2, 18));
-              onClose(false);
-            }}
-          >
-            Crear
-          </Button>
-          <Button onClick={() => onClose(false)}>Cancel</Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                addTaskToWorkSpace(task);
+                setTaskId(Math.random().toString(36).substr(2, 18));
+                onClose(false);
+              }}
+            >
+              Crear
+            </Button>
+            <Button onClick={() => onClose(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </React.Fragment>
   );
 };
 

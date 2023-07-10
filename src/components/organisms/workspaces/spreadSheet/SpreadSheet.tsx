@@ -14,11 +14,13 @@ import {
   DrawerCloseButton,
   useDimensions,
   Divider,
+  Tooltip,
 } from "@chakra-ui/react";
 
 import {
   EditIcon,
   HamburgerIcon,
+  RepeatIcon,
   Search2Icon,
   UnlockIcon,
 } from "@chakra-ui/icons";
@@ -47,7 +49,7 @@ import CreateColumn from "../../modals/Spread/AddColumn";
 
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 
-import { deleteIndividualGridRow } from "./Grid/utils/functions/deleteIndividualGridRows";
+import { deleteGridRow } from "./Grid/utils/functions/deleteIndividualGridRows";
 import { addGridRow } from "./Grid/utils/functions/addGridRow";
 import Loading from "@/components/molecules/Loading";
 import initResizer from "@/utilities/resizePage";
@@ -59,6 +61,9 @@ import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { Theme } from "@glideapps/glide-data-grid";
 import ResponsiveSliderPanel from "./Grid/components/ResponsiveSliderPanel";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
+import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
+import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 interface ISpreadGrid {
   wch: number;
@@ -74,6 +79,9 @@ const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentSession = useCurrentUser();
+  const { currentWorkSpace: data, setCurrentWorkSpace: setData } =
+    useCurrentWorkspace();
+  const generalWorkspaceData = useWorkspace();
   const keyCodeFromEnterDown = 13;
   const [optionsVector, setOptionsVector] = useState<any>([]);
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
@@ -89,13 +97,13 @@ const Spreadsheet = () => {
   const todoRefHTMLElement = React.createRef<HTMLElement>();
   const [openSlider, setOpenSlider] = useState(false);
   const [spreadSheetData, setSpreadSheetData] = useState(
-    currentWorkSpace.currentWorkSpace.spreadSheetData?.data
+    currentWorkSpace.currentWorkSpace?.spreadSheetData?.data
   );
   const [isLoading, setIsLoading] = useState(false);
   const [currentWindowSize, setCurrentWindowSize] = useState<
     number | undefined
   >(0);
-  const [currentRowsSelected, setCurrentRowsSelected] = useState<number>();
+  const [currentRowsSelected, setCurrentRowsSelected] = useState<number[]>([]);
   const [typedQueryFromUser, setTypeQueryFromUser] = useState({
     workspaceID: "",
     query: "",
@@ -108,8 +116,10 @@ const Spreadsheet = () => {
 
   const isBrowser = () => typeof window !== "undefined";
 
+  console.log(currentRowsSelected)
+
   const restrictedColumnsToQuery =
-    currentWorkSpace.currentWorkSpace.spreadSheetData?.columns.filter(
+    currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns.filter(
       (useColumn) => {
         if (useColumn.type === "string") return true;
         if (useColumn.type === "number") return true;
@@ -396,6 +406,14 @@ const Spreadsheet = () => {
     }
   }, [gridColumns]);
 
+  React.useEffect(() => {
+    const currentWorkSpace: IWspUser | undefined =
+      generalWorkspaceData.userWsps.find(
+        (currentWsp) => currentWsp?._id === data?._id
+      );
+    setData(currentWorkSpace);
+  }, [generalWorkspaceData.userWsps]);
+
   return (
     <div
       className="todoContainer"
@@ -580,6 +598,8 @@ const Spreadsheet = () => {
             </div>
           </DrawerBody>
 
+          <Divider style={{ marginTop: "40px" }} />
+
           <DrawerFooter>
             <Button
               variant="outline"
@@ -608,12 +628,15 @@ const Spreadsheet = () => {
       />
       {isLoading && (
         <Portal>
-          <Loading message="Agregando nueva columna" />
+          <Loading message="Actualizando datos, espere un momento..." />
         </Portal>
       )}
       <div className={styles.toolbarsect}>
         <div className="header">
-          <h2 className={styles.mainText}>
+          <h2
+            className={styles.mainText}
+            style={{ fontSize: "30px", fontWeight: "initial" }}
+          >
             {currentWorkSpace.currentWorkSpace.name}
           </h2>
         </div>
@@ -642,43 +665,47 @@ const Spreadsheet = () => {
               />
             </InputGroup>
           </div>
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", width: "100%" }}>
             <div style={{ marginRight: "20px" }}>
-              <Button
-                onClick={() => {
-                  setAddTask(true);
-                }}
-              >
-                <AddIcon sx={{ marginRight: "10px" }} />
-                Añadir Columna
-              </Button>
+              <Tooltip label="Añadir columna">
+                <Button
+                  onClick={() => {
+                    setAddTask(true);
+                  }}
+                >
+                  <AddIcon />
+                </Button>
+              </Tooltip>
             </div>
             <div style={{ marginRight: "20px" }}>
-              <Button onClick={() => addGridRow(currentWorkSpace)}>
-                <PlusSquareIcon sx={{ marginRight: "10px" }} />
-                Añadir fila
-              </Button>
+              <Tooltip label="Añadir fila">
+                <Button onClick={() => addGridRow(currentWorkSpace)}>
+                  <PlusSquareIcon />
+                </Button>
+              </Tooltip>
             </div>
             <div style={{ marginRight: "20px" }}>
-              <Button
-                onClick={() =>
-                  deleteIndividualGridRow(
-                    currentRowsSelected,
-                    currentWorkSpace,
-                    toastNotification
-                  )
-                }
-                isDisabled={currentRowsSelected !== undefined ? false : true}
-              >
-                <DeleteIcon sx={{ marginRight: "10px" }} />
-                Eliminar fila
-              </Button>
+              <Tooltip label="Eliminar fila">
+                <Button
+                  onClick={() =>
+                    deleteGridRow(
+                      currentRowsSelected,
+                      currentWorkSpace,
+                      toastNotification
+                    )
+                  }
+                  isDisabled={currentRowsSelected !== undefined ? false : true}
+                >
+                  <DeleteIcon />
+                </Button>
+              </Tooltip>
             </div>
             <div style={{ marginRight: "20px" }}>
-              <Button onClick={() => exportToExcel()}>
-                <ExternalLinkIcon sx={{ marginRight: "10px" }} />
-                Exportar excel
-              </Button>
+              <Tooltip label="Exportar excel">
+                <Button onClick={() => exportToExcel()}>
+                  <ExternalLinkIcon />
+                </Button>
+              </Tooltip>
             </div>
             <div style={{ marginRight: "20px" }}>
               <Button
@@ -688,6 +715,31 @@ const Spreadsheet = () => {
               >
                 <EditIcon sx={{ marginRight: "10px" }} />
                 Grid config
+              </Button>
+            </div>
+
+            <div style={{ marginRight: "20px" }}>
+              <Button
+                onClick={async () => {
+                  setIsLoading(true);
+                  await UpdateWorkSpace(
+                    currentWorkSpace.currentWorkSpace._id,
+                    currentWorkSpace.currentWorkSpace
+                  );
+
+                  setIsLoading(false);
+                  toastNotification({
+                    title: "Correcto",
+                    description:
+                      "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
+                    status: "success",
+                    duration: 4000,
+                    isClosable: true,
+                  });
+                }}
+              >
+                <RepeatIcon sx={{ marginRight: "10px" }} />
+                Sincronizar datos
               </Button>
             </div>
           </div>

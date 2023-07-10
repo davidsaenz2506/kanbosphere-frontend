@@ -13,11 +13,20 @@ import { Button } from "@chakra-ui/react";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
+import { DeleteCard } from "@/services/workspaces/deleteCard";
 
-const DeleteTask = (props) => {
+interface IDeleteComponentProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  data: IDataToDo;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const ref = useRef(null);
+  const { isOpen, setIsLoading, onClose, data } = props;
 
   async function deleteCurrentTask(currentTask: IDataToDo) {
     let workspaceData: IDataToDo[] | undefined = wspData.wspData;
@@ -36,8 +45,10 @@ const DeleteTask = (props) => {
   return (
     <>
       <AlertDialog
-        isOpen={props.isOpen}
-        onClose={props.onClose}
+        isOpen={isOpen}
+        onClose={() => {
+          onClose(false);
+        }}
         leastDestructiveRef={ref}
       >
         <AlertDialogOverlay>
@@ -47,18 +58,20 @@ const DeleteTask = (props) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Estas a punto de eliminar la siguiente tarea: {props.data.title}
+              Estas a punto de eliminar la siguiente tarea: {data.title}
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button onClick={() => props.onClose(false)}>Cancelar</Button>
+              <Button onClick={() => onClose(false)}>Cancelar</Button>
               <Button
                 colorScheme="red"
                 ml={3}
                 onClick={async () => {
+                  setIsLoading(true);
                   deleteCurrentTask(props.data);
-                  await UpdateWorkSpace(wspData);
-                  props.onClose(false);
+                  await DeleteCard(wspData._id, { taskId: props.data.taskId });
+                  setIsLoading(false);
+                  onClose(false);
                 }}
               >
                 Eliminar

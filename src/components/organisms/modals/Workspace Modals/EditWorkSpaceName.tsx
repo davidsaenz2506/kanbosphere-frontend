@@ -40,7 +40,7 @@ const EditWorkSpaceName = ({ isOpen, onClose, data }) => {
           <FormControl>
             <FormLabel>Nuevo nombre de Workspace</FormLabel>
             <Input
-            sx={{marginTop: "5px"}}
+              sx={{ marginTop: "5px" }}
               value={wspName}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setWspName(e.target.value)
@@ -55,7 +55,7 @@ const EditWorkSpaceName = ({ isOpen, onClose, data }) => {
             mr={3}
             onClick={async () => {
               editCurrentWorkspace(data);
-              await UpdateWorkSpace(wspData);
+              await UpdateWorkSpace(wspData._id, { name: wspData.name });
               onClose(false);
             }}
           >

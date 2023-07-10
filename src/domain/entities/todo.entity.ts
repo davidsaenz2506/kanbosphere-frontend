@@ -1,6 +1,6 @@
 export interface IPriority {
     value: string;
-    color: string;
+    color: string | undefined;
 }
 export interface IDataToDo {
     userId: string,

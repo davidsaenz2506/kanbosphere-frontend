@@ -38,7 +38,6 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
   const [currentPrefix, setCurrentPrefix] = useState<string>("");
   const wspUser: IWspContext = useWorkspace();
   const currentUserInfo: ICurrentUserContext = useCurrentUser();
-  const computedUserDataField = useCurrentUser();
 
   const [newWorkSpace, setNewWorkSpace] = useState<IWspUser>({
     name: "",
@@ -60,13 +59,8 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
   async function handleCreate() {
     setIsLoading(true);
 
-    console.log(newWorkSpace);
-    await CreateWorkSpaces(newWorkSpace);
-    const response = await getAllWorkSpaces(
-      computedUserDataField.currentUser.userID
-    );
-
-    wspUser.setUsersWsps(response);
+    const createdWorkspace = await CreateWorkSpaces(newWorkSpace);
+    wspUser.setUsersWsps([...wspUser.userWsps, createdWorkspace.data]);
 
     setIsLoading(false);
 

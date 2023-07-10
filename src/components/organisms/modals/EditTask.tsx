@@ -14,8 +14,9 @@ import Loading from "@/components/molecules/Loading";
 import { Box, FormLabel, Portal, Textarea } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
+import { UpdateCard } from "@/services/workspaces/updateCard";
 
-const EditTask = ({ isOpen, onClose, data }) => {
+const EditTask = ({ isOpen, onClose, data, setIsLoading }) => {
   const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const statusOptions = [
@@ -135,23 +136,25 @@ const EditTask = ({ isOpen, onClose, data }) => {
   }
 
   async function handleSendNewTask() {
-    setLoadingAsyncEdit(true);
+    try {
+      await UpdateCard(wspData._id, modifiedTask);
 
-    editCurrentTask(modifiedTask);
+      editCurrentTask(modifiedTask);
+      setIsLoading(false);
 
-    await UpdateWorkSpace(wspData);
-    setLoadingAsyncEdit(false);
+      toastNotification({
+        title: "Correcto",
+        description:
+          "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
 
-    toastNotification({
-      title: "Correcto",
-      description:
-        "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
-      status: "success",
-      duration: 4000,
-      isClosable: true,
-    });
-
-    onClose(false);
+      onClose(false);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function deleteFileFromDirectory() {
@@ -174,11 +177,6 @@ const EditTask = ({ isOpen, onClose, data }) => {
 
   return (
     <React.Fragment>
-      {loadingAsyncEdit && (
-        <Portal>
-          <Loading message="Editando tarea" />
-        </Portal>
-      )}
       <FileViewer
         openModalForFiles={openModalForFiles}
         setOpenModalForFiles={setOpenModalForFiles}
@@ -295,9 +293,12 @@ const EditTask = ({ isOpen, onClose, data }) => {
             Close
           </Button>
           <Button
-            onClick={async () => {
+            onPress={async () => {
               try {
-                handleSendNewTask();
+                setIsLoading(true);
+                setTimeout(() => {
+                  handleSendNewTask();
+                }, 1000);
               } catch (error) {
                 toastNotification({
                   title: "Ups, algo ha ocurrido...",

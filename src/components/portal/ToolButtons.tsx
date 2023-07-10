@@ -137,6 +137,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                   }}
                   onClick={() => {
                     setCurrentSelected(todoWorkspace._id);
+                    console.log(todoWorkspace._id)
                     currentWorkSpace.setCurrentWorkSpace(todoWorkspace);
                     setWorkSpaceFlow(todoWorkspace.type);
                   }}

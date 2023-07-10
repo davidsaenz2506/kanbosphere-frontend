@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { addGridRow } from "../utils/functions/addGridRow";
-import { deleteIndividualGridRow } from "../utils/functions/deleteIndividualGridRows";
+import { deleteGridRow } from "../utils/functions/deleteIndividualGridRows";
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 
 interface ISlideProps {
@@ -24,7 +24,7 @@ interface ISlideProps {
   keyCodeFromEnterDown: number;
   handleUserQuery(): Promise<void>;
   setAddTask: (value: React.SetStateAction<boolean>) => void;
-  currentRowsSelected: number | undefined;
+  currentRowsSelected: number[] | undefined;
   toastNotification: any;
   exportToExcel(): void;
   setOpenSlider: (value: React.SetStateAction<boolean>) => void;
@@ -93,7 +93,7 @@ const ResponsiveSliderPanel = (Props: ISlideProps) => {
         <div style={{ marginBottom: "20px" }}>
           <Button
             onClick={() =>
-              deleteIndividualGridRow(
+              deleteGridRow(
                 currentRowsSelected,
                 currentWorkSpace,
                 toastNotification
@@ -121,6 +121,8 @@ const ResponsiveSliderPanel = (Props: ISlideProps) => {
             Grid config
           </Button>
         </div>
+
+      
       </div>
     </React.Fragment>
   );

@@ -41,8 +41,7 @@ export interface ISelectColorOptions {
 }
 
 const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
-  const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
-    useCurrentWorkspace();
+  const currentWorkspace = useCurrentWorkspace();
   const performanceWorkspaces = useWorkspace();
   const [columnName, setColumnName] = useState("");
   const [columnType, setColumnType] = useState("");
@@ -60,9 +59,14 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   >([]);
 
   const [currentSpreadData, setCurrentSpreadData] = useState<ISpreadSheet>({
-    columns: [...(data.spreadSheetData?.columns ?? []), newColumn],
-    data: data.spreadSheetData?.data ?? [],
-    userId: data.spreadSheetData?.userId ?? data.createdById,
+    columns: [
+      ...(currentWorkspace.currentWorkSpace.spreadSheetData?.columns ?? []),
+      newColumn,
+    ],
+    data: currentWorkspace.currentWorkSpace.spreadSheetData?.data ?? [],
+    userId:
+      currentWorkspace.currentWorkSpace.spreadSheetData?.userId ??
+      currentWorkspace.currentWorkSpace.createdById,
   });
 
   React.useEffect(() => {
@@ -87,13 +91,20 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   ];
 
   async function addColumn() {
-    setUserTasks({ ...data, spreadSheetData: currentSpreadData });
-    await UpdateWorkSpace(data);
+    currentWorkspace.setCurrentWorkSpace({
+      ...currentWorkspace.currentWorkSpace,
+      spreadSheetData: currentSpreadData,
+    });
+
+    await UpdateWorkSpace(currentWorkspace.currentWorkSpace._id, {
+      ...currentWorkspace.currentWorkSpace,
+      spreadSheetData: currentSpreadData,
+    });
 
     const currentWorkspaces: IWspUser[] = performanceWorkspaces.userWsps;
     const updatedWorkspaces = currentWorkspaces.map((bookRow: IWspUser) => {
-      if (bookRow._id === data._id) {
-        return data;
+      if (bookRow._id === currentWorkspace.currentWorkSpace._id) {
+        return currentWorkspace.currentWorkSpace;
       } else return bookRow;
     });
 
@@ -107,7 +118,10 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
 
   React.useEffect(() => {
     if (newColumn.title && newColumn.type) addColumn();
-  }, [currentSpreadData, data.spreadSheetData?.columns]);
+  }, [
+    currentSpreadData,
+    currentWorkspace.currentWorkSpace.spreadSheetData?.columns,
+  ]);
 
   return (
     <Modal isOpen={isOpen} onClose={() => onClose(false)}>
@@ -218,8 +232,8 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
             onClick={() => {
               setIsLoading(true);
               setSpreadColumns(
-                data,
-                setUserTasks,
+                currentWorkspace.currentWorkSpace,
+                currentWorkspace.setCurrentWorkSpace,
                 setCurrentSpreadData,
                 newColumn,
                 performanceWorkspaces
