@@ -1,4 +1,4 @@
 import { io } from "socket.io-client";
-const currentBiridectionalCommunication = io("http://localhost:5000");
+const currentBiridectionalCommunication = io("https://tumble-tasks-service.onrender.com");
 
 export default currentBiridectionalCommunication;
