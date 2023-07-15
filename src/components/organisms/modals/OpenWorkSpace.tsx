@@ -17,7 +17,6 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { DateTime } from "luxon";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 import { CreateWorkSpaces } from "@/services/workspaces/createWorkSpace";
-import { getAllWorkSpaces } from "@/services/workspaces/getAll";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 import { IWspContext } from "@/context/usersWorkSpaces/wsp.context";

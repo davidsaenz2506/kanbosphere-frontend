@@ -21,12 +21,16 @@ import { GetCurrentUser } from "@/services/user/getCurrentUser";
 import { getFirstName } from "@/utilities/getFirstName";
 import Loading from "@/components/molecules/Loading";
 import currentBiridectionalCommunication from "@/services/socket";
+import { GetUsersByArray } from "@/services/user/getByArray";
+import getByArray from "./api/user/getByArray";
+import { useCurrentContact } from "@/context/currentContacts/currentContacts.hook";
 
 const PortalUser = () => {
-  const [workspaceFlow, setWorkspaceFlow] = useState("");
+  const [workspaceFlow, setWorkspaceFlow] = useState("mainMenu");
   const [loadingServerData, setLoadingServerData] = useState(false);
   const [resizeListener, setResizeListener] = useState(0);
   const computedUserItems = useCurrentUser();
+  const { setCurrentContacts } = useCurrentContact();
   const cookies = new Cookies();
 
   const userPrivateToken = cookies.get("tumbleToken");
@@ -52,7 +56,26 @@ const PortalUser = () => {
         decodedInfoFromServer.username
       );
 
+      //@ts-ignore
+      const friendsData: string[] = userInfoFromDataBase?.friends.map(
+        (currentCanonicalId) => currentCanonicalId.canonicalId
+      );
+
+      //@ts-ignore
+      const requestData: string[] = userInfoFromDataBase?.requests.map(
+        (currentCanonicalId) => currentCanonicalId.canonicalId
+      );
+
+      const dataShakeFriends = await GetUsersByArray(friendsData);
+      const dataShakeRequests = await GetUsersByArray(requestData);
+
+      const currentRequestAndFriendData = {
+        friends: dataShakeFriends,
+        requests: dataShakeRequests,
+      };
+
       computedUserItems.setCurrentUser(userInfoFromDataBase);
+      setCurrentContacts(currentRequestAndFriendData);
     }
 
     getUserInfoFromServer();
@@ -64,7 +87,7 @@ const PortalUser = () => {
         computedUserItems.currentUser.userID,
         setLoadingServerData
       );
-  }, [computedUserItems.currentUser]);
+  }, [computedUserItems.currentUser.userID]);
 
   React.useEffect(() => {
     var resizerTool = document.getElementById("resizerTool");

@@ -15,10 +15,12 @@ import { DeleteCurrentWorkSpace } from "@/services/workspaces/deleteWorkSpace";
 
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
+import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 
 const DeleteWorkSpace = (props) => {
   const ref = useRef(null);
   const workSpace = useWorkspace();
+  const currentWorkSpace = useCurrentWorkspace();
 
   async function handleDeleteWorkSpace(wspId: string) {
     let workSpacesList: IWspUser[] = workSpace.userWsps;
@@ -30,6 +32,7 @@ const DeleteWorkSpace = (props) => {
     });
 
     workSpace.setUsersWsps(workSpacesList);
+    props.setWorkSpaceFlow("mainMenu");
 
     await DeleteCurrentWorkSpace(props.data?._id);
   }

@@ -24,7 +24,7 @@ const NewsCard: React.FC<INewsComponentProps> = ({
   cardItems,
   changeAction,
 }) => {
-  const [translateMathValue, setTransaleMathValue] = useState(0);
+  const [translateMathValue, setTransaleMathValue] = useState(1);
   const { author, role, date, content, image } = cardItems;
   return (
     <React.Fragment>
@@ -35,8 +35,8 @@ const NewsCard: React.FC<INewsComponentProps> = ({
           color: "#1C1C1C",
           width: "100%",
           maxWidth: "max-content",
-          transform: `translateX(${translateMathValue}px)`,
-          transition: "transform .8s ease-in-out",
+          opacity: translateMathValue,
+          transition: "opacity .8s ease-in-out",
           marginTop: "40px",
         }}
         maxW="md"
@@ -54,10 +54,10 @@ const NewsCard: React.FC<INewsComponentProps> = ({
               variant="ghost"
               aria-label="Change new"
               onClick={() => {
-                setTransaleMathValue(4500);
+                setTransaleMathValue(0);
                 setTimeout(() => {
                   changeAction();
-                  setTransaleMathValue(0);
+                  setTransaleMathValue(1);
                 }, 500);
               }}
               icon={<ArrowRightIcon />}

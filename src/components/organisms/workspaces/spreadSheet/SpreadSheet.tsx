@@ -116,8 +116,6 @@ const Spreadsheet = () => {
 
   const isBrowser = () => typeof window !== "undefined";
 
-  console.log(currentRowsSelected)
-
   const restrictedColumnsToQuery =
     currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns.filter(
       (useColumn) => {
@@ -367,7 +365,7 @@ const Spreadsheet = () => {
 
   React.useEffect(() => {
     setSpreadSheetData(currentWorkSpace.currentWorkSpace.spreadSheetData?.data);
-  }, [currentWorkSpace.currentWorkSpace.spreadSheetData?.data]);
+  }, [currentWorkSpace.currentWorkSpace?.spreadSheetData?.data]);
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =

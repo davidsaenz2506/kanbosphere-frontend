@@ -12,6 +12,8 @@ export default function initResizer(
     var sbWidth: string = window.getComputedStyle(toolSpace, "").width;
     w = parseInt(sbWidth, 10);
 
+    resizerTool.style.backgroundColor = "#4c9aff"
+
     document.addEventListener("mousemove", rs_mouseMoveHandler);
     document.addEventListener("mouseup", rs_mouseUpHandler);
   }
@@ -41,6 +43,8 @@ export default function initResizer(
 
   function rs_mouseUpHandler() {
     document.body.style.cursor = "default";
+
+    resizerTool.style.backgroundColor = "#D3D3D3"
 
     document.removeEventListener("mouseup", rs_mouseUpHandler);
     document.removeEventListener("mousemove", rs_mouseMoveHandler);

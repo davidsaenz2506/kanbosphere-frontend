@@ -11,7 +11,7 @@ import { ChevronDownIcon, ChevronLeftIcon } from "@chakra-ui/icons";
 
 import { List, ListItem, ListIcon, Stack } from "@chakra-ui/react";
 
-import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import { Skeleton } from "@chakra-ui/react";
 
 import { EditIcon } from "@chakra-ui/icons";
 
@@ -42,10 +42,11 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
         isOpen={openDelete}
         onClose={setOpenDelete}
         data={item}
+        setWorkSpaceFlow={setWorkSpaceFlow}
       />
       <EditWorkSpaceName isOpen={openEdit} onClose={setOpenEdit} data={item} />
       <div style={{ marginTop: "10px", color: "#252525" }}>
-        <div>
+        <div className={styles.buttonSpace}>
           <HamburgerIcon sx={{ marginLeft: "20px" }} />
           <button
             type="button"
@@ -93,21 +94,17 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
             </button>
           </div>
           <div>
-            {isCollapsed ? (
-              <ChevronDownIcon
-                w={6}
-                h={6}
-                sx={{ marginRight: "30px", cursor: "pointer" }}
-                onClick={() => setIsCollapsed(!isCollapsed)}
-              />
-            ) : (
-              <ChevronLeftIcon
-                w={6}
-                h={6}
-                sx={{ marginRight: "30px", cursor: "pointer" }}
-                onClick={() => setIsCollapsed(!isCollapsed)}
-              />
-            )}
+            <ChevronDownIcon
+              w={6}
+              h={6}
+              sx={{
+                marginRight: "30px",
+                cursor: "pointer",
+                transition: "all .2s ease-in",
+                transform: `rotate(${!isCollapsed ? "90" : 0}deg)`,
+              }}
+              onClick={() => setIsCollapsed(!isCollapsed)}
+            />
           </div>
         </div>
 
@@ -122,12 +119,16 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
             </Stack>
           ) : (
             wspUsers.userWsps.map((todoWorkspace) => (
-              <List sx={{ transition: "all .5s" }} spacing={3}>
+              <List spacing={3}>
                 <ListItem
+                  className={styles.buttonSpaceList}
                   sx={{
                     cursor: "pointer",
                     display: "flex",
+                    borderRadius: "10px",
                     justifyContent: "space-between",
+                    paddingLeft: "10px",
+                    paddingRight: "10px",
                     alignItems: " center",
                     color: "#1C1C1C",
                     fontWeight:
@@ -137,7 +138,6 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
                   }}
                   onClick={() => {
                     setCurrentSelected(todoWorkspace._id);
-                    console.log(todoWorkspace._id)
                     currentWorkSpace.setCurrentWorkSpace(todoWorkspace);
                     setWorkSpaceFlow(todoWorkspace.type);
                   }}
@@ -173,7 +173,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
         </div>
       </div>
 
-      <div>
+      <div className={styles.buttonSpace}>
         <ChatIcon sx={{ marginLeft: "20px", color: "#252525" }} />
         <button
           type="button"
@@ -194,7 +194,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
         </button>
       </div>
 
-      <div>
+      <div className={styles.buttonSpace}>
         <CalendarIcon sx={{ marginLeft: "20px", color: "#252525" }} />
         <button
           type="button"
@@ -215,7 +215,7 @@ const ToolButtons = ({ workspaceFlow, setWorkSpaceFlow }) => {
         </button>
       </div>
 
-      <div>
+      <div className={styles.buttonSpace}>
         <StarIcon sx={{ marginLeft: "20px", color: "#252525" }} />
         <button
           type="button"
