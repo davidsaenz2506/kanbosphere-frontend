@@ -33,6 +33,7 @@ const WorkspaceManager = ({ workspaceFlow }) => {
       getUpdatedWorkspace(currentSession.currentUser.userID);
     }
   }, [dischargeStabilizerPointer]);
+  
 
   async function getUpdatedWorkspace(userId: string) {
     await getUpdatedServerWorkspaces(userId, {
