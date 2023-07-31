@@ -18,6 +18,7 @@ export const CurrentUserProvider: FC<PropTypes> = ({ children }: any) => {
     profilePicture: "",
     friends: [],
     requests: [],
+    invitations: []
   });
 
   const fetchCurrentUser = useCallback(async (credentials: any) => {

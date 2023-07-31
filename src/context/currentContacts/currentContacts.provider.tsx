@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback } from "react";
+import React, { ReactNode } from "react";
 import { FC } from "react";
 
 import { CurrentContactContext, ICurrentContact } from "./currentContacts.context";

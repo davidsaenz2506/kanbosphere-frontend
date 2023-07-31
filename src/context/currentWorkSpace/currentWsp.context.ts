@@ -2,21 +2,12 @@
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { createContext } from "react";
 
-const { DateTime } = require("luxon");
-
 export interface ICurrentWspContext {
-    currentWorkSpace: IWspUser,
-    setCurrentWorkSpace: (value: any) => void,
+    currentWorkSpace: IWspUser | undefined,
+    setCurrentWorkSpace: React.Dispatch<React.SetStateAction<IWspUser | undefined>>,
 }
 
 export const CurrentWorkSpaceContext = createContext<ICurrentWspContext>({
-    currentWorkSpace: {
-        name: "",
-        prefix: "",
-        createdDate: DateTime.now(),
-        createdById: "",
-        type: "",
-        wspData: []
-    },
+    currentWorkSpace: undefined,
     setCurrentWorkSpace: () => { }
 })

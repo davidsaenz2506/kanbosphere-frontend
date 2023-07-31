@@ -1,0 +1,41 @@
+.GridContainer {
+  height: 88%;
+}
+
+.toolbarsect {
+  display: flex;
+  align-items: center;
+  position: sticky;
+  left: 0;
+  height: 12%;
+  width: 100%;
+}
+
+.syncButton {
+  border-right: 1px solid #dddddd;
+  display: flex;
+  align-items: center;
+}
+
+.syncIcon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1550px) {
+  .toolbarsect {
+    display: none;
+  }
+
+  .GridContainer {
+    height: 100%;
+  }
+}

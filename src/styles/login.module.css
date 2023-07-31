@@ -1,47 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=League+Spartan:wght@700&family=Noto+Sans:wght@400;600&family=Red+Hat+Display:wght@700&display=swap");
 
 .container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .formLog {
-   width: 50%;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   flex-direction: column;
+  width: 60%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .patent {
-   background: linear-gradient(90deg, rgba(107,254,255,1) 0%, rgba(148,190,233,1) 100%);
-   width: 50%;
-   border-radius: 50% 0% 0% 50%;
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
-   align-items: center;
+  background-image: url("../../public/assets/Welcome\ to\ Syncronova.jpg");
+  background-size: cover;
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "League Spartan", sans-serif;
 }
 
 .userLogin {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .logo {
-    background-image: url("../../public/assets/tumblelogo.png");
-    height: 300px;
-    width: 500px;
-    margin-right: 80px;
-    margin-top: -90px;
+  background-image: url("../../public/assets/Syncronova.png");
+  height: 400px;
+  width: 500px;
+  margin-top: -200px;
+  margin-left: 20px;
 }
 
-.banner {
-    background-image: url("../../public/assets/banner.png");
-    height: 90vh;
-    width: 800px;
-    margin-left: 200px;
-    margin-top: -90px;   
+.loginButtonModule {
+  margin-top: 20px;
+  padding: 5px;
+  border-radius: 20px;
+  width: 100%;
+  color: white;
+  font-weight: 400;
+  background-color: #212a3e;
+  transition: all .2s;
+}
+
+.loginButtonModule:hover {
+  background-color: #394867;
 }

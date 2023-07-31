@@ -5,7 +5,7 @@ export async function middleware(request) {
   const jwt = request.cookies.get("tumbleToken");
   const finalToken = jwt?.value;
 
-  if (request.nextUrl.pathname.includes("/portalUser")) {
+  if (request.nextUrl.pathname.includes("/dashboard")) {
     if (jwt === undefined) {
       return NextResponse.redirect(new URL("/", request.url));
     }

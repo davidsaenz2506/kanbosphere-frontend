@@ -1,11 +1,19 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { WspProvider } from "@/context/usersWorkSpaces/wsp.provider";
 import { NextUIProvider } from "@nextui-org/react";
 import { CurrentWorkSpaceProvider } from "@/context/currentWorkSpace/currentWsp.provider";
 import { CurrentUserProvider } from "@/context/currentUser/currentUser.provider";
 import { CurrentContactProvider } from "@/context/currentContacts/currentContacts.provider";
+
+const theme = extendTheme({
+  styles: {
+    global: {
+      "--toast-z-index": 1000,
+    },
+  },
+})
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -14,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <CurrentWorkSpaceProvider>
           <NextUIProvider>
             <WspProvider>
-              <ChakraProvider>
+              <ChakraProvider theme={theme}>
                 <Component {...pageProps} />
               </ChakraProvider>
             </WspProvider>

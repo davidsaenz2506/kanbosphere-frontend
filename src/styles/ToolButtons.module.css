@@ -1,17 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Geologica&family=League+Spartan:wght@700&family=Noto+Sans:wght@400;600&family=Red+Hat+Display:wght@700&display=swap");
+
+.generalButtons {
+  font-family: "Geologica", sans-serif;
+}
+
 .collapsed {
   display: none;
 }
 
 .expanded {
-  display: block;
-  margin-left: 30px;
+  display: flex;
+  margin-left: 10px;
+  width: 93.4%;
+  border-radius: 0 0 10px 10px;
+}
+
+.buttonSpace,
+.mainObject p {
+  font-family: "Geologica", sans-serif;
+}
+
+.buttonSpace {
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 8px;
 }
 
 .buttonSpace:hover {
-  background-color: #d3d3d3;
+  background-color: #f8f8f8;
   transition: all 0.2s ease-in;
-}
-
-.buttonSpaceList:hover {
-  background-color: #d3d3d3;
+  cursor: pointer;
 }

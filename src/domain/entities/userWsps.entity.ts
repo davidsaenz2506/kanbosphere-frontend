@@ -1,6 +1,10 @@
 import { ISpreadSheet } from "./spreadsheet.entity";
 import { IDataToDo } from "./todo.entity";
 
+export interface IWspPreferences {
+    selectedTask: string
+}
+
 export interface IWspUser {
     _id?: string;
     name: string;
@@ -8,6 +12,8 @@ export interface IWspUser {
     createdDate: Date;
     createdById: string;
     type: string;
+    sharedWith: string[];
     wspData?: IDataToDo[];
-    spreadSheetData?: ISpreadSheet
+    wspDataPreferences?: IWspPreferences;
+    spreadSheetData?: ISpreadSheet;
 }

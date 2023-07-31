@@ -1,4 +1,4 @@
-import { ISelectColorOptions } from "@/components/organisms/modals/Spread/AddColumn";
+import { ISelectColorOptions } from "@/components/Modals/AddColumn";
 
 export interface IColumnProjection {
     title: string;

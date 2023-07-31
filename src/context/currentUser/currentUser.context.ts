@@ -1,5 +1,6 @@
 
 import ICurrentUser from "@/domain/entities/user.entity";
+import { m } from "framer-motion";
 import { createContext } from "react";
 
 
@@ -18,7 +19,8 @@ export const CurrentUserContext = createContext<ICurrentUserContext>({
         password: "",
         profilePicture: "",
         friends: [],
-        requests: []
+        requests: [],
+        invitations: []
     },
     setCurrentUser: () => {},
     fetchCurrentUser: async () => {}

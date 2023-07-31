@@ -2,10 +2,12 @@ import styles from "../styles/login.module.css";
 import "bootstrap/dist/css/bootstrap.css";
 import { LoginUser } from "@/services/user/login";
 import { useState } from "react";
-import WrongLogin from "@/components/organisms/modals/WrongLogin";
+import WrongLogin from "@/components/Modals/WrongLogin";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
-import { Spinner } from "@chakra-ui/react";
+import {
+  Spinner,
+} from "@chakra-ui/react";
 import { debounce } from "lodash";
 
 export default function Home() {
@@ -22,7 +24,7 @@ export default function Home() {
     LoginUser(userCredentials)
       .then((res) => {
         userOperationsComputed.fetchCurrentUser(res);
-        window.open("/portalUser", "_self");
+        window.open("/dashboard", "_self");
         debounce(() => setIsLoginSession(false), 10000);
       })
       .catch((err) => {
@@ -59,7 +61,7 @@ export default function Home() {
                     password: userCredentials.password,
                   });
                 }}
-                placeholder="Correo electronico"
+                placeholder="Usuario"
                 type="text"
               />
               <input
@@ -77,13 +79,7 @@ export default function Home() {
               {!isLoginSession && (
                 <button
                   type="button"
-                  style={{
-                    marginTop: "20px",
-                    width: "100%",
-                    color: "white",
-                    fontWeight: 500,
-                  }}
-                  className="btn btn-info"
+                  className={styles.loginButtonModule}
                   onClick={() => {
                     handleLogin();
                   }}
@@ -96,23 +92,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={styles.patent}>
-          <h1
-            style={{
-              color: "white",
-              fontSize: "50px",
-              marginTop: "30px",
-              marginBottom: "100px",
-              fontWeight: "bolder",
-              cursor: "default",
-              alignSelf: "flex-end",
-              marginRight: "20px",
-            }}
-          >
-            Portal de Usuarios
-          </h1>
-          <div className={styles.banner}></div>
-        </div>
+        <div className={styles.patent}></div>
       </div>
     </>
   );

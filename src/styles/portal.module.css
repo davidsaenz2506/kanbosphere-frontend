@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Geologica&family=League+Spartan:wght@700&family=Noto+Sans:wght@400;600&family=Red+Hat+Display:wght@700&display=swap");
+
 .principalContainer {
   background-color: rgb(255, 255, 255);
   height: 100vh;
@@ -5,14 +7,14 @@
 }
 
 .toolSpace {
-  min-width: 350px;
+  min-width: 300px;
   height: 100vh;
   display: flex;
   user-select: none;
 }
 
 .workSpace {
-  background-color: #EAEAEA;
+  background-color: #eaeaea;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -29,23 +31,36 @@
 
 .resizerParticle {
   user-select: none;
-  width: 3px;
+  width: 4px;
   height: 100vh;
-  cursor: col-resize;
-  background-color: #D3D3D3;
+  background-color: #d3d3d3;
   z-index: 100;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .toolContainer {
   width: 99%;
-  background-color: #EAEAEA;
   height: 100vh;
-  color: whitesmoke;
 }
 
 .hrElement {
   width: 95%;
+}
+
+.buttonNotification {
+  transform: rotate(0deg);
+}
+
+.buttonNotification:hover {
+  transform: rotate(15deg);
+}
+
+.contactSection {
+  background-color: white;
+}
+
+.contactSection p {
+  font-family: "Geologica", sans-serif;
 }
 
 @keyframes animateBackground {

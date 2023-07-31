@@ -2,22 +2,14 @@ import React, { ReactNode } from "react";
 import { FC } from "react";
 
 import { CurrentWorkSpaceContext } from "./currentWsp.context";
-
-import {DateTime} from "luxon";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 type PropTypes = {
   children?: ReactNode;
 };
 
 export const CurrentWorkSpaceProvider: FC<PropTypes> = ({ children }: any) => {
-  const [currentWorkSpace, setCurrentWorkSpace] = React.useState({
-    name: "",
-    prefix: "",
-    createdDate: DateTime.now(),
-    createdById: "",
-    type: "",
-    wspData: [],
-  });
+  const [currentWorkSpace, setCurrentWorkSpace] = React.useState<IWspUser>();
 
   return (
     <CurrentWorkSpaceContext.Provider

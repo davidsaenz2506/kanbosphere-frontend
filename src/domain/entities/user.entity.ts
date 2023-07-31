@@ -1,3 +1,5 @@
+import IUserInvitations from "./invitations";
+
 export interface IFriendsRequest {
     canonicalId: string;
     requestDate: Date;
@@ -16,4 +18,5 @@ export default interface ICurrentUser {
     profilePicture?: string;
     friends: IFriends[];
     requests: IFriendsRequest[];
+    invitations: IUserInvitations[];
 }

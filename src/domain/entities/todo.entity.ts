@@ -1,6 +1,19 @@
+import ICurrentUser from "./user.entity";
+
 export interface IPriority {
     value: string;
     color: string | undefined;
+}
+
+export interface IFilePath {
+    name: string;
+    relativePath: string;
+}
+
+export interface IClockTime {
+    recordedTime: number;
+    recordedBy: Partial<ICurrentUser>;
+    registrationDate: string ;
 }
 export interface IDataToDo {
     userId: string,
@@ -10,7 +23,9 @@ export interface IDataToDo {
     info: string,
     description: string,
     title: string,
-    createDate: Date,
-    file: string,
-    finishDate?: Date
+    clockTime: IClockTime[],
+    expectedWorkingHours: number,
+    createDate: Date | undefined,
+    finishDate?: Date | undefined
+    file: IFilePath[] | undefined,
 }

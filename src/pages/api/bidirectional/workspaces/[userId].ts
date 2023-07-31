@@ -12,7 +12,8 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
         const { userId } = req.query;
         const { data: workspaces } = await axios.post<any>(`${process.env.WORKSPACE_API}/data-updates/getUpdatedWorkspaceData/${userId}`, roomToken, {
             headers: {
-                Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`
+                Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`,
+                Connection: 'keep-alive'
             }
         });
         return res.status(200).json(workspaces);

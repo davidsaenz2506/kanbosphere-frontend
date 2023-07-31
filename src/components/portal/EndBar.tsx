@@ -1,34 +1,35 @@
 import React, { useState } from "react";
 
-import { SettingsIcon } from "@chakra-ui/icons";
-import { CloseIcon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
+import { CiSettings } from "react-icons/ci";
+import { IoExitOutline } from "react-icons/io5";
 
 import "bootstrap/dist/css/bootstrap.css";
 
 import { useRouter } from "next/router";
 
-import EndSession from "../organisms/modals/endSession";
-
+import EndSession from "../Modals/endSession";
 import styles from "../../styles/ToolButtons.module.css";
+import { Box, Divider } from "@chakra-ui/react";
 
-const EndBar = ({ setWorkSpaceFlow }) => {
+const EndBar = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <EndSession isOpen={isOpen} setIsOpen={setIsOpen} router={router} />
-      <div
+      <Box
         style={{
           position: "absolute",
           bottom: 0,
-          marginBottom: "20px",
+          marginBottom: "10px",
           color: "#252525",
-          width: "100%"
         }}
       >
-        <div className={styles.buttonSpace}>
-          <SettingsIcon sx={{ marginLeft: "20px" }} />
+        <Divider width={"86%"} marginLeft={"20px"} marginBottom={"10px"}/>
+        <Box style={{ paddingRight: "25px" }} className={styles.buttonSpace}>
+          <Icon as={CiSettings} w={6} h={6} sx={{ marginLeft: "15px" }} />
           <button
             type="button"
             className="btn btn-secondary btn-lg btn-block"
@@ -36,15 +37,16 @@ const EndBar = ({ setWorkSpaceFlow }) => {
               backgroundColor: "transparent",
               border: "none",
               color: "#1C1C1C",
-              marginLeft: "5px",
+              marginLeft: "0px",
+              fontSize: "15px",
             }}
-            onClick={() => setWorkSpaceFlow("userConfig")}
+            onClick={() => router.push(`/dashboard?briefcase=settings`)}
           >
             Configuración de usuario
           </button>
-        </div>
-        <div className={styles.buttonSpace}>
-          <CloseIcon sx={{ marginLeft: "20px", marginTop: "2px" }} />
+        </Box>
+        <Box className={styles.buttonSpace}>
+          <Icon as={IoExitOutline} w={5} h={5} sx={{ marginLeft: "19px" }} />
           <button
             type="button"
             className="btn btn-secondary btn-lg btn-block"
@@ -52,14 +54,15 @@ const EndBar = ({ setWorkSpaceFlow }) => {
               backgroundColor: "transparent",
               border: "none",
               color: "#1C1C1C",
-              marginLeft: "5px",
+              marginLeft: "0px",
+              fontSize: "15px",
             }}
             onClick={() => setIsOpen(true)}
           >
             Cerrar sesión
           </button>
-        </div>
-      </div>
+        </Box>
+      </Box>
     </>
   );
 };
