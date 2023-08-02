@@ -4,18 +4,19 @@ import { IColumnProjection, ISpreadSheet } from "@/domain/entities/spreadsheet.e
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext, currentUser: ICurrentUserContext, userColumns: IColumnProjection[], data: any) {
-  const currentWorkspaceData: IWspUser = currentUserWsp.currentWorkSpace;
+  const currentWorkspaceData: IWspUser | undefined = currentUserWsp.currentWorkSpace;
   const newSpreadsheetData: ISpreadSheet = {
     userId:
-      currentWorkspaceData.spreadSheetData?.userId ??
+      currentWorkspaceData?.spreadSheetData?.userId ??
       currentUser.currentUser.userID,
     columns: userColumns,
     data: data,
   };
 
-  currentUserWsp.setCurrentWorkSpace({
-    ...currentWorkspaceData,
-    spreadSheetData: newSpreadsheetData,
-  });
-
+  if (currentWorkspaceData) {
+    currentUserWsp.setCurrentWorkSpace({
+      ...currentWorkspaceData,
+      spreadSheetData: newSpreadsheetData,
+    });
+  }
 }

@@ -8,12 +8,26 @@ import { CurrentUserProvider } from "@/context/currentUser/currentUser.provider"
 import { CurrentContactProvider } from "@/context/currentContacts/currentContacts.provider";
 
 const theme = extendTheme({
+  colors: {
+    customColor: {
+      50: "#f0f9ff",
+      100: "#c2e2ff",
+      200: "#91c1ff",
+      300: "#60a0ff",
+      400: "#2f80ff",
+      500: "#005fff",
+      600: "#0046cc",
+      700: "#002e99",
+      800: "#001966",
+      900: "#000833",
+    },
+  },
   styles: {
     global: {
       "--toast-z-index": 1000,
     },
   },
-})
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

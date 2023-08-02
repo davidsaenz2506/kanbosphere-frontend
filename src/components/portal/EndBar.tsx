@@ -23,8 +23,9 @@ const EndBar = () => {
         style={{
           position: "absolute",
           bottom: 0,
-          marginBottom: "10px",
+          paddingBottom: "10px",
           color: "#252525",
+          backgroundColor: "#ffffff"
         }}
       >
         <Divider width={"86%"} marginLeft={"20px"} marginBottom={"10px"}/>

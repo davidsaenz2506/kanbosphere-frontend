@@ -21,6 +21,14 @@ export const getCellData = (
                 displayData: dataRow[field] ? dataRow[field] : "",
             };
 
+        case "mail":
+            return {
+                kind: GridCellKind.Text,
+                data: dataRow[field] ? dataRow[field] : "",
+                allowOverlay: true,
+                displayData: dataRow[field] ? dataRow[field] : "",
+            };
+
         case "boolean":
             return {
                 kind: GridCellKind.Boolean,
@@ -53,8 +61,34 @@ export const getCellData = (
                 data: {
                     type: "date",
                     date: dataRow[field] ? dataRow[field] : DateTime.now(),
-                    displayDate: !dataRow[field] ? "" : renderDateFromServer,
+                    displayDate: !dataRow[field] ? "Sin establecer" : renderDateFromServer,
                     format: "date",
+                },
+                allowOverlay: true,
+                copyData: "",
+            };
+
+        case "time":
+
+            return {
+                kind: GridCellKind.Custom,
+                data: {
+                    type: "time",
+                    time: dataRow[field] ? dataRow[field] : "12:00",
+                    displayTime: dataRow[field] ? dataRow[field] : "Sin establecer"
+                },
+                allowOverlay: true,
+                copyData: "",
+            };
+
+        case "phone":
+
+            return {
+                kind: GridCellKind.Custom,
+                data: {
+                    type: "phone",
+                    phone: dataRow[field] ? dataRow[field] : "",
+                    displayPhone: dataRow[field] ? dataRow[field] : ""
                 },
                 allowOverlay: true,
                 copyData: "",

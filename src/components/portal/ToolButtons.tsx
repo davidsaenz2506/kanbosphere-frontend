@@ -36,12 +36,14 @@ import {
   BsUiChecksGrid,
   BsCalendarMonth,
   BsMenuButtonWide,
+  BsPeople,
 } from "react-icons/bs";
 import { TbPigMoney } from "react-icons/tb";
 import { MdOutlineContactMail } from "react-icons/md";
 import { PiProjectorScreenChartDuotone } from "react-icons/pi";
 
 import { LiaCloudSolid } from "react-icons/lia";
+import { IoPeopleOutline } from "react-icons/io5";
 
 const ToolButtons = () => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -84,7 +86,12 @@ const ToolButtons = () => {
           />
           <p style={{ fontSize: "20px" }}>Kanbosphere</p>
         </Box>
-        <Divider width={"86%"} marginLeft={"20px"} marginBottom={"10px"} marginTop={"10px"} />
+        <Divider
+          width={"86%"}
+          marginLeft={"20px"}
+          marginBottom={"10px"}
+          marginTop={"10px"}
+        />
         <Box
           backgroundColor={
             query.briefcase == "main" ? "#f0f0f0" : "transparent"
@@ -175,8 +182,8 @@ const ToolButtons = () => {
               <Stack
                 style={{
                   width: "90%",
-                  marginTop: "10px",
-                  marginBottom: "10px",
+                  marginTop: "0px",
+                  marginBottom: "10px",marginLeft: "13px"
                 }}
               >
                 <Skeleton height="20px" />
@@ -198,10 +205,6 @@ const ToolButtons = () => {
                       marginTop: index === 0 ? "-10px" : "0px",
                       marginBottom:
                         index === wspUsers.userWsps.length - 1 ? "0px" : "8px",
-                      fontWeight:
-                        currentSelected === todoWorkspace._id
-                          ? "bolder"
-                          : "normal",
                     }}
                     onClick={() => {
                       setCurrentSelected(todoWorkspace._id);
@@ -211,13 +214,10 @@ const ToolButtons = () => {
                     }}
                   >
                     <Box
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        marginRight: "45px",
-                      }}
-                      maxWidth={"300px"}
+                      maxWidth={"160px"}
+                      minWidth={"160px"}
+                      display={"flex"}
+                      alignItems={"center"}
                     >
                       <ListIcon
                         as={
@@ -229,7 +229,22 @@ const ToolButtons = () => {
                         h={4}
                         sx={{ marginRight: "10px" }}
                       />
-                      {todoWorkspace.name}
+                      <Text
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                        fontSize={"15px"}
+                        fontWeight={
+                          currentSelected === todoWorkspace._id
+                            ? "bolder"
+                            : "normal"
+                        }
+                      >
+                        {" "}
+                        {todoWorkspace.name}
+                      </Text>
                     </Box>
 
                     <Box style={{ display: "flex" }}>
@@ -261,10 +276,7 @@ const ToolButtons = () => {
         }
         className={styles.buttonSpace}
       >
-        <Icon
-          as={MdOutlineContactMail}
-          sx={{ marginLeft: "21px", color: "#252525" }}
-        />
+        <Icon as={BsPeople} sx={{ marginLeft: "21px", color: "#252525" }} />
         <button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
@@ -280,7 +292,7 @@ const ToolButtons = () => {
             router.push(`/dashboard?briefcase=friends`);
           }}
         >
-          Listado de contactos
+          Social
         </button>
       </Box>
 

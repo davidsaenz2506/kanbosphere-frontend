@@ -4,11 +4,12 @@ import {
   ProvideEditorCallback,
   CustomRenderer,
   getMiddleCenterBias,
-  useTheme,
   GridCellKind,
 } from "@glideapps/glide-data-grid";
 import * as React from "react";
 import Select, { MenuProps, components } from "react-select";
+
+import chroma from 'chroma-js';
 
 interface CustomMenuProps extends MenuProps<any> {}
 
@@ -55,8 +56,21 @@ const Editor: ReturnType<ProvideEditorCallback<DropdownCell>> = (p) => {
         control: (base) => ({
           ...base,
           border: 0,
-          boxShadow: "none",
+          boxShadow: "none"
         }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+          const color = chroma("rgba(33,42,62,1)");
+          return {
+            ...styles,
+            backgroundColor: isDisabled
+            ? undefined
+            : isSelected
+            ? "rgba(33,42,62,1)"
+            : isFocused
+            ? color.alpha(0.2).css()
+            : undefined,
+          };
+        },
       }}
       menuPortalTarget={document.getElementById("portal")}
       autoFocus={true}

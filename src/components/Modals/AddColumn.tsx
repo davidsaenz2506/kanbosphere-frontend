@@ -12,6 +12,10 @@ import {
   FormLabel,
   Input,
   Box,
+  Badge,
+  Tag,
+  TagLabel,
+  TagCloseButton,
 } from "@chakra-ui/react";
 
 import Select, { SingleValue } from "react-select";
@@ -42,12 +46,18 @@ export interface ISelectColorOptions {
 
 const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   const currentWorkspace = useCurrentWorkspace();
+  const maxOrderValue: number | undefined =
+    currentWorkspace?.currentWorkSpace?.spreadSheetData?.columns.reduce(
+      (max, column) => Math.max(max, column.order),
+      0
+    );
   const performanceWorkspaces = useWorkspace();
   const [columnName, setColumnName] = useState("");
   const [columnType, setColumnType] = useState("");
   const [newColumn, setNewColumn] = useState<IColumnProjection>({
     title: "",
     type: "",
+    order: maxOrderValue ? maxOrderValue + 1 : 0,
     width: 100,
   });
 
@@ -74,25 +84,27 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
       title: columnName,
       type: columnType,
       width: 100,
+      order: maxOrderValue ? maxOrderValue + 1 : 0,
       picklistValues: userPicklistValues,
     });
   }, [columnName, columnType, userClick, userPicklistValues]);
 
   const statusOptions: IPicklistOptions[] = [
-    { value: "string", label: "Texto" },
-    { value: "number", label: "Numero" },
-    { value: "picklist", label: "Picklist" },
-    { value: "multipicklist", label: "Multipicklist" },
-    { value: "date", label: "Fecha" },
-    { value: "datetime", label: "Fecha y Hora" },
-    { value: "mail", label: "Correo electronico" },
-    { value: "cellphone", label: "Numero celular" },
-    { value: "boolean", label: "Checkbox" },
+    { value: "string", label: "✍ Texto" },
+    { value: "number", label: "🔢 Numero" },
+    { value: "picklist", label: "🧨 Picklist" },
+    { value: "multipicklist", label: "🧮 Multipicklist" },
+    { value: "date", label: "📅 Fecha" },
+    { value: "time", label: "🕐 Hora" },
+    { value: "mail", label: "📩 Correo electronico" },
+    { value: "phone", label: "📞 Numero celular" },
+    { value: "boolean", label: "📦 Checkbox" },
   ];
 
   async function addColumn() {
-    const unmodifiedWorkspace: IWspUser | undefined = currentWorkspace.currentWorkSpace;
-    console.log(unmodifiedWorkspace)
+    const unmodifiedWorkspace: IWspUser | undefined =
+      currentWorkspace.currentWorkSpace;
+
     if (unmodifiedWorkspace) {
       unmodifiedWorkspace.spreadSheetData = currentSpreadData;
       currentWorkspace.setCurrentWorkSpace(unmodifiedWorkspace);
@@ -130,9 +142,9 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Añadir Columna</ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton marginTop={"5px"} />
         <ModalBody pb={6}>
-          <FormControl style={{ marginBottom: "20px" }}>
+          <FormControl>
             <FormLabel>Nombre de la columna</FormLabel>
             <Input
               type="text"
@@ -156,7 +168,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
             <React.Fragment>
               {" "}
               <FormControl mt={4}>
-                <FormLabel>Crear valores de picklist</FormLabel>
+                <FormLabel>Crear tarjetas</FormLabel>
                 <Input
                   type="text"
                   placeholder="Ingresa el valor que deseas agregar a la lista"
@@ -182,44 +194,39 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
               <div
                 className="miniTargets"
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  marginTop: userPicklistValues.length ? "20px" : "0px",
                 }}
               >
                 {userPicklistValues.map((individualPicklistValue, index) => (
                   <React.Fragment>
-                    <Tooltip
-                      label="Click para eliminar"
-                      aria-label="A tooltip"
-                      placement="right"
+                    <Tag
+                      size={"lg"}
+                      bgColor={individualPicklistValue.color}
+                      cursor={"pointer"}
+                      marginRight={"5px"}
+                      marginBottom={"5px"}
                     >
-                      <Box
-                        style={{
-                          marginTop: "20px",
-                          backgroundColor: individualPicklistValue.color,
-                          padding: "10px",
-                          borderRadius: "20px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          const newTags = userPicklistValues;
-
-                          newTags.splice(index, 1);
-
-                          setUserPicklistValues(newTags);
-
-                          setUserClick(
-                            Math.floor(Math.random() * (10 - 1) + 1)
-                          );
-                        }}
+                      <TagLabel>{individualPicklistValue.label}</TagLabel>
+                      <Tooltip
+                        label="Click para eliminar"
+                        aria-label="A tooltip"
+                        placement="right"
                       >
-                        <p style={{ fontWeight: "bolder" }}>
-                          {individualPicklistValue.label}
-                        </p>
-                      </Box>
-                    </Tooltip>
+                        <TagCloseButton
+                          onClick={() => {
+                            const newTags = userPicklistValues;
+
+                            newTags.splice(index, 1);
+
+                            setUserPicklistValues(newTags);
+
+                            setUserClick(
+                              Math.floor(Math.random() * (10 - 1) + 1)
+                            );
+                          }}
+                        />
+                      </Tooltip>
+                    </Tag>
                   </React.Fragment>
                 ))}
               </div>
@@ -229,7 +236,8 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
 
         <ModalFooter>
           <Button
-            colorScheme="blue"
+            bgColor={"rgba(33,42,62,1)"}
+            color={"white"}
             mr={3}
             onClick={() => {
               setIsLoading(true);

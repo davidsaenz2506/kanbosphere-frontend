@@ -1,19 +1,31 @@
 import { ISpreadSheet } from "./spreadsheet.entity";
 import { IDataToDo } from "./todo.entity";
 
-export interface IWspPreferences {
-    selectedTask: string
+export interface IAgilePreferences {
+    selectedTask: string | null
+}
+
+export interface ISpreadSheetPreferences {
+    isDarkModeOpen: boolean;
+    isMultipleSelectionOpen: boolean;
+    freezedColumns: number;
+}
+
+export interface ICollaborators {
+    _id?: string;
+    name: string;
+    role: string;
 }
 
 export interface IWspUser {
     _id?: string;
     name: string;
-    prefix: string;
     createdDate: Date;
     createdById: string;
     type: string;
-    sharedWith: string[];
+    sharedWith: ICollaborators[];
+    prefix?: string;
     wspData?: IDataToDo[];
-    wspDataPreferences?: IWspPreferences;
+    wspDataPreferences?: IAgilePreferences | ISpreadSheetPreferences;
     spreadSheetData?: ISpreadSheet;
 }

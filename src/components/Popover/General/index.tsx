@@ -12,11 +12,13 @@ const PopoverComponent: React.FC<IPopoverProps> = (props) => {
   const { trigger, content, placement } = props;
 
   return (
-    <Popover placement={placement}>
+    <Popover shouldCloseOnInteractOutside={() => false} placement={placement}>
       <Popover.Trigger>
         <Box>{trigger}</Box>
       </Popover.Trigger>
-      <Popover.Content>{content}</Popover.Content>
+      <Popover.Content css={{ zIndex: "100 !important" }}>
+        {content}
+      </Popover.Content>
     </Popover>
   );
 };

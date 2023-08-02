@@ -27,67 +27,53 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
   const wspUser: IWspContext = useWorkspace();
   const currentUserInfo: ICurrentUserContext = useCurrentUser();
 
-  const [newWorkSpace, setNewWorkSpace] = useState<IWspUser>({
-    name: "",
-    prefix: "",
-    createdDate: DateTime.now().toISO(),
-    createdById: "",
-    type: "",
-    ...(title === "agile"
-      ? { wspData: [] }
-      : {
-          spreadSheetData: {
-            columns: [],
-            data: [],
-            userId: currentUserInfo.currentUser.userID,
-          },
-        }),
-    ...(title === "agile" ? { wspDataPreferences: { selectedTask: "" } } : {}),
-    sharedWith: [],
-  });
-
   async function handleCreate() {
+    let newWorkspaceToCreate: Partial<IWspUser> = {};
     setIsLoading(true);
 
-    const createdWorkspace = await CreateWorkSpaces(newWorkSpace);
+    if (title === "agile") {
+      newWorkspaceToCreate.createdDate = DateTime.now().toString();
+      newWorkspaceToCreate.name = nameValue;
+      newWorkspaceToCreate.wspData = [];
+      newWorkspaceToCreate.wspDataPreferences = { selectedTask: null };
+      newWorkspaceToCreate.prefix = currentPrefix;
+      newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
+      newWorkspaceToCreate.type = title;
+      newWorkspaceToCreate.sharedWith = [{
+        _id: currentUserInfo.currentUser._id,
+        name: currentUserInfo.currentUser.username,
+        role: "HOST"
+      }]
+    }
+
+    if (title === "spreadsheet") {
+      newWorkspaceToCreate.createdDate = DateTime.now().toString();
+      newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
+      newWorkspaceToCreate.type = title;
+      newWorkspaceToCreate.name = nameValue;
+      newWorkspaceToCreate.spreadSheetData = {
+        columns: [],
+        data: [],
+        userId: currentUserInfo.currentUser.userID,
+      };
+      newWorkspaceToCreate.wspDataPreferences = {
+        isDarkModeOpen: false,
+        isMultipleSelectionOpen: false,
+        freezedColumns: 0,
+      };
+      newWorkspaceToCreate.sharedWith = [{
+        _id: currentUserInfo.currentUser._id,
+        name: currentUserInfo.currentUser.username,
+        role: "HOST"
+      }]
+    }
+
+    const createdWorkspace = await CreateWorkSpaces(newWorkspaceToCreate);
     wspUser.setUsersWsps([...wspUser.userWsps, createdWorkspace.data]);
 
     setIsLoading(false);
-
     setIsOpen(false);
   }
-
-  React.useEffect(() => {
-    setNewWorkSpace({
-      ...newWorkSpace,
-      name: nameValue,
-      prefix: currentPrefix,
-      createdDate: DateTime.now().toISO(),
-      createdById: currentUserInfo.currentUser.userID,
-      type: title,
-    });
-  }, [nameValue, currentPrefix]);
-
-  React.useEffect(() => {
-    setNewWorkSpace({
-      name: "",
-      prefix: "",
-      createdDate: DateTime.now().toISO(),
-      createdById: "",
-      type: "",
-      ...(title === "agile"
-        ? { wspData: [] }
-        : {
-            spreadSheetData: {
-              columns: [],
-              data: [],
-              userId: currentUserInfo.currentUser.userID,
-            },
-          }),
-      ...(title === "agile" ? { wspDataPreferences: { selectedTask: "" } } : {}),
-      sharedWith: [],
-    });
-  }, [title]);
 
   return (
     <>

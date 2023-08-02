@@ -53,6 +53,7 @@ import { RxLapTimer } from "react-icons/rx";
 import { getSchemeByValue } from "../SlideTask";
 import PopoverComponent from "../Popover/General";
 import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 const statusOptions = [
   { value: "In Proccess", label: "In Proccess" },
@@ -237,15 +238,17 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
   }
 
   async function editCurrentTask(currentTask: any) {
+    const currentWorkSpace : IWspUser | undefined = wspData;
     let workspaceData: IDataToDo[] | undefined = wspData?.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
-    let modifiedWorkSpaceData = workspaceData?.map((task, index) => {
-      if (task.taskId === currentTaskUser.taskId && workspaceData)
-        workspaceData[index] = currentTaskUser;
+    workspaceData?.forEach((task, index) => {
+      if (task.taskId === currentTaskUser.taskId && workspaceData) workspaceData[index] = currentTaskUser;
     });
 
-    setUserTasks({ ...wspData, data: modifiedWorkSpaceData });
+    if (currentWorkSpace?.wspData) currentWorkSpace.wspData = workspaceData;
+
+    setUserTasks(currentWorkSpace);
   }
 
   async function handleSendNewTask() {
@@ -264,8 +267,6 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
         isClosable: true,
       });
 
-      setStringPathToRender([]);
-      setCurrentTaskStorageRefs([]);
       onClose(false);
     } catch (error) {
       setIsLoading(false);
@@ -350,7 +351,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
       >
         <Modal.Header>
           {" "}
-          <Text id="modal-title" size={25} style={{ marginBottom: "-10px" }}>
+          <Text id="modal-title" size={25} style={{ marginBottom: "-20px" }}>
             Administrar historia
           </Text>
         </Modal.Header>
@@ -805,7 +806,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                     <Progress size="xs" isIndeterminate />
                   </Box>
                 )}
-                {isGettingImage && (
+                {(isGettingImage && !stringPathToRender.length) && (
                   <Box
                     paddingLeft={"20px"}
                     paddingRight={"20px"}

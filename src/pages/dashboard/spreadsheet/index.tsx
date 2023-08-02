@@ -2,7 +2,8 @@ import React, { useState } from "react";
 
 import { utils, writeFile } from "xlsx";
 
-import Select, { SingleValue } from "react-select";
+import Select from "react-select";
+import chroma from "chroma-js";
 
 import {
   Drawer,
@@ -23,22 +24,16 @@ import {
   Badge,
   Grid,
   GridItem,
+  Spinner,
+  InputLeftElement,
 } from "@chakra-ui/react";
 
-import {
-  EditIcon,
-  HamburgerIcon,
-  RepeatIcon,
-  Search2Icon,
-  UnlockIcon,
-} from "@chakra-ui/icons";
+import { Search2Icon } from "@chakra-ui/icons";
 
 import {
   Button,
   Input,
   InputGroup,
-  InputLeftElement,
-  Portal,
   useToast,
   Checkbox,
 } from "@chakra-ui/react";
@@ -52,8 +47,6 @@ import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.contex
 
 import { deleteGridRow } from "../../../libraries/spreadsheet/Grid/utils/functions/deleteIndividualGridRows";
 import { addGridRow } from "../../../libraries/spreadsheet/Grid/utils/functions/addGridRow";
-import Loading from "@/components/Loading";
-import initResizer from "@/utilities/resizePage";
 import { GetFilteredDataByQuery } from "@/services/spreadsheet/getQueryData";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
@@ -70,7 +63,6 @@ import {
   FcAddColumn,
   FcAddRow,
   FcAlphabeticalSortingAz,
-  FcAlphabeticalSortingZa,
   FcClearFilters,
   FcCloseUpMode,
   FcCollaboration,
@@ -78,10 +70,7 @@ import {
   FcDataEncryption,
   FcDeleteColumn,
   FcDeleteRow,
-  FcDocument,
-  FcExport,
   FcFilledFilter,
-  FcPieChart,
   FcSynchronize,
 } from "react-icons/fc";
 
@@ -91,6 +80,8 @@ import { GrDocumentPdf } from "react-icons/gr";
 import { BsFiletypeJson } from "react-icons/bs";
 
 import { TbMathFunction } from "react-icons/tb";
+import { sendNewColumnsToServer } from "@/libraries/spreadsheet/Grid/utils/functions/sendColumnsToServet";
+import PopoverComponent from "@/components/Popover/General";
 
 interface ISpreadGrid {
   wch: number;
@@ -111,6 +102,7 @@ const Spreadsheet = () => {
   const generalWorkspaceData = useWorkspace();
   const keyCodeFromEnterDown = 13;
   const [optionsVector, setOptionsVector] = useState<any>([]);
+  const [isSendingQuery, setIsSendingQuery] = useState<boolean>(false);
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
   const [freezeColumns, setFreezeColums] = useState(0);
   const [isDescendingActive, setIsDescendingActive] = useState(true);
@@ -127,36 +119,26 @@ const Spreadsheet = () => {
     currentWorkSpace.currentWorkSpace?.spreadSheetData?.data
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [currentWindowSize, setCurrentWindowSize] = useState<
-    number | undefined
-  >(0);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number[]>([]);
   const [typedQueryFromUser, setTypeQueryFromUser] = useState({
     workspaceID: "",
     query: "",
   });
 
+  const [spreadColumns, setSpreadColumns] = useState<IColumnProjection[]>([]);
+
   const [useCurrentTheme, setUseCurrentTheme] = useState<Partial<Theme>>({});
-  const [gridColumns, setGridColumns] = useState<
-    IColumnProjection[] | undefined
-  >([]);
 
   const router = useRouter();
 
   const isBrowser = () => typeof window !== "undefined";
 
-  const restrictedColumnsToQuery =
-    currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns.filter(
-      (useColumn) => {
-        if (useColumn.type === "string") return true;
-        if (useColumn.type === "number") return true;
-        if (useColumn.type === "date") return true;
-        if (useColumn.type === "datetime") return true;
-        if (useColumn.type === "cellphone") return true;
-        if (useColumn.type === "mail") return true;
-        if (useColumn.type === "boolean") return true;
-      }
-    );
+  const restrictedColumnsToQuery = spreadColumns.filter((useColumn) => {
+    if (useColumn.type === "string") return true;
+    if (useColumn.type === "number") return true;
+    if (useColumn.type === "date") return true;
+    if (useColumn.type === "boolean") return true;
+  });
 
   const toastNotification = useToast();
 
@@ -172,8 +154,6 @@ const Spreadsheet = () => {
 
       const resizetToolData: HTMLElement | null =
         document.getElementById("resizerTool");
-
-      setCurrentWindowSize(todoDocument?.getBoundingClientRect()?.width);
 
       if (
         todoDocument &&
@@ -193,6 +173,7 @@ const Spreadsheet = () => {
   }
 
   async function handleUserQuery() {
+    setIsSendingQuery(true);
     const queryDataFromMongo = await GetFilteredDataByQuery(
       typedQueryFromUser,
       currentSession.currentUser.userID
@@ -203,6 +184,8 @@ const Spreadsheet = () => {
       setSpreadSheetData(
         currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
       );
+
+    setIsSendingQuery(false);
   }
 
   function exportToExcel() {
@@ -384,18 +367,20 @@ const Spreadsheet = () => {
   }
 
   React.useEffect(() => {
-    const InitialTodoDocument: HTMLDivElement | null =
-      document.querySelector(".todoContainer");
-
-    setCurrentWindowSize(InitialTodoDocument?.getBoundingClientRect()?.width);
     setSpreadSheetData(
       currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
+    );
+    setSpreadColumns(
+      currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns ?? []
     );
   }, []);
 
   React.useEffect(() => {
     setSpreadSheetData(
       currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
+    );
+    setSpreadColumns(
+      currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns ?? []
     );
   }, [currentWorkSpace.currentWorkSpace?.spreadSheetData?.data]);
 
@@ -411,22 +396,6 @@ const Spreadsheet = () => {
       }px`;
     }
   });
-
-  React.useEffect(() => {
-    setGridColumns(
-      currentWorkSpace?.currentWorkSpace?.spreadSheetData?.columns
-    );
-    if (gridColumns?.length) {
-      setOptionsVector(
-        gridColumns.map((value: IColumnProjection, index: number) => {
-          return {
-            value: index + 1,
-            label: index + 1,
-          };
-        })
-      );
-    }
-  }, [gridColumns]);
 
   React.useEffect(() => {
     const currentWorkSpace: IWspUser | undefined =
@@ -565,7 +534,16 @@ const Spreadsheet = () => {
             <div style={{ marginTop: "30px" }}>
               <h4 style={{ marginBottom: "20px" }}>Congelar columnas</h4>
               <Select
-                options={optionsVector ?? []}
+                options={
+                  currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns.map(
+                    (value: IColumnProjection, index: number) => {
+                      return {
+                        value: index + 1,
+                        label: index + 1,
+                      };
+                    }
+                  ) ?? []
+                }
                 value={freezeColumns}
                 onChange={(e: any) => {
                   if (e) {
@@ -672,7 +650,12 @@ const Spreadsheet = () => {
             <Box style={{ width: "100%" }}>
               <InputGroup display={"flex"} alignItems={"center"}>
                 <InputLeftElement>
-                  <Search2Icon w={3} h={3} marginBottom={"10px"} />
+                  <Icon
+                    as={isSendingQuery ? Spinner : Search2Icon}
+                    w={3}
+                    h={3}
+                    marginBottom={"10px"}
+                  />
                 </InputLeftElement>
                 <Input
                   sx={{
@@ -705,26 +688,89 @@ const Spreadsheet = () => {
               alignItems={"center"}
             >
               <Box display={"flex"}>
-                <Button
-                  borderRight={"1px solid #dddddd"}
-                  borderLeft={"1px solid #dddddd"}
-                  height={"30px"}
-                  borderRadius={"0px"}
-                  onClick={() => {
-                    setAddTask(true);
-                  }}
-                >
-                  <Icon as={FcAlphabeticalSortingAz} />
-                </Button>
+                <PopoverComponent
+                  content={
+                    <Box overflowY={"hidden"} padding={"10px 20px 20px 20px"}>
+                      <Text marginBottom={"5px"}>Ordernar por columnas</Text>
+                      <Select
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        options={
+                          restrictedColumnsToQuery?.map((userColumn) => {
+                            return {
+                              value: userColumn.title,
+                              type: userColumn.type,
+                              label: userColumn.title,
+                            };
+                          }) ?? []
+                        }
+                        onChange={(e: any) => {
+                          if (e) {
+                            if (e.value && selectedColumnToSort.length <= 2)
+                              setSelectedColumnToSort(uniqBy([e], "label"));
+                          }
+                        }}
+                        placeholder="Seleccione una columna"
+                      />
 
-                <Button
-                  borderRight={"1px solid #dddddd"}
-                  height={"30px"}
-                  borderRadius={"0px"}
-                  onClick={() => addGridRow(currentWorkSpace)}
-                >
-                  <Icon as={FcAlphabeticalSortingZa} />
-                </Button>
+                      {selectedColumnToSort.map((uniqResort, index) => {
+                        if (index == selectedColumnToSort.length - 1)
+                          return (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <Input
+                                value={uniqResort.label}
+                                style={{ marginTop: "20px" }}
+                                size="md"
+                              />
+                              <Checkbox
+                                sx={{ marginTop: "15px", marginLeft: "5px" }}
+                                colorScheme="purple"
+                                isChecked={isDescendingActive}
+                                onChange={() => {
+                                  setIsDescendingActive(!isDescendingActive);
+                                  sortRowsBySelection(spreadSheetData);
+                                }}
+                              >
+                                Orden descendiente
+                              </Checkbox>
+
+                              <Button
+                                sx={{ marginTop: "20px" }}
+                                onClick={() => {
+                                  setInternalTriggerPointer(
+                                    Math.random() * 1000 - 1 + 1
+                                  );
+                                  sortRowsBySelection(spreadSheetData);
+                                }}
+                                bgColor={"rgba(33,42,62,1)"}
+                                color={"white"}
+                                _hover={{}}
+                              >
+                                Ordenar
+                              </Button>
+                            </div>
+                          );
+                      })}
+                    </Box>
+                  }
+                  trigger={
+                    <Button
+                      borderRight={"1px solid #dddddd"}
+                      borderLeft={"1px solid #dddddd"}
+                      height={"30px"}
+                      borderRadius={"0px"}
+                    >
+                      <Icon as={FcAlphabeticalSortingAz} />
+                    </Button>
+                  }
+                />
 
                 <Button
                   borderRight={"1px solid #dddddd"}
@@ -762,6 +808,66 @@ const Spreadsheet = () => {
                   <Icon as={FcCollaboration} />
                 </Button>
 
+                <PopoverComponent
+                  content={
+                    <Box
+                      minW={"300px"}
+                      overflowY={"hidden"}
+                      padding={"10px 20px 20px 20px"}
+                    >
+                      <Text marginBottom={"5px"}>Congelar columnas</Text>
+                      <Select
+                        options={
+                          spreadColumns.map(
+                            (value: IColumnProjection, index: number) => {
+                              return {
+                                value: index + 1,
+                                label: index + 1,
+                              };
+                            }
+                          ) ?? []
+                        }
+                        value={freezeColumns}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                          option: (
+                            styles,
+                            { data, isDisabled, isFocused, isSelected }
+                          ) => {
+                            const color = chroma("rgba(33,42,62,1)");
+                            return {
+                              ...styles,
+                              backgroundColor: isDisabled
+                                ? undefined
+                                : isSelected
+                                ? "rgba(33,42,62,1)"
+                                : isFocused
+                                ? color.alpha(0.2).css()
+                                : undefined,
+                            };
+                          },
+                        }}
+                        onChange={(e: any) => {
+                          if (e) {
+                            if (e.value) setFreezeColums(e);
+                          }
+                        }}
+                        placeholder="Congelar columnas"
+                      />
+                    </Box>
+                  }
+                  trigger={
+                    <Button
+                      borderRight={"1px solid #dddddd"}
+                      height={"30px"}
+                      borderRadius={"0px"}
+                    >
+                      <Icon as={FcDataEncryption} />
+                    </Button>
+                  }
+                />
+
                 <Button
                   borderRight={"1px solid #dddddd"}
                   height={"30px"}
@@ -788,38 +894,55 @@ const Spreadsheet = () => {
                   <Icon as={FcCloseUpMode} />
                 </Button>
 
-                <Button
-                  borderRight={"1px solid #dddddd"}
-                  height={"30px"}
-                  borderRadius={"0px"}
-                  onClick={async () => {
-                    setIsLoading(true);
-                    await UpdateWorkSpace(
-                      currentWorkSpace?.currentWorkSpace?._id,
-                      //@ts-ignore
-                      currentWorkSpace?.currentWorkSpace
-                    );
-
-                    setIsLoading(false);
-                    toastNotification({
-                      title: "Correcto",
-                      description:
-                        "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
-                      status: "success",
-                      duration: 4000,
-                      isClosable: true,
-                    });
-                  }}
-                >
-                  <Icon as={FcDataEncryption} />
-                </Button>
-
                 <Box
                   display={"flex"}
                   alignItems={"center"}
                   paddingLeft={"20px"}
                 >
-                  <Switch size="sm" colorScheme="gray" />
+                  <Switch
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setIsNightThemeActive(e.target.checked);
+                      if (e.target.checked) {
+                        setUseCurrentTheme({
+                          accentColor: "#8c96ff",
+                          accentLight: "rgba(202, 206, 255, 0.253)",
+
+                          textDark: "#ffffff",
+                          textMedium: "#b8b8b8",
+                          textLight: "#a0a0a0",
+                          textBubble: "#ffffff",
+
+                          bgIconHeader: "#b8b8b8",
+                          fgIconHeader: "#000000",
+                          textHeader: "#a1a1a1",
+                          textHeaderSelected: "#000000",
+
+                          bgCell: "#16161b",
+                          bgCellMedium: "#202027",
+                          bgHeader: "#212121",
+                          bgHeaderHasFocus: "#474747",
+                          bgHeaderHovered: "#404040",
+
+                          bgBubble: "#212121",
+                          bgBubbleSelected: "#000000",
+
+                          bgSearchResult: "#423c24",
+
+                          borderColor: "rgba(225,225,225,0.2)",
+                          drilldownBorder: "rgba(225,225,225,0.4)",
+
+                          linkColor: "#4F5DFF",
+
+                          headerFontStyle: "bold 14px",
+                          baseFontStyle: "13px",
+                          fontFamily:
+                            "Inter, Roboto, -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, noto, arial, sans-serif",
+                        });
+                      } else setUseCurrentTheme({});
+                    }}
+                    size="sm"
+                    colorScheme="gray"
+                  />
                   <Text fontSize={"14px"} marginLeft={"15px"}>
                     Modo oscuro
                   </Text>
@@ -879,7 +1002,37 @@ const Spreadsheet = () => {
                 borderRadius={"0px"}
                 height={"30px"}
                 borderRight={"1px solid #dddddd"}
-                onClick={() => exportToExcel()}
+                onClick={() => {
+                  setIsLoading(true);
+
+                  setTimeout(async () => {
+                    const currentColumns: IColumnProjection[] =
+                      currentWorkSpace.currentWorkSpace?.spreadSheetData
+                        ?.columns ?? [];
+                    const currentColumnSelected =
+                      currentSelection?.columns["items"][0][0];
+                    currentColumns.splice(currentColumnSelected, 1);
+
+                    sendNewColumnsToServer(
+                      currentWorkSpace,
+                      currentSession,
+                      currentColumns,
+                      spreadSheetData
+                    );
+
+                    await UpdateWorkSpace(
+                      currentWorkSpace?.currentWorkSpace?._id,
+                      {
+                        ...currentWorkSpace.currentWorkSpace,
+                        spreadSheetData:
+                          currentWorkSpace.currentWorkSpace?.spreadSheetData,
+                      }
+                    );
+
+                    setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
+                    setIsLoading(false);
+                  }, 1000);
+                }}
               >
                 <Icon as={FcDeleteColumn} />
               </Button>
@@ -927,8 +1080,7 @@ const Spreadsheet = () => {
                     setIsLoading(false);
                     toastNotification({
                       title: "Correcto",
-                      description:
-                        "¡Datos sincronizados con éxito!",
+                      description: "¡Datos sincronizados con éxito!",
                       status: "success",
                       duration: 4000,
                       isClosable: true,
@@ -938,6 +1090,7 @@ const Spreadsheet = () => {
               >
                 <Icon
                   className={isLoading ? styles.syncIcon : "staticIcon"}
+                  transform={"rotate(45deg)"}
                   as={FcSynchronize}
                 />
               </Button>
@@ -989,13 +1142,7 @@ const Spreadsheet = () => {
                   borderRight={"1px solid #dddddd"}
                   height={"30px"}
                   borderRadius={"0px"}
-                  onClick={() =>
-                    deleteGridRow(
-                      currentRowsSelected,
-                      currentWorkSpace,
-                      toastNotification
-                    )
-                  }
+                  onClick={() => exportToExcel()}
                   isDisabled={currentRowsSelected !== undefined ? false : true}
                 >
                   <Icon as={SiMicrosoftexcel} />

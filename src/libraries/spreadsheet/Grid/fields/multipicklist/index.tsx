@@ -8,6 +8,7 @@ import {
 } from "@glideapps/glide-data-grid";
 import * as React from "react";
 import { roundedRect } from "./draw-fns";
+import { Checkbox, Tag } from "@chakra-ui/react";
 
 interface TagsCellProps {
   readonly kind: "multipicklist";
@@ -22,8 +23,8 @@ interface TagsCellProps {
 
 export type TagsCell = CustomCell<TagsCellProps>;
 
-const tagHeight = 20;
-const innerPad = 10;
+const tagHeight = 25;
+const innerPad = 12;
 
 const renderer: CustomRenderer<TagsCell> = {
   kind: GridCellKind.Custom,
@@ -49,10 +50,7 @@ const renderer: CustomRenderer<TagsCell> = {
       drawArea.y +
       (drawArea.height - rows * tagHeight - (rows - 1) * innerPad) / 2;
     for (const tag of tags) {
-      const color =
-        possibleTags.find((t) => t.label === tag)?.color ?? theme.bgBubble;
-
-      ctx.font = `12px ${theme.fontFamily}`;
+      const color = possibleTags.find((t) => t.label === tag)?.color ?? theme.bgBubble;
       const metrics = measureTextCached(tag, ctx);
       const width = metrics.width + innerPad * 2;
       const textY = tagHeight / 2;
@@ -68,15 +66,17 @@ const renderer: CustomRenderer<TagsCell> = {
       }
 
       ctx.fillStyle = color;
+
       ctx.beginPath();
-      roundedRect(ctx, x, y, width, tagHeight, tagHeight / 2);
+      ctx.font = `${500} ${13}px ${theme.fontFamily}`;
+      roundedRect(ctx, x, y, width, tagHeight, tagHeight / 5);
       ctx.fill();
 
-      ctx.fillStyle = theme.textDark;
+      ctx.fillStyle = "black";
       ctx.fillText(
         tag,
         x + innerPad,
-        y + textY + getMiddleCenterBias(ctx, `12px ${theme.fontFamily}`)
+        y + textY
       );
 
       x += width + 8;
@@ -86,7 +86,6 @@ const renderer: CustomRenderer<TagsCell> = {
     return true;
   },
   provideEditor: () => {
-    // eslint-disable-next-line react/display-name
     return (p) => {
       const { onChange, value } = p;
       const { possibleTags, tags, readonly = false } = value.data;
@@ -106,11 +105,12 @@ const renderer: CustomRenderer<TagsCell> = {
                 }}
               >
                 {!readonly && (
-                  <input
+                  <Checkbox
                     className="gdg-input"
                     style={{ width: "5%" }}
-                    type="checkbox"
-                    checked={selected}
+                    iconColor="white"
+                    colorScheme="purple"
+                    isChecked={selected}
                     onChange={() => {
                       const newTags = selected
                         ? tags.filter((x) => x !== t.value)
@@ -125,12 +125,11 @@ const renderer: CustomRenderer<TagsCell> = {
                     }}
                   />
                 )}
-                <div
+                <Tag
                   className={"pill " + (selected ? "selected" : "unselected")}
                   style={{
-                    backgroundColor: selected ? t.color : undefined,
+                    backgroundColor: selected ? t.color : "transparent",
                     width: "95%",
-                    borderRadius: "10px",
                     textAlign: "start",
                     height: "30px",
                     display: "flex",
@@ -143,7 +142,7 @@ const renderer: CustomRenderer<TagsCell> = {
                   }}
                 >
                   {t.value}
-                </div>
+                </Tag>
               </label>
             );
           })}

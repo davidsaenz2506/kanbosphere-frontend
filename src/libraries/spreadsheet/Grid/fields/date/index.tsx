@@ -4,7 +4,10 @@ import {
   CustomRenderer,
   drawTextCell,
   GridCellKind,
+  measureTextCached,
+  Rectangle,
 } from "@glideapps/glide-data-grid";
+import { roundedRect } from "../multipicklist/draw-fns";
 
 interface DatePickerCellProps {
   readonly kind: "date";
@@ -12,6 +15,9 @@ interface DatePickerCellProps {
   readonly displayDate: string;
   readonly format: "date" | "datetime-local";
 }
+
+const tagHeight = 25;
+const innerPad = 12;
 
 export type DatePickerCell = CustomCell<DatePickerCellProps>;
 
@@ -22,8 +28,59 @@ const renderer: CustomRenderer<DatePickerCell> = {
   },
 
   draw: (args, cell) => {
+    const { ctx, theme, rect } = args;
     const { displayDate } = cell.data;
-    drawTextCell(args, displayDate, cell.contentAlign);
+
+    const drawArea: Rectangle = {
+      x: rect.x + theme.cellHorizontalPadding,
+      y: rect.y + theme.cellVerticalPadding,
+      width: rect.width - 2 * theme.cellHorizontalPadding,
+      height: rect.height - 2 * theme.cellVerticalPadding,
+    };
+    const rows = Math.max(
+      1,
+      Math.floor(drawArea.height / (tagHeight + innerPad))
+    );
+
+    let x = drawArea.x;
+    let row = 1;
+    let y =
+      drawArea.y +
+      (drawArea.height - rows * tagHeight - (rows - 1) * innerPad) / 2;
+  
+      const color = "#EEEEEE";
+      const metrics = measureTextCached(displayDate, ctx);
+      const width = metrics.width + innerPad * 2;
+      const textY = tagHeight / 2;
+
+      if (
+        x !== drawArea.x &&
+        x + width > drawArea.x + drawArea.width &&
+        row < rows
+      ) {
+        row++;
+        y += tagHeight + innerPad;
+        x = drawArea.x;
+      }
+
+      ctx.fillStyle = color;
+
+      ctx.beginPath();
+      ctx.font = `${500} ${13}px ${theme.fontFamily}`;
+      roundedRect(ctx, x, y, width, tagHeight, tagHeight / 5);
+      ctx.fill();
+
+      ctx.fillStyle = "black";
+      ctx.fillText(
+        displayDate,
+        x + innerPad,
+        y + textY
+      );
+
+      x += width + 8;
+      if (x > drawArea.x + drawArea.width && row >= rows) return;
+    
+
     return true;
   },
 

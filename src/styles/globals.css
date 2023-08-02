@@ -5,6 +5,10 @@ body {
   overflow: hidden;
 }
 
+* {
+  font-family: "Geologica", sans-serif;
+}
+
 body p {
   font-family: "Geologica", sans-serif;
 }

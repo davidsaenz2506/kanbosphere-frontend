@@ -32,6 +32,12 @@ export const editGridCell = async (
     // @ts-ignore
     if (type === "multipicklist") data[row][key] = newValue.data.tags.join(";");
 
+    // @ts-ignore
+    if (type === "phone") data[row][key] = newValue.data.phone;
+
+    // @ts-ignore
+    if (type === "time") data[row][key] = newValue.data.date
+
     if (type === "mail") {
         const errors: string[] = [];
         if (typeof newValue.data === "string") {

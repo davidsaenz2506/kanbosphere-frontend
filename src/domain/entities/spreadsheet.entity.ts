@@ -3,6 +3,7 @@ import { ISelectColorOptions } from "@/components/Modals/AddColumn";
 export interface IColumnProjection {
     title: string;
     type?: string;
+    order: number;
     width: number;
     picklistValues?: ISelectColorOptions[]
 }

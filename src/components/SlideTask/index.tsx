@@ -82,7 +82,6 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
           borderRadius: "4px",
         },
       }}
-      backgroundColor={"#e6effc"}
       overflowY={"scroll"}
       zIndex={1000}
       width={isOpenSliderTask ? "40%" : "0%"}
@@ -90,30 +89,37 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
       {selectedTask ? (
         <Box padding={"20px"}>
           <Box
-            marginBottom={"10px"}
+            marginBottom={"20px"}
             display={"flex"}
             alignItems={"center"}
             justifyContent={"space-between"}
+            borderBottom={"2px solid #d9d9e3"}
+            paddingBottom={"20px"}
           >
             <Box>
-              <Text fontWeight={"bold"}>{selectedTask?.title}</Text>
-              <Text>{selectedTask?.description}</Text>
+              <Text fontSize={"18px"} fontWeight={"bold"}>
+                {selectedTask?.title}
+              </Text>
+              <Text fontSize={"18px"}>{selectedTask?.description}</Text>
             </Box>
 
-            <SearchIcon marginBottom={"20px"} />
+            <SearchIcon marginRight={"5px"} w={5} h={5} />
           </Box>
 
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            borderBottom={"2px solid #d9d9e3"}
+            paddingBottom={"20px"}
           >
             <Text fontWeight={"bold"}>Gestionar registro</Text>
             <Box>
               <Tooltip label="Editar record">
                 <IconButton
                   borderRadius={"50%"}
-                  boxShadow={"0 4px 8px rgba(0, 0, 0, 0.4);"}
+                  backgroundColor={"white"}
+                  boxShadow={"0 4px 8px rgba(0, 0, 0, 0.3);"}
                   onClick={() => setOpenEdit(true)}
                   icon={<Icon as={FcServices} />}
                   aria-label="edit"
@@ -122,7 +128,8 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
               <Tooltip label="Eliminar record">
                 <IconButton
                   borderRadius={"50%"}
-                  boxShadow={"0 4px 8px rgba(0, 0, 0, 0.4);"}
+                  backgroundColor={"white"}
+                  boxShadow={"0 4px 8px rgba(0, 0, 0, 0.3);"}
                   onClick={() => setOpenDelete(true)}
                   marginLeft={"10px"}
                   marginRight={"10px"}
@@ -133,7 +140,7 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
               <Tooltip label="Ver registros">
                 <IconButton
                   colorScheme={""}
-                  boxShadow={"0 4px 8px rgba(0, 0, 0, 0.5);"}
+                  boxShadow={"0 4px 8px rgba(0, 0, 0, 0.3);"}
                   borderRadius={"50%"}
                   icon={<Icon as={FcComboChart} />}
                   aria-label="charts"
@@ -159,6 +166,8 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
           <Box display={"flex"}>
             <Badge
               backgroundColor={selectedTask?.priority?.color}
+              padding={"5px"}
+              borderRadius={"5px"}
               ml="1"
               color={"white"}
               fontSize="1.2em"
@@ -177,6 +186,8 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
 
             <Badge
               backgroundColor={statusColorValues[selectedTask?.status ?? 0]}
+              padding={"5px"}
+              borderRadius={"5px"}
               ml="1"
               color={"white"}
               fontSize="1.2em"
@@ -273,25 +284,32 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
             max={selectedTask.expectedWorkingHours}
           />
 
-          <Box>
+          <Box
+            borderTop={"2px solid #d9d9e3"}
+            marginTop={"30px"}
+            paddingTop={"10px"}
+          >
             <Text marginTop={"15px"} marginBottom={"15px"} fontWeight={"bold"}>
               Multimedia
             </Text>
 
-            <Box>
+            <Box display={"flex"}>
               {stringPathToRender.length > 0 && !isGettingImage && (
                 <React.Fragment>
                   {stringPathToRender.map(
                     (currentPath: IFilePath, index: number) => {
                       return (
                         <Box
-                          flexDirection={"column"}
+                          flexDirection={"row"}
                           justifyContent={"center"}
                           alignItems={"center"}
                           display={"flex"}
                           marginBottom={"15px"}
+                          marginRight={"15px"}
                         >
                           <Image
+                            w={"150px"}
+                            h={"150px"}
                             style={{
                               borderRadius: "5px",
                             }}
@@ -307,7 +325,9 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
               )}
               {selectedTask?.file?.length === 0 && (
                 <React.Fragment>
-                  <Text style={{ width: "100%" }}>Sin contenido</Text>
+                  <Text style={{ width: "100%", marginTop: "-10px" }}>
+                    Sin contenido
+                  </Text>
                 </React.Fragment>
               )}
               {isGettingImage && (
@@ -316,6 +336,7 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
                   flexDirection={"column"}
                   justifyContent={"center"}
                   width={"100%"}
+                  marginTop={"-10px"}
                 >
                   <Text
                     style={{
