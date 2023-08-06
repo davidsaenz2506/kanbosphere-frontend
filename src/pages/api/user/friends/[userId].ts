@@ -9,7 +9,7 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
         const canonicalData: { canonicalId: string, method: string } = req.body;
         const { userId } = req.query;
 
-        const { data: userUpdated } = await axios.post(`${process.env.WORKSPACE_API}/users/contactOperations/${userId}`, canonicalData, {
+        const { data: userUpdated } = await axios.post(`${process.env.WORKSPACE_API}/social/contactOperations/${userId}`, canonicalData, {
             headers: {
                 Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`
             }

@@ -5,12 +5,11 @@ import AddTask from "../../../components/Modals/AddTask";
 
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import Header from "../../../components/Header/Header";
-import { Box, Portal, useToast } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import { IDataToDo, IFilePath } from "@/domain/entities/todo.entity";
 
 import EditTask from "@/components/Modals/EditTask";
 import DeleteTask from "@/components/Modals/DeleteTask";
-import Loading from "@/components/Loading";
 
 import { storage } from "@/storage/firebaseClient";
 import {
@@ -85,9 +84,11 @@ const ToDoWorkspace = () => {
   }
 
   React.useEffect(() => {
-     const relatedWorkspace: IWspUser[] = userWsps.filter((currentRecord: IWspUser) => currentRecord._id === router.query?.fridgeKey)
-     setCurrentWorkSpace(relatedWorkspace[0])
-  }, [router.query?.fridgeKey])
+    const relatedWorkspace: IWspUser[] = userWsps.filter(
+      (currentRecord: IWspUser) => currentRecord._id === router.query?.fridgeKey
+    );
+    setCurrentWorkSpace(relatedWorkspace[0]);
+  }, [router.query?.fridgeKey]);
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
@@ -150,8 +151,8 @@ const ToDoWorkspace = () => {
     setSelectedTask(
       currentWorkSpace?.wspData?.filter(
         (currentRecord) =>
-          currentRecord?.taskId ===
-          currentWorkSpace?.wspDataPreferences?.selectedTask
+          // @ts-ignore
+          currentRecord?.taskId === currentWorkSpace?.wspDataPreferences?.selectedTask
       )[0]
     );
   }, [currentWorkSpace]);

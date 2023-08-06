@@ -8,6 +8,7 @@ import MiniCard from "../MiniCard/MiniCard";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateCard } from "@/services/workspaces/updateCard";
+import currentBiridectionalCommunication from "@/services/socket";
 
 const LaneComponent = ({
   title,
@@ -34,13 +35,23 @@ const LaneComponent = ({
           modifiedWorkspaceData?.find(
             (currentRecord) => currentRecord.taskId === item.item.taskId
           );
+
+        // @ts-ignore
         setCurrentWorkSpace({
           ...currentWorkSpace,
           wspData: modifiedWorkspaceData,
         });
 
         if (modifiedRecord)
-          await UpdateCard(currentWorkSpace?._id, modifiedRecord);
+          await UpdateCard(currentWorkSpace?._id, {
+            body: modifiedRecord,
+            transactionObject: {
+              currentUserSocketId: currentBiridectionalCommunication.id,
+              currentRoomToken: {
+                roomToken: currentWorkSpace?._id ?? "",
+              },
+            },
+          });
       }
     },
     canDrop: (item) => {
@@ -67,7 +78,7 @@ const LaneComponent = ({
           boxShadow: "rgba(0, 0, 0, 0.15) 0px 3px 8px;",
           height: "100%",
           marginLeft: "20px",
-          marginRight: "10px"
+          marginRight: "10px",
         }}
       >
         <CardHeader>
@@ -77,7 +88,7 @@ const LaneComponent = ({
               color: "#182433",
               textAlign: "center",
               fontWeight: "initial",
-              fontSize: "18px"
+              fontSize: "18px",
             }}
           >
             {" "}
@@ -89,9 +100,17 @@ const LaneComponent = ({
             marginTop: "-10px",
             transition: "all .1s",
             cursor: "default",
-            border: isOver ?  ( canDrop ? "2px dashed green" : "2px dashed red" )  : "none",
+            border: isOver
+              ? canDrop
+                ? "2px dashed green"
+                : "2px dashed red"
+              : "none",
             borderRadius: "8px",
-            backgroundColor: isOver ? ( canDrop ? "#C1E7D9" : "#FFD4D4" ) : bgColor,
+            backgroundColor: isOver
+              ? canDrop
+                ? "#C1E7D9"
+                : "#FFD4D4"
+              : bgColor,
             paddingTop: "5px",
           }}
         >

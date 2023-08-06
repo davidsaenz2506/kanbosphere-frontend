@@ -32,6 +32,7 @@ import { Tooltip } from "@chakra-ui/react";
 import { getColor } from "@/utilities/spreadsheet/getTagColor";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
+import currentBiridectionalCommunication from "@/services/socket";
 
 export interface IPicklistOptions {
   value: string;
@@ -111,8 +112,16 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
     }
 
     await UpdateWorkSpace(currentWorkspace?.currentWorkSpace?._id, {
-      ...currentWorkspace.currentWorkSpace,
-      spreadSheetData: currentSpreadData,
+      body: {
+        ...currentWorkspace.currentWorkSpace,
+        spreadSheetData: currentSpreadData,
+      },
+      transactionObject: {
+        currentRoomToken: {
+          roomToken: currentWorkspace.currentWorkSpace?._id ?? "",
+        },
+        currentUserSocketId: currentBiridectionalCommunication.id,
+      },
     });
 
     const currentWorkspaces: IWspUser[] = performanceWorkspaces.userWsps;
@@ -237,6 +246,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
         <ModalFooter>
           <Button
             bgColor={"rgba(33,42,62,1)"}
+            _hover={{}}
             color={"white"}
             mr={3}
             onClick={() => {

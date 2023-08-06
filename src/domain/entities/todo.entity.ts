@@ -1,5 +1,12 @@
 import ICurrentUser from "./user.entity";
 
+export interface ITransactionData {
+    currentUserSocketId: string,
+    currentRoomToken: {
+        roomToken: string
+    }
+}
+
 export interface IPriority {
     value: string;
     color: string | undefined;
@@ -28,4 +35,9 @@ export interface IDataToDo {
     createDate: Date | undefined,
     finishDate?: Date | undefined
     file: IFilePath[] | undefined,
+}
+
+export interface ITransactionToDo {
+    body: Partial<IDataToDo>;
+    transactionObject: ITransactionData
 }

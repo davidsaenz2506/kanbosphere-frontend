@@ -54,7 +54,7 @@ const TableSpread: React.FC<SpreadTableComponent> = (props) => {
           {spreadChunkData.map((currentChunk) => {
             const activeUsers = [
               currentChunk.createdById,
-              ...currentChunk.sharedWith,
+              ...currentChunk.collaborators,
             ];
 
             return (

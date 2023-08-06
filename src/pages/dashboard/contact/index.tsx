@@ -42,7 +42,7 @@ import { SendInvitation } from "@/services/user/invitations/send";
 import IUserInvitations from "@/domain/entities/invitations";
 import { GetUsersByArray } from "@/services/user/getByArray";
 
-import styles from "../../../styles/portal.module.css"
+import styles from "../../../styles/portal.module.css";
 
 export const ContactUser = () => {
   const { currentUser } = useCurrentUser();
@@ -174,7 +174,7 @@ export const ContactUser = () => {
                           workspaceToJoinId: currentSpace._id,
                           workspaceToJoinType: currentSpace.type,
                           workspaceUsersAmount:
-                            currentSpace.sharedWith.length + 1,
+                            currentSpace.collaborators.length + 1,
                           workspaceToJoin: currentSpace.name,
                         };
 
@@ -516,26 +516,20 @@ export const ContactUser = () => {
                           setIsDeletingFriend(true);
                           setItemSelected(result?._id);
 
-                          const operateRequest = await OperateRequest(
-                            result?._id,
-                            {
-                              canonicalId: currentUser._id,
-                              method: "delete",
-                            }
-                          );
+                          await OperateRequest(result?._id, {
+                            canonicalId: currentUser._id,
+                            method: "delete",
+                          });
 
-                          if (operateRequest) {
-                            currentContact.setCurrentContacts({
-                              friends:
-                                currentContact.currentContacts?.friends?.splice(
-                                  index,
-                                  1
-                                ),
-                              requests:
-                                currentContact.currentContacts?.requests,
-                            });
-                            setIsDeletingFriend(false);
-                          }
+                          currentContact.setCurrentContacts({
+                            friends:
+                              currentContact.currentContacts?.friends?.splice(
+                                index,
+                                1
+                              ),
+                            requests: currentContact.currentContacts?.requests,
+                          });
+                          setIsDeletingFriend(false);
                         }}
                       />
                     </ButtonGroup>
@@ -637,26 +631,20 @@ export const ContactUser = () => {
                           onClick={async () => {
                             setIsAcceptingRequest(true);
                             setItemSelected(currentRequest?._id);
-                            const operateRequest = await OperateRequest(
-                              currentUser._id,
-                              {
-                                canonicalId: currentRequest?._id,
-                                method: "acceptreq",
-                              }
-                            );
+                            await OperateRequest(currentUser._id, {
+                              canonicalId: currentRequest?._id,
+                              method: "acceptreq",
+                            });
 
-                            if (operateRequest) {
-                              currentContact.setCurrentContacts({
-                                friends:
-                                  currentContact.currentContacts?.friends,
-                                requests:
-                                  currentContact.currentContacts?.requests?.splice(
-                                    index - 1,
-                                    1
-                                  ),
-                              });
-                              setIsAcceptingRequest(false);
-                            }
+                            currentContact.setCurrentContacts({
+                              friends: currentContact.currentContacts?.friends,
+                              requests:
+                                currentContact.currentContacts?.requests?.splice(
+                                  index - 1,
+                                  1
+                                ),
+                            });
+                            setIsAcceptingRequest(false);
                           }}
                         />
                       </Tooltip>
@@ -678,26 +666,20 @@ export const ContactUser = () => {
                           onClick={async () => {
                             setIsDeletingRequest(true);
                             setItemSelected(currentRequest?._id);
-                            const operateRequest = await OperateRequest(
-                              currentUser._id,
-                              {
-                                canonicalId: currentRequest?._id,
-                                method: "deletereq",
-                              }
-                            );
+                            await OperateRequest(currentUser._id, {
+                              canonicalId: currentRequest?._id,
+                              method: "deletereq",
+                            });
 
-                            if (operateRequest) {
-                              currentContact.setCurrentContacts({
-                                friends:
-                                  currentContact.currentContacts?.friends,
-                                requests:
-                                  currentContact.currentContacts?.requests?.splice(
-                                    index - 1,
-                                    1
-                                  ),
-                              });
-                              setIsDeletingRequest(false);
-                            }
+                            currentContact.setCurrentContacts({
+                              friends: currentContact.currentContacts?.friends,
+                              requests:
+                                currentContact.currentContacts?.requests?.splice(
+                                  index - 1,
+                                  1
+                                ),
+                            });
+                            setIsDeletingRequest(false);
                           }}
                         />
                       </Tooltip>

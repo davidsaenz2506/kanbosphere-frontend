@@ -13,27 +13,22 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
 import jwtDecode from "jwt-decode";
 import { GetCurrentUser } from "@/services/user/getCurrentUser";
-import { getFirstName } from "@/utilities/getFirstName";
 import { GetUsersByArray } from "@/services/user/getByArray";
 import { useCurrentContact } from "@/context/currentContacts/currentContacts.hook";
 import {
   Box,
   IconButton,
-  Tooltip,
   Text,
   useToast,
-  Stack,
-  Skeleton,
   Spinner,
   Avatar,
   Badge,
   Icon,
+  ButtonGroup,
 } from "@chakra-ui/react";
-import { BellIcon } from "@chakra-ui/icons";
+import { BellIcon, CheckIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import { getUpdatedServerWorkspaces } from "@/services/bidirectional/workspaces";
 import currentBiridectionalCommunication from "@/services/socket";
-import { getUpdatedUserData } from "@/services/bidirectional/users";
 import { renderComponent } from "@/routes";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import PopoverComponent from "@/components/Popover/General";
@@ -41,21 +36,71 @@ import IUserInvitations from "@/domain/entities/invitations";
 import { getDaysPassedFromDate } from "@/utilities/date/getDays";
 
 import { IoIosNotificationsOutline } from "react-icons/io";
+import { HandleInvitation } from "@/services/user/invitations/handle";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 const PortalUser = () => {
   const cookies = new Cookies();
   const router = useRouter();
   const { query } = router;
-  const { userWsps } = useWorkspace();
+  const { userWsps, setUsersWsps } = useWorkspace();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const computedUserItems = useCurrentUser();
   const [loadingServerData, setLoadingServerData] = useState(false);
   const { setCurrentContacts } = useCurrentContact();
 
+  const [droppedElement, setDroppedElement] = useState<string | undefined>(
+    undefined
+  );
+
   const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
   const toastNotification = useToast();
 
+  const handleNotificationAction = async (index: number, requestData: IUserInvitations): Promise<any> => {
+    setDroppedElement(undefined);
+    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: any, blockIndex: number) => blockIndex !== index);
+
+    computedUserItems.setCurrentUser({
+      ...computedUserItems.currentUser,
+      invitations: newNotificationsChunk,
+    });
+
+    if (computedUserItems.currentUser._id) await HandleInvitation(computedUserItems.currentUser._id, { ...requestData, method: "accept"});
+  };
+
+  const handleNotificationDelete = async (index: number, requestData: IUserInvitations): Promise<any> => {
+    setDroppedElement(undefined);
+    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: any, blockIndex: number) => blockIndex !== index);
+
+    computedUserItems.setCurrentUser({
+      ...computedUserItems.currentUser,
+      invitations: newNotificationsChunk,
+    });
+
+    if (computedUserItems.currentUser._id) await HandleInvitation(computedUserItems.currentUser._id, { ...requestData, method: "delete"});
+  };
+
+  currentBiridectionalCommunication.emit(
+    "joinToWorkspaceRoom",
+    currentWorkSpace?._id
+  );
+
+  currentBiridectionalCommunication.on("currentDataUpdated", (response) => {
+    if (response) {
+        const currentUpdatedWorkspace: IWspUser = response[0];
+        const currentUserWorkspaces: IWspUser[] = userWsps;
+        const modifiedUserWorkspaces: IWspUser[] = currentUserWorkspaces.map((currentBlock: IWspUser) => {
+             if (currentBlock._id === currentUpdatedWorkspace._id) return response[0];
+             return currentBlock;
+        })
+
+        setCurrentWorkSpace(currentUpdatedWorkspace);
+        setUsersWsps(modifiedUserWorkspaces);
+    }
+  });
 
   React.useEffect(() => {
     async function getUserInfoFromServer() {
@@ -92,28 +137,11 @@ const PortalUser = () => {
 
   React.useEffect(() => {
     if (computedUserItems.currentUser.userID) {
-      getUpdatedWorkspace(computedUserItems.currentUser.userID);
+      getUpdatedWorkspace();
     }
   }, [computedUserItems.currentUser.userID]);
 
-  React.useEffect(() => {
-    currentBiridectionalCommunication.emit(
-      "joinToWorkspaceRoom",
-      currentWorkSpace?._id
-    );
-    currentBiridectionalCommunication.on("currentDataUpdated", (response) => {
-      if (response) workSpaces.setUsersWsps(response);
-    });
-  }, [currentWorkSpace?._id]);
-
-  async function getUpdatedWorkspace(userId: string) {
-    await getUpdatedServerWorkspaces(userId, {
-      roomToken: currentWorkSpace?._id,
-    });
-    await getUpdatedUserData(userId, {
-      roomToken: computedUserItems.currentUser._id,
-    });
-
+  async function getUpdatedWorkspace() {
     currentBiridectionalCommunication.emit(
       "joinToRoom",
       computedUserItems.currentUser._id
@@ -129,7 +157,7 @@ const PortalUser = () => {
   React.useEffect(() => {
     if (computedUserItems.currentUser.userID)
       workSpaces.fetchWorkSpaces(
-        computedUserItems.currentUser.userID,
+        computedUserItems.currentUser._id ?? "",
         setLoadingServerData
       );
   }, [computedUserItems.currentUser.userID]);
@@ -156,8 +184,6 @@ const PortalUser = () => {
       setCurrentWorkSpace(selectedByRouterQuery[0]);
     }
   }, [userWsps]);
-
-
 
   return (
     <React.Fragment>
@@ -186,7 +212,11 @@ const PortalUser = () => {
             <PopoverComponent
               placement="bottom-right"
               content={
-                <Box minW={"500px"} padding={"10px 40px 10px 20px"}>
+                <Box
+                  minW={"700px"}
+                  maxW={"700px"}
+                  padding={"15px 20px 20px 20px"}
+                >
                   <Box display={"flex"} alignItems={"center"}>
                     <Text fontWeight={"bold"}>Notificaciones</Text>
                     <Icon
@@ -199,47 +229,81 @@ const PortalUser = () => {
                   </Box>
 
                   {!computedUserItems.currentUser.invitations.length && (
-                    <Text>
+                    <Text marginTop={"5px"}>
                       En este momento no tienes invitaciones para aceptar
                     </Text>
                   )}
                   {computedUserItems.currentUser.invitations.map(
-                    (currentInvitation: IUserInvitations) => {
+                    (currentInvitation: IUserInvitations, index: number) => {
                       return (
                         <Box
-                          padding={"10px 0 10px 0"}
+                          padding={"10px 0 0 0"}
                           display={"flex"}
                           alignItems={"center"}
+                          justifyContent={"space-between"}
+                          transition={droppedElement !== currentInvitation.workspaceToJoinId ? "none" : "all .5s ease-in-out"}
+                          transform={droppedElement === currentInvitation.workspaceToJoinId ? "translateX(1200px)" : "none"}
                         >
-                          <Avatar
-                            marginRight={"10px"}
-                            w={10}
-                            h={10}
-                            name={currentInvitation.hostName}
-                          />
-                          <Box>
+                          <Box display={"flex"} alignItems={"center"}>
+                            <Avatar
+                              marginRight={"10px"}
+                              w={10}
+                              h={10}
+                              name={currentInvitation.hostName}
+                            />
                             <Box>
-                              <Badge marginRight={"10px"}>Invitación</Badge>
-                              {getDaysPassedFromDate(
-                                currentInvitation.requestDate
-                              ) > 1 ? (
-                                <Badge colorScheme="purple">
-                                  Hace{" "}
-                                  {getDaysPassedFromDate(
-                                    currentInvitation.requestDate
-                                  )}{" "}
-                                  días
-                                </Badge>
-                              ) : (
-                                <Badge colorScheme="green">Hoy</Badge>
-                              )}
-                            </Box>
+                              <Box>
+                                <Badge marginRight={"10px"}>Invitación</Badge>
+                                {getDaysPassedFromDate(
+                                  currentInvitation.requestDate
+                                ) > 1 ? (
+                                  <Badge colorScheme="purple">
+                                    Hace{" "}
+                                    {getDaysPassedFromDate(
+                                      currentInvitation.requestDate
+                                    )}{" "}
+                                    días
+                                  </Badge>
+                                ) : (
+                                  <Badge colorScheme="green">Hoy</Badge>
+                                )}
+                              </Box>
 
-                            <Text fontSize={"15px"}>
-                              Tu contacto {currentInvitation.hostName} te ha
-                              invitado a unirte a su espacio de trabajo.{" "}
-                            </Text>
+                              <Text fontSize={"15px"}>
+                                Tu contacto {currentInvitation.hostName} te ha
+                                invitado a unirte a su espacio de trabajo.{" "}
+                              </Text>
+                            </Box>
                           </Box>
+                          <ButtonGroup marginLeft={"40px"} size={"xs"}>
+                            <IconButton
+                              colorScheme="teal"
+                              aria-label="Add to friends"
+                              borderRadius={"20px"}
+                              icon={<CheckIcon />}
+                              onClick={() => {
+                                setDroppedElement(
+                                  currentInvitation.workspaceToJoinId
+                                );
+                                setTimeout(() => {
+                                  handleNotificationAction(index, currentInvitation);
+                                }, 500);
+                              }}
+                            />
+
+                            <IconButton
+                              colorScheme="red"
+                              aria-label="Add to friends"
+                              borderRadius={"20px"}
+                              icon={<DeleteIcon />}
+                              onClick={() => {
+                                setDroppedElement(currentInvitation.workspaceToJoinId);
+                                setTimeout(() => {
+                                  handleNotificationDelete(index, currentInvitation);
+                                }, 500);
+                              }}
+                            />
+                          </ButtonGroup>
                         </Box>
                       );
                     }

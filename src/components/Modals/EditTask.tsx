@@ -54,6 +54,7 @@ import { getSchemeByValue } from "../SlideTask";
 import PopoverComponent from "../Popover/General";
 import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
+import currentBiridectionalCommunication from "@/services/socket";
 
 const statusOptions = [
   { value: "In Proccess", label: "In Proccess" },
@@ -253,7 +254,15 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
 
   async function handleSendNewTask() {
     try {
-      await UpdateCard(wspData?._id, modifiedTask);
+      await UpdateCard(wspData?._id, {
+        body: modifiedTask,
+        transactionObject: {
+          currentUserSocketId: currentBiridectionalCommunication.id,
+          currentRoomToken: {
+            roomToken: wspData?._id ?? "",
+          },
+        },
+      });
 
       editCurrentTask(modifiedTask);
       setIsLoading(false);
@@ -829,6 +838,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
           <Button
             backgroundColor={"rgba(33,42,62,1)"}
             color={"white"}
+            _hover={{}}
             onClick={async () => {
               try {
                 setIsLoading(true);

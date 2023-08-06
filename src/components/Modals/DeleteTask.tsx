@@ -13,7 +13,7 @@ import { Button } from "@chakra-ui/react";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { DeleteCard } from "@/services/workspaces/deleteCard";
-
+import currentBiridectionalCommunication from "@/services/socket";
 
 interface IDeleteComponentProps {
   isOpen: boolean;
@@ -38,6 +38,7 @@ const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
       return task;
     });
 
+    // @ts-ignore
     setUserTasks({ ...wspData, data: modifiedWorkSpaceData });
   }
 
@@ -68,7 +69,15 @@ const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
                 onClick={async () => {
                   setIsLoading(true);
                   deleteCurrentTask(props?.data);
-                  await DeleteCard(wspData?._id, { taskId: props.data?.taskId });
+                  await DeleteCard(wspData?._id, {
+                    body: { taskId: props.data.taskId },
+                    transactionObject: {
+                      currentUserSocketId: currentBiridectionalCommunication.id,
+                      currentRoomToken: {
+                        roomToken: wspData?._id ?? "",
+                      },
+                    },
+                  });
                   setIsLoading(false);
                   onClose(false);
                 }}

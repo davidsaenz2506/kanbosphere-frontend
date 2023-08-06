@@ -39,7 +39,7 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
       newWorkspaceToCreate.prefix = currentPrefix;
       newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
       newWorkspaceToCreate.type = title;
-      newWorkspaceToCreate.sharedWith = [{
+      newWorkspaceToCreate.collaborators = [{
         _id: currentUserInfo.currentUser._id,
         name: currentUserInfo.currentUser.username,
         role: "HOST"
@@ -61,7 +61,7 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
         isMultipleSelectionOpen: false,
         freezedColumns: 0,
       };
-      newWorkspaceToCreate.sharedWith = [{
+      newWorkspaceToCreate.collaborators = [{
         _id: currentUserInfo.currentUser._id,
         name: currentUserInfo.currentUser.username,
         role: "HOST"

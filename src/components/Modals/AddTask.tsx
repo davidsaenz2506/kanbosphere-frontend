@@ -23,8 +23,8 @@ import {
 import { DateTime } from "luxon";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { AddCard } from "@/services/workspaces/addCard";
-import Loading from "@/components/Loading";
 import QuillEditor from "../RichText.tsx";
+import currentBiridectionalCommunication from "@/services/socket";
 
 export interface IPicklistOptions {
   value: string;
@@ -110,9 +110,18 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
 
       if (workspaceData) workspaceData.push(newTask);
 
+      // @ts-ignore
       setUserTasks({ ...data, wspData: workspaceData });
 
-      await AddCard(data?._id, newTask);
+      await AddCard(data?._id, {
+        body: newTask,
+        transactionObject: {
+          currentUserSocketId: currentBiridectionalCommunication.id,
+          currentRoomToken: {
+            roomToken: data?._id ?? "",
+          },
+        }
+      });
       setIsLoading(false);
     } catch (error) {
       toastNotification({
@@ -205,6 +214,7 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
             backgroundColor={"rgba(33,42,62,1)"}
             mr={3}
             color={"white"}
+            _hover={{}}
             onClick={() => {
               addTaskToWorkSpace(task);
               setTaskId(Math.random().toString(36).substr(2, 18));

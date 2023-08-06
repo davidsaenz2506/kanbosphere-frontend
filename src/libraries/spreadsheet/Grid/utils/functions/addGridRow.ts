@@ -5,8 +5,7 @@ import { UpdateWorkSpace } from "@/services/workspaces/update";
 
 export async function addGridRow(currentWorkSpace: ICurrentWspContext) {
     const tumbleSpreadRow = {};
-    const userColumns: IColumnProjection[] | undefined =
-        currentWorkSpace.currentWorkSpace.spreadSheetData?.columns;
+    const userColumns: IColumnProjection[] | undefined = currentWorkSpace?.currentWorkSpace?.spreadSheetData?.columns;
 
     userColumns?.forEach((individualColumn) => {
         if (!tumbleSpreadRow.hasOwnProperty(individualColumn?.title)) {
@@ -14,14 +13,16 @@ export async function addGridRow(currentWorkSpace: ICurrentWspContext) {
         }
     });
 
-    let newSpreadData: ISpreadSheet | undefined =
-        currentWorkSpace.currentWorkSpace.spreadSheetData;
+    let newSpreadData: ISpreadSheet | undefined = currentWorkSpace?.currentWorkSpace?.spreadSheetData;
 
     // @ts-ignore
     newSpreadData?.data?.push(tumbleSpreadRow);
 
-    currentWorkSpace.setCurrentWorkSpace({
-        ...currentWorkSpace.currentWorkSpace,
-        spreadSheetData: newSpreadData,
-    });
+    if (currentWorkSpace.currentWorkSpace) {
+        currentWorkSpace.setCurrentWorkSpace({
+            ...currentWorkSpace.currentWorkSpace,
+            spreadSheetData: newSpreadData,
+        });
+    }
+
 }

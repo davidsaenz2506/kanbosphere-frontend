@@ -75,7 +75,7 @@ const TableAgile: React.FC<AgileComponent> = (props) => {
             {agileSpaceChunkData.map((currentChunk) => {
               const activeUsers = [
                 currentChunk.createdById,
-                ...currentChunk.sharedWith,
+                ...currentChunk.collaborators,
               ];
 
               return (

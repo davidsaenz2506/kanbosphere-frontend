@@ -82,6 +82,7 @@ import { BsFiletypeJson } from "react-icons/bs";
 import { TbMathFunction } from "react-icons/tb";
 import { sendNewColumnsToServer } from "@/libraries/spreadsheet/Grid/utils/functions/sendColumnsToServet";
 import PopoverComponent from "@/components/Popover/General";
+import currentBiridectionalCommunication from "@/services/socket";
 
 interface ISpreadGrid {
   wch: number;
@@ -1011,7 +1012,11 @@ const Spreadsheet = () => {
                         ?.columns ?? [];
                     const currentColumnSelected =
                       currentSelection?.columns["items"][0][0];
+                    const modifiedWorkspaceTarget: Partial<IWspUser> =
+                      currentWorkSpace.currentWorkSpace ?? {};
                     currentColumns.splice(currentColumnSelected, 1);
+                    modifiedWorkspaceTarget.spreadSheetData =
+                      currentWorkSpace.currentWorkSpace?.spreadSheetData;
 
                     sendNewColumnsToServer(
                       currentWorkSpace,
@@ -1023,9 +1028,15 @@ const Spreadsheet = () => {
                     await UpdateWorkSpace(
                       currentWorkSpace?.currentWorkSpace?._id,
                       {
-                        ...currentWorkSpace.currentWorkSpace,
-                        spreadSheetData:
-                          currentWorkSpace.currentWorkSpace?.spreadSheetData,
+                        body: modifiedWorkspaceTarget,
+                        transactionObject: {
+                          currentUserSocketId:
+                            currentBiridectionalCommunication.id,
+                          currentRoomToken: {
+                            roomToken:
+                              currentWorkSpace.currentWorkSpace?._id ?? "",
+                          },
+                        },
                       }
                     );
 
@@ -1073,8 +1084,17 @@ const Spreadsheet = () => {
                   setTimeout(async () => {
                     await UpdateWorkSpace(
                       currentWorkSpace?.currentWorkSpace?._id,
-                      //@ts-ignore
-                      currentWorkSpace?.currentWorkSpace
+                      {
+                        body: currentWorkSpace.currentWorkSpace ?? {},
+                        transactionObject: {
+                          currentUserSocketId:
+                            currentBiridectionalCommunication.id,
+                          currentRoomToken: {
+                            roomToken:
+                              currentWorkSpace.currentWorkSpace?._id ?? "",
+                          },
+                        },
+                      }
                     );
 
                     setIsLoading(false);

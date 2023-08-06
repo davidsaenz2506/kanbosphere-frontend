@@ -1,5 +1,5 @@
 import { ISpreadSheet } from "./spreadsheet.entity";
-import { IDataToDo } from "./todo.entity";
+import { IDataToDo, ITransactionData } from "./todo.entity";
 
 export interface IAgilePreferences {
     selectedTask: string | null
@@ -23,9 +23,14 @@ export interface IWspUser {
     createdDate: Date;
     createdById: string;
     type: string;
-    sharedWith: ICollaborators[];
+    collaborators: ICollaborators[];
     prefix?: string;
     wspData?: IDataToDo[];
     wspDataPreferences?: IAgilePreferences | ISpreadSheetPreferences;
     spreadSheetData?: ISpreadSheet;
+}
+
+export interface ITransactionWorkspace {
+    body: Partial<IWspUser>,
+    transactionObject: ITransactionData
 }

@@ -16,11 +16,11 @@ import {
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
+import currentBiridectionalCommunication from "@/services/socket";
 
 const EditWorkSpaceName = ({ isOpen, onClose, data }) => {
   const { currentWorkSpace: wspData, setCurrentWorkSpace } =
     useCurrentWorkspace();
-
   const [wspName, setWspName] = useState("");
 
   async function editCurrentWorkspace(currentWorkSpace: IWspUser) {
@@ -55,7 +55,15 @@ const EditWorkSpaceName = ({ isOpen, onClose, data }) => {
             mr={3}
             onClick={async () => {
               editCurrentWorkspace(data);
-              await UpdateWorkSpace(wspData?._id, { name: wspData?.name });
+              await UpdateWorkSpace(wspData?._id, {
+                body: { name: wspData?.name },
+                transactionObject: {
+                  currentRoomToken: {
+                    roomToken: wspData?._id ?? "",
+                  },
+                  currentUserSocketId: currentBiridectionalCommunication.id,
+                },
+              });
               onClose(false);
             }}
           >

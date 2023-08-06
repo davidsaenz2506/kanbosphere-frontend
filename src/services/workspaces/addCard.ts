@@ -1,8 +1,8 @@
 
 import httpService from '../../lib/httpClient';
-import { IDataToDo } from '@/domain/entities/todo.entity';
+import { IDataToDo, ITransactionToDo } from '@/domain/entities/todo.entity';
 
-export const AddCard = async (workspaceId: string | undefined, toPush: IDataToDo): Promise<void> => {
+export const AddCard = async (workspaceId: string | undefined, toPush: ITransactionToDo): Promise<void> => {
 
     await httpService.post(`/workSpaces/card/add/${workspaceId}`, toPush);
     return;

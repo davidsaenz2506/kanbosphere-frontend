@@ -18,8 +18,8 @@ import { useCustomCells } from "@glideapps/glide-data-grid";
 import Date from "./fields/date";
 import PickList from "./fields/picklist";
 import Multipicklist from "./fields/multipicklist";
-import Time from "./fields/time"
-import Phone from "./fields/phone"
+import Time from "./fields/time";
+import Phone from "./fields/phone";
 
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
@@ -59,24 +59,42 @@ const GridDataEditor = (Props: ISpreadProps) => {
     rows: CompactSelection.empty(),
   };
 
-  const [userSelection, setUserSelection] = React.useState<GridSelection>(selection);
-  const [userColumns, setUserColumns] = React.useState<IColumnProjection[]>(currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns ?? []);
+  const [userSelection, setUserSelection] =
+    React.useState<GridSelection>(selection);
+  const [userColumns, setUserColumns] = React.useState<IColumnProjection[]>(
+    currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns ?? []
+  );
 
-  const CustomCells = useCustomCells([Date, PickList, Multipicklist, Time, Phone]);
+  const CustomCells = useCustomCells([
+    Date,
+    PickList,
+    Multipicklist,
+    Time,
+    Phone,
+  ]);
 
   React.useEffect(() => {
     if (currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns) {
-      const sortedColumns : IColumnProjection[] =  currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns.map((currentColumn: IColumnProjection) => {
-          if (iconsForCols[currentColumn.type]?.overlayIcon) currentColumn["overlayIcon"] = iconsForCols[currentColumn?.type]["overlayIcon"];
-          if (iconsForCols[currentColumn?.type]?.icon) {
-            currentColumn["icon"] = iconsForCols[currentColumn?.type]["icon"] ?? "";
-          }
+      const sortedColumns: IColumnProjection[] =
+        currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns
+          .map((currentColumn: IColumnProjection) => {
+            if (iconsForCols[currentColumn.type]?.overlayIcon)
+              currentColumn["overlayIcon"] =
+                iconsForCols[currentColumn?.type]["overlayIcon"];
+            if (iconsForCols[currentColumn?.type]?.icon) {
+              currentColumn["icon"] =
+                iconsForCols[currentColumn?.type]["icon"] ?? "";
+            }
 
-          return currentColumn;
-        }).sort((a, b) => a.order - b.order);
+            return currentColumn;
+          })
+          .sort((a, b) => a.order - b.order);
       setUserColumns(sortedColumns);
     }
-  }, [currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns, internalTriggerPointer]);
+  }, [
+    currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns,
+    internalTriggerPointer,
+  ]);
 
   const getUserData = useCallback(
     ([col, row]: Item): GridCell => getCellData([col, row], data, userColumns),
@@ -111,15 +129,8 @@ const GridDataEditor = (Props: ISpreadProps) => {
       }
     );
 
-    if (assignNewOrderValues) {
-      setUserColumns(assignNewOrderValues);
-      sendNewColumnsToServer(
-        currentUserWsp,
-        currentUser,
-        assignNewOrderValues,
-        data
-      );
-    }
+    setUserColumns(assignNewOrderValues);
+    sendNewColumnsToServer(currentUserWsp, currentUser, assignNewOrderValues, data, currentUserWorkspaces);
   };
 
   const onCellEdited = useCallback(
@@ -189,7 +200,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
           setUserColumns(newColumnsWithMechanicalWidth);
         }}
         onColumnResizeEnd={() =>
-          sendNewColumnsToServer(currentUserWsp, currentUser, userColumns, data)
+          sendNewColumnsToServer(currentUserWsp, currentUser, userColumns, data, currentUserWorkspaces)
         }
         onCellEdited={onCellEdited}
         onGridSelectionChange={(e: GridSelection) => {
