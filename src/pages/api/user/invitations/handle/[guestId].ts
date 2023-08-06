@@ -13,7 +13,7 @@ export default handler.post(
       const { guestId } = req.query;
 
       const { data: userUpdated } = await axios.post<ICurrentUser>(
-        `${process.env.WORKSPACE_API}/users/handleInvitationToJob/${guestId}`,
+        `${process.env.WORKSPACE_API}/social/handleInvitationToJob/${guestId}`,
         toSend,
         {
           headers: {

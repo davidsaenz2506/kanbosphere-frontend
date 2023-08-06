@@ -102,6 +102,12 @@ const PortalUser = () => {
     }
   });
 
+  currentBiridectionalCommunication.on("userWorkspacesUpdated", (response) => {
+    if (response) {
+      setUsersWsps(response);
+    }
+  })
+
   React.useEffect(() => {
     async function getUserInfoFromServer() {
       const decodedInfoFromServer: any = jwtDecode(userPrivateToken);
@@ -136,9 +142,7 @@ const PortalUser = () => {
   }, []);
 
   React.useEffect(() => {
-    if (computedUserItems.currentUser.userID) {
-      getUpdatedWorkspace();
-    }
+    if (computedUserItems.currentUser.userID) getUpdatedWorkspace()
   }, [computedUserItems.currentUser.userID]);
 
   async function getUpdatedWorkspace() {
@@ -146,6 +150,7 @@ const PortalUser = () => {
       "joinToRoom",
       computedUserItems.currentUser._id
     );
+
     currentBiridectionalCommunication.on("currentUserUpdated", (response) => {
       if (response) {
         computedUserItems.setCurrentUser(response[0]);
