@@ -54,7 +54,7 @@ const ResponsiveSliderPanel = (Props: ISlideProps) => {
           type="text"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTypeQueryFromUser({
-              workspaceID: currentWorkSpace.currentWorkSpace._id ?? "",
+              workspaceID: currentWorkSpace?.currentWorkSpace?._id ?? "",
               query: e.currentTarget.value,
             })
           }

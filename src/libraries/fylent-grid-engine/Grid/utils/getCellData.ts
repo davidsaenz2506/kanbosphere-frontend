@@ -1,4 +1,5 @@
-import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
+import { IChildCompounds, IColumnProjection, ICompoundProjection } from "@/domain/entities/spreadsheet.entity";
+import { mathematicalEnginedEncapsuled } from "@/libraries/fylent-math-engine";
 import { GridCell, GridCellKind, Item } from "@glideapps/glide-data-grid";
 import { DateTime } from "luxon";
 
@@ -19,6 +20,48 @@ export const getCellData = (
                 data: dataRow[field] ? dataRow[field] : "",
                 allowOverlay: true,
                 displayData: dataRow[field] ? dataRow[field] : "",
+            };
+
+        case "compound":
+            let currentColumnParameters: ICompoundProjection;
+            let valueToRender: string | undefined;
+            let currentMethod: any = undefined;
+
+            if (columnsCol.compoundValues) {
+                currentColumnParameters = columnsCol.compoundValues;
+
+                const currentFormulaName = currentColumnParameters.formulaName;
+                const parameters: IChildCompounds[] = currentColumnParameters.compounds;
+                const dataEntryValues: Array<any> = parameters.map((currentEntryPoint) => {
+                    return {
+                        [currentEntryPoint.columnValue]: dataRow[currentEntryPoint.name]
+                    }
+                })
+
+                const newEntryPoint: Object = dataEntryValues.reduce((currentChunk, object) => {
+                    return {
+                        ...currentChunk,
+                        ...object
+                    }
+                }, {});
+
+
+                Object.values(mathematicalEnginedEncapsuled).forEach((currentCapsule) => {
+                    const extractedCapsule = Object.values(currentCapsule);
+                    extractedCapsule.forEach((currentChild) => {
+                        if (currentChild.value === currentFormulaName) currentMethod = currentChild.method;
+                    })
+                })
+
+                valueToRender = currentMethod(newEntryPoint);
+                dataRow[field] = valueToRender;
+            }
+
+            return {
+                kind: GridCellKind.Text,
+                data: dataRow[field] ?? "",
+                allowOverlay: false,
+                displayData: dataRow[field] ?? "",
             };
 
         case "mail":
@@ -79,6 +122,19 @@ export const getCellData = (
                 },
                 allowOverlay: true,
                 copyData: "",
+            };
+
+        case "calculator":
+
+            return {
+                kind: GridCellKind.Custom,
+                data: {
+                    type: "calculator",
+                    displayData: dataRow[field] ?? "",
+                    data: dataRow[field] ?? 0
+                },
+                allowOverlay: true,
+                copyData: ""
             };
 
         case "phone":

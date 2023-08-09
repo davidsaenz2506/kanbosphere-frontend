@@ -13,6 +13,29 @@ interface ILaneProps {
   isGettingImage: boolean;
 }
 
+const filterItemsMap = {
+  New: {
+    title: "Nuevas",
+    filterValue: "New",
+  },
+  "In Proccess": {
+    title: "En proceso",
+    filterValue: "In Proccess",
+  },
+  "For Review": {
+    title: "Para revisión",
+    filterValue: "For Review",
+  },
+  Finished: {
+    title: "Finalizadas",
+    filterValue: "Finished",
+  },
+  Blocked: {
+    title: "Bloqueo",
+    filterValue: "Blocked",
+  },
+};
+
 const ToDoLanes: React.FC<ILaneProps> = (props) => {
   const { currentWorkSpace: data, setCurrentWorkSpace: setData } =
     useCurrentWorkspace();
@@ -38,80 +61,18 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
       }}
     >
       <DndProvider backend={HTML5Backend}>
-        <LaneComponent
-          title="Nuevas"
-          instance="New"
-          bgColor={backGroundLaneColor}
-          setSelectedTasks={props.setSelectedTasks}
-          isGettingImage={props.isGettingImage}
-          data={
-            data?.wspData
-              ? data?.wspData?.filter(
-                  (instance: any) => instance.status === "New"
-                )
-              : []
-          }
-        />
-
-        <LaneComponent
-          title="En proceso"
-          instance="In Proccess"
-          bgColor={backGroundLaneColor}
-          setSelectedTasks={props.setSelectedTasks}
-          isGettingImage={props.isGettingImage}
-          data={
-            data?.wspData
-              ? data?.wspData?.filter(
-                  (instance: any) => instance.status === "In Proccess"
-                )
-              : []
-          }
-        />
-
-        <LaneComponent
-          title="Para revisión"
-          instance="For Review"
-          bgColor={backGroundLaneColor}
-          setSelectedTasks={props.setSelectedTasks}
-          isGettingImage={props.isGettingImage}
-          data={
-            data?.wspData
-              ? data?.wspData?.filter(
-                  (instance: any) => instance.status === "For Review"
-                )
-              : []
-          }
-        />
-
-        <LaneComponent
-          title="Finalizadas"
-          instance="Finished"
-          bgColor={backGroundLaneColor}
-          setSelectedTasks={props.setSelectedTasks}
-          isGettingImage={props.isGettingImage}
-          data={
-            data?.wspData
-              ? data?.wspData?.filter(
-                  (instance: any) => instance.status === "Finished"
-                )
-              : []
-          }
-        />
-
-        <LaneComponent
-          title="Bloqueadas"
-          instance="Blocked"
-          bgColor={backGroundLaneColor}
-          setSelectedTasks={props.setSelectedTasks}
-          isGettingImage={props.isGettingImage}
-          data={
-            data?.wspData
-              ? data?.wspData?.filter(
-                  (instance: any) => instance.status === "Blocked"
-                )
-              : []
-          }
-        />
+        {Object.entries(filterItemsMap).map((currentItemMapped) => {
+          return (
+            <LaneComponent
+              title={currentItemMapped[1].title}
+              instance={currentItemMapped[1].filterValue}
+              bgColor={backGroundLaneColor}
+              setSelectedTasks={props.setSelectedTasks}
+              isGettingImage={props.isGettingImage}
+              data={ data?.wspData ? data?.wspData?.filter((instance: any) => instance.status === currentItemMapped[1].filterValue) : [] }
+            />
+          );
+        })}
       </DndProvider>
     </div>
   );

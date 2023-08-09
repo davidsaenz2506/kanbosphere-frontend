@@ -1,11 +1,8 @@
 import React from "react";
 
 import { Button, Icon, Tooltip } from "@chakra-ui/react";
-
 import { IWspUser } from "@/domain/entities/userWsps.entity";
-
 import { TbMoodSearch } from "react-icons/tb";
-
 import { AiFillFileAdd } from "react-icons/ai";
 
 interface IHeaderProps {

@@ -8,7 +8,7 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import { useRouter } from "next/router";
 
-import EndSession from "../Modals/endSession";
+import EndSession from "../Modals/EndSession";
 import styles from "../../styles/ToolButtons.module.css";
 import { Box, Divider } from "@chakra-ui/react";
 

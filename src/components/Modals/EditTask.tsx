@@ -12,7 +12,6 @@ import {
   IFilePath,
 } from "@/domain/entities/todo.entity";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import FileViewer from "./FileViewer";
 import {
   Box,
   FormLabel,
@@ -21,7 +20,6 @@ import {
   Image,
   Progress,
   Icon,
-  Tooltip,
   TableContainer,
   Table,
   Thead,
@@ -345,12 +343,6 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
 
   return (
     <React.Fragment>
-      <FileViewer
-        openModalForFiles={openModalForFiles}
-        setOpenModalForFiles={setOpenModalForFiles}
-        pathImage={currentPathSelected}
-        deleteFileFromDirectory={deleteFileFromDirectory}
-      />
       <Modal
         style={{ borderRadius: "5px", height: "95vh" }}
         open={isOpen}
@@ -472,7 +464,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                               ).toISODate(),
                               recordedBy: {
                                 _id: currentUser._id,
-                                fullname: currentUser.fullname,
+                                fullname: currentUser.username,
                               },
                             });
                           }}
@@ -517,9 +509,9 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
 
               {clockTime?.length > 0 && (
                 <Box marginTop={"10px"}>
-                  <Text style={{ fontSize: "13px" }}>Hoja de registro</Text>
+                  <Text style={{ fontSize: "13px", marginBottom: "15px" }}>Hoja de registro</Text>
                   <TableContainer>
-                    <Table variant="simple">
+                    <Table size="sm" variant='striped' colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
                           <Th textAlign={"center"}>Usuario</Th>
@@ -539,7 +531,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                                       <Avatar
                                         w={8}
                                         h={8}
-                                        name={currentChunk.recordedBy.fullname}
+                                        
                                         marginRight={"10px"}
                                       />
                                       {currentChunk.recordedBy.fullname}
@@ -552,10 +544,12 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                                     {currentChunk.registrationDate}
                                   </Td>
 
-                                  <Td textAlign={"center"}>
+                                  <Td display={"flex"} alignItems={"center"} justifyContent={"center"} textAlign={"center"}>
                                     <IconButton
+                                      size={"xs"}
                                       borderRadius={"50%"}
                                       colorScheme="red"
+                                      
                                       variant={"solid"}
                                       icon={<DeleteIcon />}
                                       aria-label="delete"

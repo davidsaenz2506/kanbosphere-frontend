@@ -48,7 +48,7 @@ const DeleteWorkSpace = (props) => {
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            <AlertDialogHeader marginBottom={"-20px"} fontSize="lg" fontWeight="bold">
               Eliminar WorkSpace
             </AlertDialogHeader>
 

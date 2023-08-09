@@ -36,6 +36,9 @@ export const editGridCell = async (
     if (type === "phone") data[row][key] = newValue.data.phone;
 
     // @ts-ignore
+    if (type === "calculator") data[row][key] = newValue.data.data;
+
+    // @ts-ignore
     if (type === "time") data[row][key] = newValue.data.date
 
     if (type === "mail") {

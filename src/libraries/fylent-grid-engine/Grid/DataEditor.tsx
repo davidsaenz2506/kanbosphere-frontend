@@ -20,6 +20,7 @@ import PickList from "./fields/picklist";
 import Multipicklist from "./fields/multipicklist";
 import Time from "./fields/time";
 import Phone from "./fields/phone";
+import Engineer from "./fields/calculator";
 
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
@@ -28,7 +29,6 @@ import { sendNewColumnsToServer } from "./utils/functions/sendColumnsToServet";
 import { useToast } from "@chakra-ui/react";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
-import iconsForCols from "./utils/iconsForCols";
 
 interface ISpreadProps {
   data: any;
@@ -71,24 +71,13 @@ const GridDataEditor = (Props: ISpreadProps) => {
     Multipicklist,
     Time,
     Phone,
+    Engineer
   ]);
 
   React.useEffect(() => {
     if (currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns) {
       const sortedColumns: IColumnProjection[] =
-        currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns
-          .map((currentColumn: IColumnProjection) => {
-            if (iconsForCols[currentColumn.type]?.overlayIcon)
-              currentColumn["overlayIcon"] =
-                iconsForCols[currentColumn?.type]["overlayIcon"];
-            if (iconsForCols[currentColumn?.type]?.icon) {
-              currentColumn["icon"] =
-                iconsForCols[currentColumn?.type]["icon"] ?? "";
-            }
-
-            return currentColumn;
-          })
-          .sort((a, b) => a.order - b.order);
+        currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns.sort((a, b) => a.order - b.order);
       setUserColumns(sortedColumns);
     }
   }, [
@@ -130,7 +119,13 @@ const GridDataEditor = (Props: ISpreadProps) => {
     );
 
     setUserColumns(assignNewOrderValues);
-    sendNewColumnsToServer(currentUserWsp, currentUser, assignNewOrderValues, data, currentUserWorkspaces);
+    sendNewColumnsToServer(
+      currentUserWsp,
+      currentUser,
+      assignNewOrderValues,
+      data,
+      currentUserWorkspaces
+    );
   };
 
   const onCellEdited = useCallback(
@@ -174,6 +169,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   return (
     <div
+      id="fylent-grid-engine"
       style={{
         borderTop: "2px solid #A0A0B8",
         borderBottom: "2px solid #A0A0B8",
@@ -200,7 +196,13 @@ const GridDataEditor = (Props: ISpreadProps) => {
           setUserColumns(newColumnsWithMechanicalWidth);
         }}
         onColumnResizeEnd={() =>
-          sendNewColumnsToServer(currentUserWsp, currentUser, userColumns, data, currentUserWorkspaces)
+          sendNewColumnsToServer(
+            currentUserWsp,
+            currentUser,
+            userColumns,
+            data,
+            currentUserWorkspaces
+          )
         }
         onCellEdited={onCellEdited}
         onGridSelectionChange={(e: GridSelection) => {
@@ -208,9 +210,22 @@ const GridDataEditor = (Props: ISpreadProps) => {
           setUserSelection(e);
         }}
         {...CustomCells}
-        rowMarkers="both"
+        rowMarkers={
+          currentUserWsp.currentWorkSpace?.wspDataPreferences[
+            "isRowSelectionActive"
+          ]
+            ? "both"
+            : "none"
+        }
         rows={data.length}
         getCellContent={getUserData}
+        rowSelectionMode={
+          currentUserWsp.currentWorkSpace?.wspDataPreferences[
+            "isMultipleSelectionActive"
+          ]
+            ? "multi"
+            : "auto"
+        }
         width={"100%"}
         theme={useTheme}
         height={"100%"}

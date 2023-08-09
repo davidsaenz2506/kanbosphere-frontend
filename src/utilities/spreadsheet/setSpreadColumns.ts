@@ -1,15 +1,15 @@
 import { IWspContext } from "@/context/usersWorkSpaces/wsp.context";
-import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
+import { IColumnProjection, ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 export function setSpreadColumns(
-  data: any,
-  setUserTasks: (value: any) => void,
-  setCurrentSpreadData: React.Dispatch<React.SetStateAction<ISpreadSheet>>,
-  newColumn: any,
-  performanceWorkspaces: IWspContext
+  data: IWspUser,
+  setUserTasks: React.Dispatch<React.SetStateAction<IWspUser | undefined>>,
+  setCurrentSpreadData: React.Dispatch<React.SetStateAction<ISpreadSheet | undefined>>,
+  newColumn: IColumnProjection,
+  performanceWorkspaces: IWspContext,
 ) {
-  let newUserRows = [];
+  let newUserRows: [] = [];
 
   if (data.spreadSheetData?.data) {
     const dataMatrix = data.spreadSheetData?.data;
@@ -42,10 +42,12 @@ export function setSpreadColumns(
 
   performanceWorkspaces.setUsersWsps(updatedWorkspaces);
 
-  setCurrentSpreadData({
-    columns: [...(data.spreadSheetData?.columns ?? []), newColumn],
-    // @ts-ignore
-    data: newUserRows ?? [],
-    userId: data.spreadSheetData?.userId ?? data.createdById,
-  });
+  if (data.spreadSheetData) {
+    setCurrentSpreadData({
+      columns: [...(data?.spreadSheetData.columns), newColumn],
+      data: newUserRows,
+      userId: data.spreadSheetData?.userId ?? data.createdById,
+    });
+  }
+
 }

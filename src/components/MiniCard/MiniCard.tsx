@@ -13,6 +13,7 @@ import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { RiDragMove2Fill } from "react-icons/ri";
 import { FcClock } from "react-icons/fc";
 import { useDrag } from "react-dnd";
+import currentBiridectionalCommunication from "@/services/socket";
 
 interface IMiniCardProps {
   item: IDataToDo;
@@ -55,7 +56,11 @@ const MiniCard = (Props: IMiniCardProps) => {
 
   async function sendToServerTask() {
     await UpdateWorkSpace(currentWorkSpace?._id, {
-      wspDataPreferences: { selectedTask: item.taskId },
+      body: { wspDataPreferences: { selectedTask: item.taskId }},
+      transactionObject: {
+        currentRoomToken: { roomToken: currentWorkSpace?._id ?? ""},
+        currentUserSocketId: currentBiridectionalCommunication.id
+      }
     });
   }
 
@@ -82,11 +87,9 @@ const MiniCard = (Props: IMiniCardProps) => {
           if (!isGettingImage) {
             setIsClicked(true);
             setSelectedTasks(item);
-            setCurrentWorkSpace({
-              ...currentWorkSpace,
-              wspDataPreferences: { selectedTask: item.taskId },
-            });
 
+            // @ts-ignore
+            setCurrentWorkSpace({ ...currentWorkSpace, wspDataPreferences: { selectedTask: item.taskId }});
             sendToServerTask();
           }
         }}

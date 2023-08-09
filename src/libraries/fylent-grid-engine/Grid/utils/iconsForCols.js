@@ -39,25 +39,16 @@ const icons = {
     icon: GridColumnIcon.HeaderEmail,
   },
   compound: {
-    icon: GridColumnIcon.HeaderReference,
-  },
-  textarea: {
-    icon: GridColumnIcon.HeaderGeoDistance,
-  },
-  double: {
     icon: GridColumnIcon.HeaderGeoDistance,
   },
   datetime: {
     icon: GridColumnIcon.HeaderDate,
   },
-  reference: {
-    icon: GridColumnIcon.HeaderReference,
-  },
-  percent: {
-    icon: GridColumnIcon.HeaderEmail,
-  },
   time: {
     icon: GridColumnIcon.HeaderTime
+  },
+  calculator: {
+    icon: GridColumnIcon.HeaderMath
   }
 };
 

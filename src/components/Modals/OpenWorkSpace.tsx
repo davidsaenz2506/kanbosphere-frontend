@@ -57,8 +57,8 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
         userId: currentUserInfo.currentUser.userID,
       };
       newWorkspaceToCreate.wspDataPreferences = {
-        isDarkModeOpen: false,
-        isMultipleSelectionOpen: false,
+        isRowSelectionActive: true,
+        isMultipleSelectionActive: false,
         freezedColumns: 0,
       };
       newWorkspaceToCreate.collaborators = [{

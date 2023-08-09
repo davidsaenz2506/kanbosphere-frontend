@@ -21,22 +21,26 @@ import currentBiridectionalCommunication from "@/services/socket";
 const EditWorkSpaceName = ({ isOpen, onClose, data }) => {
   const { currentWorkSpace: wspData, setCurrentWorkSpace } =
     useCurrentWorkspace();
-  const [wspName, setWspName] = useState("");
+  const [wspName, setWspName] = useState<string>();
 
   async function editCurrentWorkspace(currentWorkSpace: IWspUser) {
     let workSpace = currentWorkSpace;
-    workSpace.name = wspName;
+    workSpace.name = wspName ?? "";
 
     setCurrentWorkSpace({ ...workSpace });
   }
+
+  React.useEffect(() => {
+    setWspName(wspData?.name ?? "");
+  }, [wspData?._id]);
 
   return (
     <Modal isOpen={isOpen} onClose={() => onClose(false)}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Editar workspace</ModalHeader>
+        <ModalHeader marginBottom={"-15px"}>Editar workspace</ModalHeader>
         <ModalCloseButton />
-        <ModalBody pb={6}>
+        <ModalBody pb={3}>
           <FormControl>
             <FormLabel>Nuevo nombre de Workspace</FormLabel>
             <Input

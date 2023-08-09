@@ -25,7 +25,7 @@ const EndSession = (props) => {
       <AlertDialog isOpen={props.isOpen}>
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            <AlertDialogHeader marginBottom={"-15px"} fontSize="lg" fontWeight="bold">
               Cerrar sesión.
             </AlertDialogHeader>
 

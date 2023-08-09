@@ -21,9 +21,10 @@ import {
 import Select, { SingleValue } from "react-select";
 
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import { UpdateWorkSpace } from "@/services/workspaces/update";
 import {
+  IChildCompounds,
   IColumnProjection,
+  ICompoundProjection,
   ISpreadSheet,
 } from "@/domain/entities/spreadsheet.entity";
 import { setSpreadColumns } from "@/utilities/spreadsheet/setSpreadColumns";
@@ -32,7 +33,10 @@ import { Tooltip } from "@chakra-ui/react";
 import { getColor } from "@/utilities/spreadsheet/getTagColor";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
-import currentBiridectionalCommunication from "@/services/socket";
+
+import { mathematicalEnginedEncapsuled } from "@/libraries/fylent-math-engine/index";
+import { indexOf, uniqBy } from "lodash";
+import iconsForCols from "@/libraries/fylent-grid-engine/Grid/utils/iconsForCols";
 
 export interface IPicklistOptions {
   value: string;
@@ -53,42 +57,49 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
       0
     );
   const performanceWorkspaces = useWorkspace();
-  const [columnName, setColumnName] = useState("");
-  const [columnType, setColumnType] = useState("");
+  const [columnName, setColumnName] = useState<string | undefined>();
+  const [columnType, setColumnType] = useState<string | undefined>();
+  const [engineOperation, setEngineOperation] = useState<string | undefined>();
   const [newColumn, setNewColumn] = useState<IColumnProjection>({
     title: "",
     type: "",
+    icon: "",
     order: maxOrderValue ? maxOrderValue + 1 : 0,
     width: 100,
   });
 
   const [userClick, setUserClick] = useState<number>(0);
   const [userTypedValue, setUserTypedValue] = useState<string>("");
+  const [engineStatements, setEngineStatements] = useState<any>();
+  const [triggerPointer, setTriggerPointer] = useState<number>(0);
+  const [columnsSuitableForComposition, setColumnsSuitableForComposition] =
+    useState<IPicklistOptions[]>();
+  const [currentCompoundColumnValues, setCurrentCompoundColumnValues] =
+    useState<ICompoundProjection>();
 
   const [userPicklistValues, setUserPicklistValues] = useState<
     ISelectColorOptions[]
   >([]);
 
-  const [currentSpreadData, setCurrentSpreadData] = useState<ISpreadSheet>({
-    columns: [
-      ...(currentWorkspace?.currentWorkSpace?.spreadSheetData?.columns ?? []),
-      newColumn,
-    ],
-    data: currentWorkspace?.currentWorkSpace?.spreadSheetData?.data ?? [],
-    userId: currentWorkspace?.currentWorkSpace?.spreadSheetData?.userId
-      ? currentWorkspace?.currentWorkSpace?.createdById
-      : "",
-  });
+  const [currentSpreadData, setCurrentSpreadData] = useState<ISpreadSheet>();
 
   React.useEffect(() => {
     setNewColumn({
-      title: columnName,
-      type: columnType,
+      title: columnName ?? "Default",
+      type: columnType ?? "string",
+      icon: iconsForCols[columnType]?.icon,
       width: 100,
       order: maxOrderValue ? maxOrderValue + 1 : 0,
       picklistValues: userPicklistValues,
+      compoundValues: currentCompoundColumnValues,
     });
-  }, [columnName, columnType, userClick, userPicklistValues]);
+  }, [
+    columnName,
+    columnType,
+    userClick,
+    userPicklistValues,
+    currentCompoundColumnValues,
+  ]);
 
   const statusOptions: IPicklistOptions[] = [
     { value: "string", label: "✍ Texto" },
@@ -100,6 +111,14 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
     { value: "mail", label: "📩 Correo electronico" },
     { value: "phone", label: "📞 Numero celular" },
     { value: "boolean", label: "📦 Checkbox" },
+    { value: "compound", label: "🎨 Compuesta" },
+    { value: "calculator", label: "📚 Calculadora" },
+  ];
+
+  const mathEngineOperations: IPicklistOptions[] = [
+    { value: "financial", label: "💵 Finanzas" },
+    { value: "medicine", label: "💉 Salud" },
+    { value: "physics", label: "🍎 Fisica" },
   ];
 
   async function addColumn() {
@@ -111,19 +130,6 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
       currentWorkspace.setCurrentWorkSpace(unmodifiedWorkspace);
     }
 
-    await UpdateWorkSpace(currentWorkspace?.currentWorkSpace?._id, {
-      body: {
-        ...currentWorkspace.currentWorkSpace,
-        spreadSheetData: currentSpreadData,
-      },
-      transactionObject: {
-        currentRoomToken: {
-          roomToken: currentWorkspace.currentWorkSpace?._id ?? "",
-        },
-        currentUserSocketId: currentBiridectionalCommunication.id,
-      },
-    });
-
     const currentWorkspaces: IWspUser[] = performanceWorkspaces.userWsps;
     const updatedWorkspaces = currentWorkspaces.map((bookRow: IWspUser) => {
       if (bookRow._id === currentWorkspace?.currentWorkSpace?._id) {
@@ -133,7 +139,10 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
 
     performanceWorkspaces.setUsersWsps(updatedWorkspaces);
 
-    setColumnType("");
+    setColumnType(undefined);
+    setEngineOperation(undefined);
+    setEngineStatements(undefined);
+    setCurrentCompoundColumnValues(undefined);
     setUserPicklistValues([]);
     setIsLoading(false);
     onClose(false);
@@ -141,13 +150,36 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
 
   React.useEffect(() => {
     if (newColumn.title && newColumn.type) addColumn();
-  }, [
-    currentSpreadData,
-    currentWorkspace?.currentWorkSpace?.spreadSheetData?.columns,
-  ]);
+  }, [triggerPointer]);
+
+  React.useEffect(() => {
+    if (currentWorkspace.currentWorkSpace?.spreadSheetData) {
+      setColumnsSuitableForComposition(
+        currentWorkspace?.currentWorkSpace?.spreadSheetData.columns
+          .filter((currentProjection) => currentProjection.type === "number")
+          .map((currentProjection) => {
+            return {
+              value: currentProjection.title,
+              label: currentProjection.title,
+            };
+          })
+      );
+    }
+  }, [currentWorkspace.currentWorkSpace]);
+
+  console.log(currentWorkspace.currentWorkSpace);
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose(false)}>
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        onClose(false);
+        setColumnType(undefined);
+        setEngineOperation(undefined);
+        setEngineStatements(undefined);
+        setCurrentCompoundColumnValues(undefined);
+      }}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Añadir Columna</ModalHeader>
@@ -241,6 +273,124 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
               </div>
             </React.Fragment>
           )}
+
+          {columnType === "compound" && (
+            <React.Fragment>
+              {" "}
+              <FormControl mt={4}>
+                <FormLabel>
+                  Seleccione el tipo de operación que desea realizar
+                </FormLabel>
+                <Box>
+                  <Select
+                    options={mathEngineOperations}
+                    onChange={(e: SingleValue<IPicklistOptions>) => {
+                      if (e) setEngineOperation(e.value);
+                    }}
+                  />
+                </Box>
+                <Box mt={4}>
+                  <Select
+                    isDisabled={engineOperation ? false : true}
+                    options={Object.entries(
+                      mathematicalEnginedEncapsuled[engineOperation] ?? {}
+                    ).map((currentSelection) => {
+                      return {
+                        label: currentSelection[0],
+                        value: currentSelection[0],
+                      };
+                    })}
+                    onChange={(e: SingleValue<IPicklistOptions>) => {
+                      if (engineOperation && e) {
+                        setEngineStatements(
+                          mathematicalEnginedEncapsuled[engineOperation][
+                            e.value
+                          ]
+                        );
+                        setCurrentCompoundColumnValues({
+                          formulaName:
+                            mathematicalEnginedEncapsuled[engineOperation][
+                              e.value
+                            ].value,
+                          compounds: [],
+                        });
+                      }
+                    }}
+                  />
+                </Box>
+                {engineStatements && (
+                  <Box mt={4}>
+                    <FormLabel>Selecciona las columnas</FormLabel>
+                    {Object.entries(engineStatements.requiredValues).map(
+                      (currentStatement: any) => {
+                        return (
+                          <Box marginBottom={"10px"}>
+                            <Select
+                              options={columnsSuitableForComposition ?? []}
+                              placeholder={currentStatement[0]}
+                              onChange={(e) => {
+                                if (
+                                  e &&
+                                  typeof currentStatement[1] === "string"
+                                ) {
+                                  const childCompound: IChildCompounds = {
+                                    name: e.value ?? "",
+                                    columnValue: currentStatement[1],
+                                  };
+                                  var propertyAlreadyExistInArray: boolean =
+                                    false;
+                                  var indexOfDuplicate: number | undefined;
+
+                                  const currentCompounds: IChildCompounds[] =
+                                    currentCompoundColumnValues?.compounds ??
+                                    [];
+
+                                  currentCompounds.forEach(
+                                    (
+                                      currentChild: IChildCompounds,
+                                      index: number
+                                    ) => {
+                                      if (
+                                        currentChild.columnValue ===
+                                        childCompound.columnValue
+                                      ) {
+                                        propertyAlreadyExistInArray = true;
+                                        indexOfDuplicate = index;
+                                      }
+                                    }
+                                  );
+
+                                  if (
+                                    propertyAlreadyExistInArray &&
+                                    indexOfDuplicate !== undefined
+                                  ) {
+                                    currentCompounds.splice(
+                                      indexOfDuplicate,
+                                      1
+                                    );
+                                    currentCompounds.push(childCompound);
+                                  } else {
+                                    currentCompounds.push(childCompound);
+                                  }
+
+                                  setCurrentCompoundColumnValues({
+                                    formulaName:
+                                      currentCompoundColumnValues?.formulaName ??
+                                      "default",
+                                    compounds: currentCompounds,
+                                  });
+                                }
+                              }}
+                            />
+                          </Box>
+                        );
+                      }
+                    )}
+                  </Box>
+                )}
+              </FormControl>
+            </React.Fragment>
+          )}
         </ModalBody>
 
         <ModalFooter>
@@ -251,13 +401,17 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
             mr={3}
             onClick={() => {
               setIsLoading(true);
-              setSpreadColumns(
-                currentWorkspace.currentWorkSpace,
-                currentWorkspace.setCurrentWorkSpace,
-                setCurrentSpreadData,
-                newColumn,
-                performanceWorkspaces
-              );
+              if (currentWorkspace.currentWorkSpace) {
+                setSpreadColumns(
+                  currentWorkspace.currentWorkSpace,
+                  currentWorkspace.setCurrentWorkSpace,
+                  setCurrentSpreadData,
+                  newColumn,
+                  performanceWorkspaces
+                );
+              }
+
+              setTriggerPointer(Math.random() * 1000 - 1 + 1);
             }}
           >
             Crear
@@ -265,6 +419,10 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
           <Button
             onClick={() => {
               setUserPicklistValues([]);
+              setEngineOperation(undefined);
+              setEngineStatements(undefined);
+              setCurrentCompoundColumnValues(undefined);
+              setColumnType(undefined);
               onClose(false);
             }}
           >

@@ -6,21 +6,10 @@ import Select from "react-select";
 import chroma from "chroma-js";
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  useDimensions,
-  Divider,
-  Tooltip,
   Box,
   Icon,
   Text,
   Switch,
-  Kbd,
   Badge,
   Grid,
   GridItem,
@@ -40,21 +29,20 @@ import {
 
 import "@glideapps/glide-data-grid/dist/index.css";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import GridDataEditor from "../../../libraries/spreadsheet/Grid/DataEditor";
+import GridDataEditor from "@/libraries/fylent-grid-engine/Grid/DataEditor";
 import CreateColumn from "../../../components/Modals/AddColumn";
 
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 
-import { deleteGridRow } from "../../../libraries/spreadsheet/Grid/utils/functions/deleteIndividualGridRows";
-import { addGridRow } from "../../../libraries/spreadsheet/Grid/utils/functions/addGridRow";
+import { deleteGridRow } from "@/libraries/fylent-grid-engine/Grid/utils/functions/deleteIndividualGridRows";
+import { addGridRow } from "@/libraries/fylent-grid-engine/Grid/utils/functions/addGridRow";
 import { GetFilteredDataByQuery } from "@/services/spreadsheet/getQueryData";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
-import styles from "../../../libraries/spreadsheet/styles/spreadsheet.module.css";
+import styles from "@/libraries/fylent-grid-engine/styles/spreadsheet.module.css";
 import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { GridSelection, Theme } from "@glideapps/glide-data-grid";
-import ResponsiveSliderPanel from "../../../components/GridSlider/ResponsiveSliderPanel";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
@@ -66,7 +54,6 @@ import {
   FcClearFilters,
   FcCloseUpMode,
   FcCollaboration,
-  FcDataConfiguration,
   FcDataEncryption,
   FcDeleteColumn,
   FcDeleteRow,
@@ -80,9 +67,10 @@ import { GrDocumentPdf } from "react-icons/gr";
 import { BsFiletypeJson } from "react-icons/bs";
 
 import { TbMathFunction } from "react-icons/tb";
-import { sendNewColumnsToServer } from "@/libraries/spreadsheet/Grid/utils/functions/sendColumnsToServet";
+import { sendNewColumnsToServer } from "@/libraries/fylent-grid-engine/Grid/utils/functions/sendColumnsToServet";
 import PopoverComponent from "@/components/Popover/General";
 import currentBiridectionalCommunication from "@/services/socket";
+import { sortRowsBySelection } from "@/utilities/sortColumns";
 
 interface ISpreadGrid {
   wch: number;
@@ -102,14 +90,14 @@ const Spreadsheet = () => {
     useCurrentWorkspace();
   const generalWorkspaceData = useWorkspace();
   const keyCodeFromEnterDown = 13;
-  const [optionsVector, setOptionsVector] = useState<any>([]);
   const [isSendingQuery, setIsSendingQuery] = useState<boolean>(false);
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
   const [freezeColumns, setFreezeColums] = useState(0);
   const [isDescendingActive, setIsDescendingActive] = useState(true);
   const [internalTriggerPointer, setInternalTriggerPointer] = useState(0);
-  const [isNightThemeActive, setIsNightThemeActive] = useState<boolean>(false);
-  const [isMenuGridOpen, setIsMenuGridOpen] = useState<boolean>(false);
+  const [isMultipleSelectionActive, setIsMultipleSelectionActive] =
+    useState<boolean>();
+  const [isRowSelectionActive, setIsRowSelectionActive] = useState<boolean>();
   const [currentSelection, setCurrentSelection] = useState<GridSelection>();
   const [selectedColumnToSort, setSelectedColumnToSort] = useState<
     ISortColumn[]
@@ -127,8 +115,6 @@ const Spreadsheet = () => {
   });
 
   const [spreadColumns, setSpreadColumns] = useState<IColumnProjection[]>([]);
-
-  const [useCurrentTheme, setUseCurrentTheme] = useState<Partial<Theme>>({});
 
   const router = useRouter();
 
@@ -236,152 +222,42 @@ const Spreadsheet = () => {
     });
   }
 
-  function sortRowsBySelection(spreadSheetData) {
-    const currentUnsortedSpreadData = spreadSheetData;
-
-    if (selectedColumnToSort.length === 0) {
-      setSpreadSheetData(
-        currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
-      );
-      return;
-    }
-
-    if (
-      selectedColumnToSort[selectedColumnToSort?.length - 1].type === "number"
-    ) {
-      if (isDescendingActive) {
-        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
-          return (
-            beforeIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
-            ] -
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
-            ]
-          );
-        });
-      } else {
-        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
-          return (
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
-            ] -
-            beforeIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1]?.value
-            ]
-          );
-        });
-      }
-    }
-
-    if (
-      selectedColumnToSort[selectedColumnToSort?.length - 1].type === "boolean"
-    ) {
-      if (isDescendingActive) {
-        currentUnsortedSpreadData.sort(function (beforeIndex, currentIndex) {
-          return beforeIndex[
-            selectedColumnToSort[selectedColumnToSort?.length - 1].value
-          ] ===
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ]
-            ? 0
-            : beforeIndex[
-                selectedColumnToSort[selectedColumnToSort?.length - 1].value
-              ]
-            ? -1
-            : 1;
-        });
-      } else {
-        currentUnsortedSpreadData.sort(function (beforeIndex, currentIndex) {
-          return beforeIndex[
-            selectedColumnToSort[selectedColumnToSort?.length - 1].value
-          ] ===
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ]
-            ? 0
-            : beforeIndex[
-                selectedColumnToSort[selectedColumnToSort?.length - 1].value
-              ]
-            ? 1
-            : -1;
-        });
-      }
-    }
-
-    if (
-      selectedColumnToSort[selectedColumnToSort?.length - 1].type === "string"
-    ) {
-      if (isDescendingActive) {
-        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
-          if (
-            beforeIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ] <
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ]
-          ) {
-            return -1;
-          }
-          if (
-            beforeIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ] >
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ]
-          ) {
-            return 1;
-          }
-          return 0;
-        });
-      } else {
-        currentUnsortedSpreadData?.sort((beforeIndex, currentIndex) => {
-          if (
-            beforeIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ] >
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ]
-          ) {
-            return -1;
-          }
-          if (
-            beforeIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ] <
-            currentIndex[
-              selectedColumnToSort[selectedColumnToSort?.length - 1].value
-            ]
-          ) {
-            return 1;
-          }
-          return 0;
-        });
-      }
-    }
-
-    setSpreadSheetData(currentUnsortedSpreadData);
-  }
-
   React.useEffect(() => {
-    setSpreadSheetData(
-      currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
-    );
-    setSpreadColumns(
-      currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns ?? []
-    );
+    if (
+      currentWorkSpace.currentWorkSpace &&
+      currentWorkSpace.currentWorkSpace.spreadSheetData
+    ) {
+      setSpreadSheetData(
+        currentWorkSpace.currentWorkSpace.spreadSheetData.data
+      );
+      setSpreadColumns(
+        currentWorkSpace.currentWorkSpace.spreadSheetData.columns
+      );
+    }
   }, []);
 
   React.useEffect(() => {
-    setSpreadSheetData(
-      currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
+    if (
+      currentWorkSpace.currentWorkSpace &&
+      currentWorkSpace.currentWorkSpace.spreadSheetData
+    ) {
+      setSpreadSheetData(
+        currentWorkSpace.currentWorkSpace.spreadSheetData.data
+      );
+      setSpreadColumns(
+        currentWorkSpace.currentWorkSpace.spreadSheetData.columns
+      );
+    }
+
+    setIsMultipleSelectionActive(
+      currentWorkSpace?.currentWorkSpace?.wspDataPreferences[
+        "isMultipleSelectionActive"
+      ]
     );
-    setSpreadColumns(
-      currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns ?? []
+    setIsRowSelectionActive(
+      currentWorkSpace?.currentWorkSpace?.wspDataPreferences[
+        "isRowSelectionActive"
+      ]
     );
   }, [currentWorkSpace.currentWorkSpace?.spreadSheetData?.data]);
 
@@ -423,211 +299,6 @@ const Spreadsheet = () => {
         background: "#edf2f7",
       }}
     >
-      <Drawer
-        isOpen={isMenuGridOpen}
-        placement="right"
-        onClose={() => setIsMenuGridOpen(false)}
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Opciones de cuadrícula</DrawerHeader>
-
-          <DrawerBody>
-            <ResponsiveSliderPanel
-              setTypeQueryFromUser={setTypeQueryFromUser}
-              currentWorkSpace={currentWorkSpace}
-              keyCodeFromEnterDown={keyCodeFromEnterDown}
-              handleUserQuery={handleUserQuery}
-              setAddTask={setAddTask}
-              currentRowsSelected={currentRowsSelected}
-              toastNotification={toastNotification}
-              exportToExcel={exportToExcel}
-              setOpenSlider={setOpenSlider}
-            />
-          </DrawerBody>
-
-          <DrawerFooter>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={() => setIsMenuGridOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
-                sortRowsBySelection(spreadSheetData);
-                setIsMenuGridOpen(false);
-              }}
-              colorScheme="blue"
-            >
-              Guardar
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-      <Drawer
-        isOpen={openSlider}
-        placement="right"
-        onClose={() => setOpenSlider(false)}
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Ordenar por columna</DrawerHeader>
-
-          <DrawerBody>
-            <Select
-              options={
-                restrictedColumnsToQuery?.map((userColumn) => {
-                  return {
-                    value: userColumn.title,
-                    type: userColumn.type,
-                    label: userColumn.title,
-                  };
-                }) ?? []
-              }
-              onChange={(e: any) => {
-                if (e) {
-                  if (e.value && selectedColumnToSort.length <= 2)
-                    setSelectedColumnToSort(uniqBy([e], "label"));
-                }
-              }}
-              placeholder="Seleccione una columna"
-            />
-
-            {selectedColumnToSort.map((uniqResort, index) => {
-              if (index == selectedColumnToSort.length - 1)
-                return (
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <Input
-                      value={uniqResort.label}
-                      style={{ marginTop: "60px" }}
-                      size="lg"
-                    />
-                    <Checkbox
-                      sx={{ marginTop: "15px", marginLeft: "10px" }}
-                      isChecked={isDescendingActive}
-                      onChange={() => {
-                        setIsDescendingActive(!isDescendingActive);
-                        sortRowsBySelection(spreadSheetData);
-                      }}
-                    >
-                      Orden descendiente
-                    </Checkbox>
-                    <Button
-                      sx={{ marginTop: "20px" }}
-                      onClick={() => {
-                        setSelectedColumnToSort([]);
-                      }}
-                      colorScheme="red"
-                    >
-                      Limpiar filtro
-                    </Button>
-                  </div>
-                );
-            })}
-
-            <Divider style={{ marginTop: "40px" }} />
-
-            <div style={{ marginTop: "30px" }}>
-              <h4 style={{ marginBottom: "20px" }}>Congelar columnas</h4>
-              <Select
-                options={
-                  currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns.map(
-                    (value: IColumnProjection, index: number) => {
-                      return {
-                        value: index + 1,
-                        label: index + 1,
-                      };
-                    }
-                  ) ?? []
-                }
-                value={freezeColumns}
-                onChange={(e: any) => {
-                  if (e) {
-                    if (e.value) setFreezeColums(e);
-                  }
-                }}
-                placeholder="Congelar columnas"
-              />
-            </div>
-
-            <div style={{ marginTop: "30px" }}>
-              <h4 style={{ marginBottom: "20px" }}>Modo oscuro</h4>
-              <Checkbox
-                defaultChecked={isNightThemeActive}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIsNightThemeActive(e.target.checked);
-                  if (e.target.checked) {
-                    setUseCurrentTheme({
-                      accentColor: "#8c96ff",
-                      accentLight: "rgba(202, 206, 255, 0.253)",
-
-                      textDark: "#ffffff",
-                      textMedium: "#b8b8b8",
-                      textLight: "#a0a0a0",
-                      textBubble: "#ffffff",
-
-                      bgIconHeader: "#b8b8b8",
-                      fgIconHeader: "#000000",
-                      textHeader: "#a1a1a1",
-                      textHeaderSelected: "#000000",
-
-                      bgCell: "#16161b",
-                      bgCellMedium: "#202027",
-                      bgHeader: "#212121",
-                      bgHeaderHasFocus: "#474747",
-                      bgHeaderHovered: "#404040",
-
-                      bgBubble: "#212121",
-                      bgBubbleSelected: "#000000",
-
-                      bgSearchResult: "#423c24",
-
-                      borderColor: "rgba(225,225,225,0.2)",
-                      drilldownBorder: "rgba(225,225,225,0.4)",
-
-                      linkColor: "#4F5DFF",
-
-                      headerFontStyle: "bold 14px",
-                      baseFontStyle: "13px",
-                      fontFamily:
-                        "Inter, Roboto, -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, noto, arial, sans-serif",
-                    });
-                  } else setUseCurrentTheme({});
-                }}
-              >
-                Activar modo oscuro
-              </Checkbox>
-            </div>
-          </DrawerBody>
-
-          <Divider style={{ marginTop: "40px" }} />
-
-          <DrawerFooter>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={() => setOpenSlider(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
-                sortRowsBySelection(spreadSheetData);
-                setOpenSlider(false);
-              }}
-              colorScheme="blue"
-            >
-              Guardar
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
       <CreateColumn
         isOpen={addTask}
         onClose={setAddTask}
@@ -690,13 +361,14 @@ const Spreadsheet = () => {
             >
               <Box display={"flex"}>
                 <PopoverComponent
+                  clickAwayClosesModal={false}
                   content={
                     <Box overflowY={"hidden"} padding={"10px 20px 20px 20px"}>
-                      <Text marginBottom={"5px"}>Ordernar por columnas</Text>
+                      <Text marginBottom={"10px"}>Ordernar</Text>
                       <Select
                         menuPortalTarget={document.body}
                         styles={{
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                          menuPortal: (base) => ({ ...base, zIndex: 1000000 }),
                         }}
                         options={
                           restrictedColumnsToQuery?.map((userColumn) => {
@@ -736,7 +408,15 @@ const Spreadsheet = () => {
                                 isChecked={isDescendingActive}
                                 onChange={() => {
                                   setIsDescendingActive(!isDescendingActive);
-                                  sortRowsBySelection(spreadSheetData);
+                                  if (spreadSheetData) {
+                                    sortRowsBySelection(
+                                      spreadSheetData,
+                                      setSpreadSheetData,
+                                      selectedColumnToSort,
+                                      isDescendingActive,
+                                      currentWorkSpace
+                                    );
+                                  }
                                 }}
                               >
                                 Orden descendiente
@@ -748,7 +428,15 @@ const Spreadsheet = () => {
                                   setInternalTriggerPointer(
                                     Math.random() * 1000 - 1 + 1
                                   );
-                                  sortRowsBySelection(spreadSheetData);
+                                  if (spreadSheetData) {
+                                    sortRowsBySelection(
+                                      spreadSheetData,
+                                      setSpreadSheetData,
+                                      selectedColumnToSort,
+                                      isDescendingActive,
+                                      currentWorkSpace
+                                    );
+                                  }
                                 }}
                                 bgColor={"rgba(33,42,62,1)"}
                                 color={"white"}
@@ -831,7 +519,7 @@ const Spreadsheet = () => {
                         value={freezeColumns}
                         menuPortalTarget={document.body}
                         styles={{
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                          menuPortal: (base) => ({ ...base, zIndex: 1000000 }),
                           option: (
                             styles,
                             { data, isDisabled, isFocused, isSelected }
@@ -901,51 +589,23 @@ const Spreadsheet = () => {
                   paddingLeft={"20px"}
                 >
                   <Switch
+                    isChecked={isRowSelectionActive}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      setIsNightThemeActive(e.target.checked);
-                      if (e.target.checked) {
-                        setUseCurrentTheme({
-                          accentColor: "#8c96ff",
-                          accentLight: "rgba(202, 206, 255, 0.253)",
-
-                          textDark: "#ffffff",
-                          textMedium: "#b8b8b8",
-                          textLight: "#a0a0a0",
-                          textBubble: "#ffffff",
-
-                          bgIconHeader: "#b8b8b8",
-                          fgIconHeader: "#000000",
-                          textHeader: "#a1a1a1",
-                          textHeaderSelected: "#000000",
-
-                          bgCell: "#16161b",
-                          bgCellMedium: "#202027",
-                          bgHeader: "#212121",
-                          bgHeaderHasFocus: "#474747",
-                          bgHeaderHovered: "#404040",
-
-                          bgBubble: "#212121",
-                          bgBubbleSelected: "#000000",
-
-                          bgSearchResult: "#423c24",
-
-                          borderColor: "rgba(225,225,225,0.2)",
-                          drilldownBorder: "rgba(225,225,225,0.4)",
-
-                          linkColor: "#4F5DFF",
-
-                          headerFontStyle: "bold 14px",
-                          baseFontStyle: "13px",
-                          fontFamily:
-                            "Inter, Roboto, -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, noto, arial, sans-serif",
-                        });
-                      } else setUseCurrentTheme({});
+                      setIsRowSelectionActive(e.target.checked);
+                      if (currentWorkSpace.currentWorkSpace) {
+                        const workspaceToModify: IWspUser =
+                          currentWorkSpace.currentWorkSpace;
+                        workspaceToModify.wspDataPreferences[
+                          "isRowSelectionActive"
+                        ] = e.target.checked;
+                        currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                      }
                     }}
                     size="sm"
                     colorScheme="gray"
                   />
                   <Text fontSize={"14px"} marginLeft={"15px"}>
-                    Modo oscuro
+                    Selección de fila
                   </Text>
                 </Box>
               </Box>
@@ -1003,46 +663,30 @@ const Spreadsheet = () => {
                 borderRadius={"0px"}
                 height={"30px"}
                 borderRight={"1px solid #dddddd"}
+                isDisabled={
+                  currentSelection?.columns["items"].length ? false : true
+                }
                 onClick={() => {
-                  setIsLoading(true);
+                  const currentColumns: IColumnProjection[] =
+                    currentWorkSpace.currentWorkSpace?.spreadSheetData
+                      ?.columns ?? [];
+                  const currentColumnSelected =
+                    currentSelection?.columns["items"][0][0];
+                  const modifiedWorkspaceTarget: Partial<IWspUser> =
+                    currentWorkSpace.currentWorkSpace ?? {};
+                  currentColumns.splice(currentColumnSelected, 1);
+                  modifiedWorkspaceTarget.spreadSheetData =
+                    currentWorkSpace.currentWorkSpace?.spreadSheetData;
 
-                  setTimeout(async () => {
-                    const currentColumns: IColumnProjection[] =
-                      currentWorkSpace.currentWorkSpace?.spreadSheetData
-                        ?.columns ?? [];
-                    const currentColumnSelected =
-                      currentSelection?.columns["items"][0][0];
-                    const modifiedWorkspaceTarget: Partial<IWspUser> =
-                      currentWorkSpace.currentWorkSpace ?? {};
-                    currentColumns.splice(currentColumnSelected, 1);
-                    modifiedWorkspaceTarget.spreadSheetData =
-                      currentWorkSpace.currentWorkSpace?.spreadSheetData;
+                  sendNewColumnsToServer(
+                    currentWorkSpace,
+                    currentSession,
+                    currentColumns,
+                    spreadSheetData
+                  );
 
-                    sendNewColumnsToServer(
-                      currentWorkSpace,
-                      currentSession,
-                      currentColumns,
-                      spreadSheetData
-                    );
-
-                    await UpdateWorkSpace(
-                      currentWorkSpace?.currentWorkSpace?._id,
-                      {
-                        body: modifiedWorkspaceTarget,
-                        transactionObject: {
-                          currentUserSocketId:
-                            currentBiridectionalCommunication.id,
-                          currentRoomToken: {
-                            roomToken:
-                              currentWorkSpace.currentWorkSpace?._id ?? "",
-                          },
-                        },
-                      }
-                    );
-
-                    setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
-                    setIsLoading(false);
-                  }, 1000);
+                  setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
+                  setIsLoading(false);
                 }}
               >
                 <Icon as={FcDeleteColumn} />
@@ -1059,20 +703,15 @@ const Spreadsheet = () => {
                     toastNotification
                   )
                 }
-                isDisabled={currentRowsSelected !== undefined ? false : true}
+                isDisabled={
+                  isRowSelectionActive
+                    ? currentSelection?.rows["items"].length
+                      ? false
+                      : true
+                    : true
+                }
               >
                 <Icon as={FcDeleteRow} />
-              </Button>
-
-              <Button
-                borderRadius={"0px"}
-                height={"30px"}
-                borderRight={"1px solid #dddddd"}
-                onClick={() => {
-                  setOpenSlider(true);
-                }}
-              >
-                <Icon as={FcDataConfiguration} />
               </Button>
 
               <Button
@@ -1116,7 +755,22 @@ const Spreadsheet = () => {
               </Button>
 
               <Box display={"flex"} alignItems={"center"} paddingLeft={"20px"}>
-                <Switch size="sm" colorScheme="green" />
+                <Switch
+                  isChecked={isMultipleSelectionActive}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setIsMultipleSelectionActive(e.target.checked);
+                    if (currentWorkSpace.currentWorkSpace) {
+                      const workspaceToModify: IWspUser =
+                        currentWorkSpace.currentWorkSpace;
+                      workspaceToModify.wspDataPreferences[
+                        "isMultipleSelectionActive"
+                      ] = e.target.checked;
+                      currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                    }
+                  }}
+                  size="sm"
+                  colorScheme="green"
+                />
                 <Text fontSize={"14px"} marginLeft={"15px"}>
                   Selección multiple
                 </Text>
@@ -1187,6 +841,17 @@ const Spreadsheet = () => {
                 >
                   <Icon as={TbMathFunction} />
                 </Button>
+
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  paddingLeft={"20px"}
+                >
+                  <Switch size="sm" colorScheme="facebook" isChecked={false} />
+                  <Text fontSize={"14px"} marginLeft={"15px"}>
+                    Autoguardado
+                  </Text>
+                </Box>
               </Box>
               {currentSelection?.current?.cell[0] !== undefined && (
                 <Box display={"flex"} flexDir={"row"} paddingRight={"10px"}>
@@ -1213,7 +878,7 @@ const Spreadsheet = () => {
           setCurrentRowsSelected={setCurrentRowsSelected}
           setCurrentSelection={setCurrentSelection}
           freezeColumns={freezeColumns}
-          useTheme={useCurrentTheme}
+          useTheme={{}}
         />
       </div>
     </div>

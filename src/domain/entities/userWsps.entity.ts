@@ -6,8 +6,8 @@ export interface IAgilePreferences {
 }
 
 export interface ISpreadSheetPreferences {
-    isDarkModeOpen: boolean;
-    isMultipleSelectionOpen: boolean;
+    isRowSelectionActive: boolean;
+    isMultipleSelectionActive: boolean;
     freezedColumns: number;
 }
 
@@ -18,7 +18,7 @@ export interface ICollaborators {
 }
 
 export interface IWspUser {
-    _id?: string;
+    _id: string;
     name: string;
     createdDate: Date;
     createdById: string;
@@ -26,7 +26,7 @@ export interface IWspUser {
     collaborators: ICollaborators[];
     prefix?: string;
     wspData?: IDataToDo[];
-    wspDataPreferences?: IAgilePreferences | ISpreadSheetPreferences;
+    wspDataPreferences: IAgilePreferences | ISpreadSheetPreferences;
     spreadSheetData?: ISpreadSheet;
 }
 
