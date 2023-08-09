@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { utils, writeFile } from "xlsx";
+import { WorkBook, WorkSheet, utils, writeFile } from "xlsx";
 
 import Select from "react-select";
 import chroma from "chroma-js";
@@ -42,7 +42,7 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import styles from "@/libraries/fylent-grid-engine/styles/spreadsheet.module.css";
 import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
-import { GridSelection, Theme } from "@glideapps/glide-data-grid";
+import { GridSelection, Item, Theme } from "@glideapps/glide-data-grid";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
@@ -71,6 +71,7 @@ import { sendNewColumnsToServer } from "@/libraries/fylent-grid-engine/Grid/util
 import PopoverComponent from "@/components/Popover/General";
 import currentBiridectionalCommunication from "@/services/socket";
 import { sortRowsBySelection } from "@/utilities/sortColumns";
+import Calculator from "@/components/Calculator/components/App/App";
 
 interface ISpreadGrid {
   wch: number;
@@ -86,8 +87,7 @@ const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentSession = useCurrentUser();
-  const { currentWorkSpace: data, setCurrentWorkSpace: setData } =
-    useCurrentWorkspace();
+  const { currentWorkSpace: data, setCurrentWorkSpace: setData } = useCurrentWorkspace();
   const generalWorkspaceData = useWorkspace();
   const keyCodeFromEnterDown = 13;
   const [isSendingQuery, setIsSendingQuery] = useState<boolean>(false);
@@ -95,17 +95,14 @@ const Spreadsheet = () => {
   const [freezeColumns, setFreezeColums] = useState(0);
   const [isDescendingActive, setIsDescendingActive] = useState(true);
   const [internalTriggerPointer, setInternalTriggerPointer] = useState(0);
-  const [isMultipleSelectionActive, setIsMultipleSelectionActive] =
-    useState<boolean>();
+  const [isMultipleSelectionActive, setIsMultipleSelectionActive] = useState<boolean>();
   const [isRowSelectionActive, setIsRowSelectionActive] = useState<boolean>();
   const [currentSelection, setCurrentSelection] = useState<GridSelection>();
-  const [selectedColumnToSort, setSelectedColumnToSort] = useState<
-    ISortColumn[]
-  >([]);
+  const [selectedColumnToSort, setSelectedColumnToSort] = useState<ISortColumn[]>([]);
+  const [spreadDataHasFilter, setSpreadDataHasFilter] = useState<boolean>(false);
   const todoRefHTMLElement = React.createRef<HTMLElement>();
-  const [openSlider, setOpenSlider] = useState(false);
-  const [spreadSheetData, setSpreadSheetData] = useState(
-    currentWorkSpace.currentWorkSpace?.spreadSheetData?.data
+  const [spreadSheetData, setSpreadSheetData] = useState<any[]>(
+    currentWorkSpace.currentWorkSpace?.spreadSheetData?.data ?? []
   );
   const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number[]>([]);
@@ -163,23 +160,16 @@ const Spreadsheet = () => {
     setIsSendingQuery(true);
     const queryDataFromMongo = await GetFilteredDataByQuery(
       typedQueryFromUser,
-      currentSession.currentUser.userID
+      currentSession.currentUser.userID ?? ""
     );
 
     if (queryDataFromMongo) setSpreadSheetData(queryDataFromMongo);
-    else
-      setSpreadSheetData(
-        currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
-      );
-
     setIsSendingQuery(false);
   }
 
   function exportToExcel() {
-    var workBook = utils.book_new();
-    var workSheet = utils.json_to_sheet(
-      currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data ?? []
-    );
+    var workBook: WorkBook = utils.book_new();
+    var workSheet: WorkSheet = utils.json_to_sheet(spreadSheetData);
 
     var widthColumnsForGrid: ISpreadGrid[] = [];
     var objectWithProperties: object = {};
@@ -220,6 +210,21 @@ const Spreadsheet = () => {
     writeFile(workBook, `${currentWorkSpace?.currentWorkSpace?.name}.xlsx`, {
       compression: true,
     });
+  }
+
+  function handleCalculatorResult (result: number) {
+     const currentDataArray: any[] | undefined = currentWorkSpace.currentWorkSpace?.spreadSheetData?.data;
+     const currentCell: Item | undefined = currentSelection?.current?.cell;
+     const columnTitle: string = currentCell ? spreadColumns[currentCell[0]].title : "Default";
+     const newCellValue: number = result;
+
+     if (currentCell && currentDataArray && currentWorkSpace.currentWorkSpace?.spreadSheetData?.userId) {
+        currentDataArray[currentCell[1]][columnTitle] = newCellValue;
+        currentWorkSpace.setCurrentWorkSpace({...currentWorkSpace.currentWorkSpace, spreadSheetData: {
+          ...currentWorkSpace.currentWorkSpace?.spreadSheetData,
+          data: currentDataArray
+      }})
+     }
   }
 
   React.useEffect(() => {
@@ -345,7 +350,24 @@ const Spreadsheet = () => {
                     })
                   }
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                    if (e.keyCode === keyCodeFromEnterDown) handleUserQuery();
+                    if (e.keyCode === keyCodeFromEnterDown) {
+                      /* The state of the grid selection is modified to solve a bug present when performing search filters when the current selection exceeds the available barrier of new query rows */
+                      setCurrentSelection(undefined);
+                      if (
+                        typedQueryFromUser.query === "" ||
+                        typedQueryFromUser.query === undefined
+                      ) {
+                        setSpreadSheetData(
+                          currentWorkSpace?.currentWorkSpace?.spreadSheetData
+                            ?.data ?? []
+                        );
+                        setSpreadDataHasFilter(false);
+                        return;
+                      } else {
+                        setSpreadDataHasFilter(true);
+                        handleUserQuery();
+                      }
+                    }
                   }}
                   placeholder="Filtra tus datos aquí"
                 />
@@ -481,7 +503,12 @@ const Spreadsheet = () => {
                   borderRadius={"0px"}
                   height={"30px"}
                   borderRight={"1px solid #dddddd"}
-                  onClick={() => exportToExcel()}
+                  onClick={() =>
+                    setSpreadSheetData(
+                      currentWorkSpace?.currentWorkSpace?.spreadSheetData
+                        ?.data ?? []
+                    )
+                  }
                 >
                   <Icon as={FcClearFilters} />
                 </Button>
@@ -490,9 +517,6 @@ const Spreadsheet = () => {
                   borderRadius={"0px"}
                   height={"30px"}
                   borderRight={"1px solid #dddddd"}
-                  onClick={() => {
-                    setOpenSlider(true);
-                  }}
                 >
                   <Icon as={FcCollaboration} />
                 </Button>
@@ -655,6 +679,7 @@ const Spreadsheet = () => {
                 height={"30px"}
                 borderRadius={"0px"}
                 onClick={() => addGridRow(currentWorkSpace)}
+                isDisabled={spreadDataHasFilter}
               >
                 <Icon as={FcAddRow} />
               </Button>
@@ -831,16 +856,42 @@ const Spreadsheet = () => {
                   <Icon as={BsFiletypeJson} />
                 </Button>
 
-                <Button
-                  borderRadius={"0px"}
-                  height={"30px"}
-                  borderRight={"1px solid #dddddd"}
-                  onClick={() => {
-                    setOpenSlider(true);
-                  }}
-                >
-                  <Icon as={TbMathFunction} />
-                </Button>
+                <PopoverComponent
+                  content={
+                    <Box width={"320px"}>
+                      <Calculator
+                        onChange={(event: number) => handleCalculatorResult(event)}
+                        currentResult={
+                          spreadSheetData.length && spreadColumns.length
+                            ? spreadSheetData[
+                                currentSelection?.current?.cell[1] ?? 0
+                              ][
+                                spreadColumns[
+                                  currentSelection?.current?.cell[0] ?? 0
+                                ]?.title
+                              ]
+                            : 0
+                        }
+                      />
+                    </Box>
+                  }
+                  trigger={
+                    <Button
+                      borderRadius={"0px"}
+                      height={"30px"}
+                      borderRight={"1px solid #dddddd"}
+                      isDisabled={
+                        spreadColumns.length &&
+                        spreadColumns[currentSelection?.current?.cell[0] ?? 0]
+                          .type !== "number"
+                          ? true
+                          : false
+                      }
+                    >
+                      <Icon as={TbMathFunction} />
+                    </Button>
+                  }
+                />
 
                 <Box
                   display={"flex"}
@@ -876,6 +927,7 @@ const Spreadsheet = () => {
           data={spreadSheetData ?? []}
           internalTriggerPointer={internalTriggerPointer}
           setCurrentRowsSelected={setCurrentRowsSelected}
+          currentSelection={currentSelection}
           setCurrentSelection={setCurrentSelection}
           freezeColumns={freezeColumns}
           useTheme={{}}

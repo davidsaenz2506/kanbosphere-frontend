@@ -33,8 +33,9 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 interface ISpreadProps {
   data: any;
   internalTriggerPointer: number;
-  setCurrentRowsSelected: any;
-  setCurrentSelection: any;
+  setCurrentRowsSelected: React.Dispatch<React.SetStateAction<number[]>>;
+  currentSelection: GridSelection | undefined,
+  setCurrentSelection: React.Dispatch<React.SetStateAction<GridSelection | undefined>>;
   freezeColumns: any;
   useTheme: Partial<Theme>;
 }
@@ -44,6 +45,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
     data,
     setCurrentRowsSelected,
     internalTriggerPointer,
+    currentSelection,
     freezeColumns,
     useTheme,
     setCurrentSelection,
@@ -59,8 +61,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
     rows: CompactSelection.empty(),
   };
 
-  const [userSelection, setUserSelection] =
-    React.useState<GridSelection>(selection);
+  const [userSelection, setUserSelection] = React.useState<GridSelection>(selection);
   const [userColumns, setUserColumns] = React.useState<IColumnProjection[]>(
     currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns ?? []
   );
@@ -76,8 +77,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   React.useEffect(() => {
     if (currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns) {
-      const sortedColumns: IColumnProjection[] =
-        currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns.sort((a, b) => a.order - b.order);
+      const sortedColumns: IColumnProjection[] = currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns.sort((a, b) => a.order - b.order);
       setUserColumns(sortedColumns);
     }
   }, [
@@ -123,7 +123,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
       currentUserWsp,
       currentUser,
       assignNewOrderValues,
-      data,
+      currentUserWsp.currentWorkSpace?.spreadSheetData?.data,
       currentUserWorkspaces
     );
   };
@@ -133,7 +133,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
       const validationExportedFromUtils: boolean = await editGridCell(
         cell,
         userColumns,
-        data,
+        currentUserWsp.currentWorkSpace?.spreadSheetData?.data,
         newValue,
         currentUserWsp
       );
@@ -166,6 +166,13 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
     setCurrentRowsSelected(reducedObject);
   }, [userSelection.rows]);
+
+
+  React.useEffect(() => {
+    if (currentSelection === undefined) {
+        setUserSelection({...userSelection, current: undefined})
+    }
+  }, [currentSelection]);
 
   return (
     <div
@@ -200,7 +207,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
             currentUserWsp,
             currentUser,
             userColumns,
-            data,
+            currentUserWsp.currentWorkSpace?.spreadSheetData?.data,
             currentUserWorkspaces
           )
         }
@@ -217,7 +224,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
             ? "both"
             : "none"
         }
-        rows={data.length}
+        rows={data.length ?? 0}
         getCellContent={getUserData}
         rowSelectionMode={
           currentUserWsp.currentWorkSpace?.wspDataPreferences[

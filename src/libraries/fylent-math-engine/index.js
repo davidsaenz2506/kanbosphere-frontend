@@ -123,6 +123,65 @@ export const mathematicalEnginedEncapsuled = {
       method: medicine.calculateGFR,
     },
   },
+  electronic: {
+    "Voltaje": {
+      value: "calculateVoltage",
+      requiredValues: {
+        "Corriente I": "I",
+        "Resistencia R": "R",
+      },
+      method: physics.calculateVoltage,
+    },
+    "Corriente Eléctrica": {
+      value: "calculateCurrent",
+      requiredValues: {
+        "Voltaje V": "V",
+        "Resistencia R": "R",
+      },
+      method: physics.calculateCurrent,
+    },
+    "Resistencia": {
+      value: "calculateResistence",
+      requiredValues: {
+        "Voltaje V": "V",
+        "Corriente I": "I",
+      },
+      method: physics.calculateResistence,
+    },
+    "Potencia eléctrica": {
+      value: "calculatePowerI2R",
+      requiredValues: {
+        "Voltaje V": "V",
+        "Corriente I": "I",
+      },
+      method: physics.calculatePowerI2R,
+    },
+    "Fuerza de Coulomb": {
+      value: "calculateCoulombForce",
+      requiredValues: {
+        "Carga eléctrica 1": "q1",
+        "Carga eléctrica 2": "q2",
+        "Distancia entre las cargas": "r"
+      },
+      method: physics.calculateCoulombForce,
+    },
+    "Energía eléctrica": {
+      value: "calculateEnergy",
+      requiredValues: {
+        "Potencia": "P",
+        "Tiempo": "t"
+      },
+      method: physics.calculateEnergy,
+    },
+    "Inducción Electromagnética": {
+      value: "calculateInducedEMF",
+      requiredValues: {
+        "Variación flujo magnético Wb": "dPhi",
+        "Tiempo en segundos": "dt"
+      },
+      method: physics.calculateEnergy,
+    },
+  },
   physics: {
     "Distancia recorrida": {
       value: "calculateUM",

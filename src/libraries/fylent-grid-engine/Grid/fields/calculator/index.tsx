@@ -19,19 +19,19 @@ const tagHeight = 25;
 const innerPad = 2;
 
 function TopEditor(p: any) {
-  const currentContentBoxElement: HTMLElement | null =
-    document.getElementById("fylent-grid-engine");
-  const boundingClientRect: DOMRect | undefined =
-    currentContentBoxElement?.getBoundingClientRect();
+  const currentContentBoxElement: HTMLElement | null = document.getElementById("fylent-grid-engine");
+  const currentClipRegionElement: HTMLElement | null = document.querySelector(".clip-region");
+  const boundingClientRect: DOMRect | undefined = currentContentBoxElement?.getBoundingClientRect();
   const currentRectHeight: number | undefined = boundingClientRect?.height;
-
   const currentDataResult: number = p.value.data.data ?? 0;
+  const [currentTriggerPointer, setCurrentTriggerPointer] = React.useState<number>(0);
 
-  if (
-    currentRectHeight &&
-    currentRectHeight - p.target.y < currentRectHeight - 472
-  )
-    p.target.y = p.target.y - 472;
+  if (currentRectHeight && currentRectHeight - p.target.y < currentRectHeight - 472) p.target.y = p.target.y - 472;
+  if (currentClipRegionElement) currentClipRegionElement.style.overflowY = "hidden"
+
+  setTimeout(() => {
+        setCurrentTriggerPointer(1);
+  }, 50)
 
   return (
     <div
@@ -40,6 +40,9 @@ function TopEditor(p: any) {
         display: "flex",
         alignItems: "center",
         minWidth: "300px",
+        borderRadius: "5px",
+        transition: "all .1s",
+        transform: currentTriggerPointer ? "scale(1)" : "scale(0)"
       }}
     >
       <Calculator

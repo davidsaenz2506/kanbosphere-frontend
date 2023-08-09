@@ -6,9 +6,9 @@ import {
   measureTextCached,
   Rectangle,
 } from "@glideapps/glide-data-grid";
-import { Input } from "@chakra-ui/react";
 import { roundedRect } from "../multipicklist/draw-fns";
 import TimeKeeper from "react-timekeeper";
+import { Box } from "@chakra-ui/react";
 
 interface TimePickerCellProps {
   readonly type: "time";
@@ -24,19 +24,20 @@ function TopEditor(p: any) {
   const currentValue: string = cell.data.time;
 
   return (
-    <TimeKeeper
-      time={currentValue}
-      onChange={(e) => {
-        console.log(e)
-        p.onChange({
-          ...p.value,
-          data: {
-            ...p.value.data,
-            date: e.formatted12 ?? undefined,
-          },
-        });
-      }}
-    />
+    <Box border={"2px solid #d9d9e3"} borderRadius={"4px"} maxW={"264px"} zIndex={10000}>
+      <TimeKeeper
+        time={currentValue}
+        onChange={(e) => {
+          p.onChange({
+            ...p.value,
+            data: {
+              ...p.value.data,
+              date: e.formatted12 ?? undefined,
+            },
+          });
+        }}
+      />
+    </Box>
   );
 }
 
@@ -102,6 +103,7 @@ const renderer: CustomRenderer<TimePickerCell> = {
 
   provideEditor: () => ({
     disablePadding: true,
+    disableStyling: true,
     editor: TopEditor,
   }),
 };

@@ -111,14 +111,14 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
     { value: "mail", label: "📩 Correo electronico" },
     { value: "phone", label: "📞 Numero celular" },
     { value: "boolean", label: "📦 Checkbox" },
-    { value: "compound", label: "🎨 Compuesta" },
-    { value: "calculator", label: "📚 Calculadora" },
+    { value: "compound", label: "🎨 Compuesta" }
   ];
 
   const mathEngineOperations: IPicklistOptions[] = [
     { value: "financial", label: "💵 Finanzas" },
     { value: "medicine", label: "💉 Salud" },
     { value: "physics", label: "🍎 Fisica" },
+    { value: "electronic", label: "⚡ Eléctrica" },
   ];
 
   async function addColumn() {

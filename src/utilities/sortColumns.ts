@@ -1,13 +1,11 @@
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
-export function sortRowsBySelection(spreadSheetData: [], setSpreadSheetData: React.Dispatch<React.SetStateAction<[] | undefined>>, selectedColumnToSort: any, isDescendingActive: boolean, currentWorkSpace: ICurrentWspContext) {
+export function sortRowsBySelection(spreadSheetData: any[], setSpreadSheetData: React.Dispatch<React.SetStateAction<any[]>>, selectedColumnToSort: any, isDescendingActive: boolean, currentWorkSpace: ICurrentWspContext) {
     const currentUnsortedSpreadData = spreadSheetData;
 
     if (selectedColumnToSort.length === 0) {
-        setSpreadSheetData(
-            currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data
-        );
+        setSpreadSheetData(currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data ?? []);
         return;
     }
 

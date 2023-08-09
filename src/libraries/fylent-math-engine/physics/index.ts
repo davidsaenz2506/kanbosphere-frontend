@@ -1,3 +1,5 @@
+const k = 8.988e9;
+
 export const calculateUM = ({ v, t }: { v: number, t: number }): string => `${(v * t).toFixed(2)} m/s`;
 
 export const calculateAV = ({ d, t }: { d: number, t: number }): string => `${(d / t).toFixed(2)} m/s`;
@@ -24,3 +26,24 @@ export const calculateDistanceFromGravityForce = ({ m1, m2, F, G }: { m1: number
 
 export const calculateCurrent = ({ V, R }: { V: number, R: number }): string =>
   `${(V / R).toFixed(2)} A`;
+
+export const calculateResistence = ({ V, I }: { V: number, I: number }): string =>
+  `${(V / I).toFixed(2)} Ohms`;
+
+export const calculatePowerVI = ({ V, I }: { V: number, I: number }): string =>
+  `${(V * I).toFixed(2)} Watts`;
+
+export const calculatePowerI2R = ({ I, R }: { I: number, R: number }): string =>
+  `${(I ** 2 * R).toFixed(2)} Watts`;
+
+export const calculatePowerV2R = ({ V, R }: { V: number, R: number }): string =>
+  `${(V ** 2 / R).toFixed(2)} Watts`;
+
+export const calculateCoulombForce = ({ q1, q2, r }: { q1: number, q2: number, r: number }): string =>
+  `${(k * q1 * q2 / r ** 2).toFixed(2)} Newtons`;
+
+export const calculateEnergy = ({ P, t }: { P: number, t: number }): string =>
+  `${(P * t).toFixed(2)} Joules`;
+
+export const calculateInducedEMF = ({ dPhi, dt }: { dPhi: number, dt: number }): string =>
+  `${(-dPhi / dt).toFixed(2)} Volts`;
