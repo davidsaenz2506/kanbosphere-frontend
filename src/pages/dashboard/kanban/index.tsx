@@ -21,14 +21,22 @@ import SlideTask from "@/components/SlideTask";
 import { useRouter } from "next/router";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { getWorkspaceById } from "@/services/workspaces/getOne";
+import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const { userWsps } = useWorkspace();
+  const { setLoadingChunk } = useLoadingChunk();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const [currentColor, setCurrentColor] = useState<string>("#FAFAFA");
   const [isGettingImage, setIsGettingImage] = useState<boolean>(false);
+  const currentCardHolderElement: HTMLElement | null = document.getElementById("cardHolder");
+  const [currentCardHolderHeight, setCurrentCardHolderHeight] = useState<number | undefined>(currentCardHolderElement?.getBoundingClientRect().height);
+  const [triggerToChangeOpacity, setTriggerToChangeOpacity] = useState<boolean | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingOrDeleting, setIsSendingOrDeleting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -57,8 +65,8 @@ const ToDoWorkspace = () => {
 
   if (isBrowser()) {
     window.onresize = function onResize() {
-      const todoDocument: HTMLDivElement | null =
-        document.querySelector(".todoContainer");
+      setCurrentCardHolderHeight(currentCardHolderElement?.getBoundingClientRect().height)
+      const todoDocument: HTMLDivElement | null = document.querySelector(".todoContainer");
       const navBarDocument: any = document.getElementById("navbarHome");
       const bodyDocumentData: HTMLBodyElement | null =
         document.querySelector("body");
@@ -148,17 +156,31 @@ const ToDoWorkspace = () => {
   }
 
   React.useEffect(() => {
-    setSelectedTask(
-      currentWorkSpace?.wspData?.filter(
-        (currentRecord) =>
-          // @ts-ignore
-          currentRecord?.taskId === currentWorkSpace?.wspDataPreferences?.selectedTask
-      )[0]
-    );
+    // @ts-ignore
+    setSelectedTask(currentWorkSpace?.wspData?.filter((currentRecord) => currentRecord?.taskId === currentWorkSpace?.wspDataPreferences?.selectedTask)[0]);
   }, [currentWorkSpace]);
+  
+  React.useEffect(() => {
+      getWorkspaceData()
+      setTimeout(() => {
+         setTriggerToChangeOpacity(true);
+      }, 1000)
+    }, [currentWorkSpace?._id]);
+
+  async function getWorkspaceData () {
+    if (currentWorkSpace?._id) {
+      setLoadingChunk(true);
+      const workspaceData: IWspUser | undefined = await getWorkspaceById(currentWorkSpace?._id);
+      if (currentWorkSpace?._id === workspaceData?._id) {
+        if (workspaceData) setCurrentWorkSpace(workspaceData);
+        setLoadingChunk(false);
+      } 
+    }
+  }
 
   return (
     <>
+      <DndProvider backend={HTML5Backend}>
       <EditTask
         isOpen={openEdit}
         onClose={setOpenEdit}
@@ -215,6 +237,7 @@ const ToDoWorkspace = () => {
               position: "sticky",
               height: "12%",
               left: 0,
+              transition: "all .5s"
             }}
           >
             <Header
@@ -231,6 +254,7 @@ const ToDoWorkspace = () => {
           </Box>
           <Box style={{ height: "90%" }}>
             <ToDoLanes
+              currentCardHolderHeight={currentCardHolderHeight ?? 0}
               isGettingImage={isGettingImage}
               setSelectedTasks={setSelectedTask}
             />
@@ -247,6 +271,7 @@ const ToDoWorkspace = () => {
           stringPathToRender={stringPathToRender}
         />
       </Box>
+      </DndProvider>
     </>
   );
 };

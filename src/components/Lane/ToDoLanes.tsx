@@ -5,17 +5,15 @@ import LaneComponent from "./LaneComponent";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-
 interface ILaneProps {
   setSelectedTasks: React.Dispatch<React.SetStateAction<IDataToDo | undefined>>;
   isGettingImage: boolean;
+  currentCardHolderHeight: number
 }
 
 const filterItemsMap = {
   New: {
-    title: "Nuevas",
+    title: "Pendientes",
     filterValue: "New",
   },
   "In Proccess": {
@@ -37,8 +35,7 @@ const filterItemsMap = {
 };
 
 const ToDoLanes: React.FC<ILaneProps> = (props) => {
-  const { currentWorkSpace: data, setCurrentWorkSpace: setData } =
-    useCurrentWorkspace();
+  const { currentWorkSpace: data, setCurrentWorkSpace: setData } = useCurrentWorkspace();
   const generalWorkspaceData = useWorkspace();
   const backGroundLaneColor = "#f5f6fA";
 
@@ -60,10 +57,10 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
         height: "90%",
       }}
     >
-      <DndProvider backend={HTML5Backend}>
         {Object.entries(filterItemsMap).map((currentItemMapped) => {
           return (
             <LaneComponent
+              currentCardHolderHeight={props.currentCardHolderHeight}
               title={currentItemMapped[1].title}
               instance={currentItemMapped[1].filterValue}
               bgColor={backGroundLaneColor}
@@ -73,7 +70,6 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
             />
           );
         })}
-      </DndProvider>
     </div>
   );
 };

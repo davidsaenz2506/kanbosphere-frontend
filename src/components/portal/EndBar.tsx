@@ -10,11 +10,29 @@ import { useRouter } from "next/router";
 
 import EndSession from "../Modals/EndSession";
 import styles from "../../styles/ToolButtons.module.css";
-import { Box, Divider } from "@chakra-ui/react";
+import { Box, Button, Divider } from "@chakra-ui/react";
+import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
+import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 
-const EndBar = () => {
+function delayTime(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const EndBar = ({setIsTriggerActive}) => {
+  const { setCurrentWorkSpace } = useCurrentWorkspace();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { loadingChunk } = useLoadingChunk();
+
+  async function handleRouterPath (caseUrl: string) { 
+    setIsTriggerActive(true)
+
+    setCurrentWorkSpace(undefined);
+    router.push(`/dashboard?briefcase=${caseUrl}`);
+    await delayTime(200);
+
+    setIsTriggerActive(false)
+}
 
   return (
     <>
@@ -25,14 +43,15 @@ const EndBar = () => {
           bottom: 0,
           paddingBottom: "10px",
           color: "#252525",
-          backgroundColor: "#ffffff"
+          backgroundColor: "#ffffff",
         }}
       >
-        <Divider width={"86%"} marginLeft={"20px"} marginBottom={"10px"}/>
+        <Divider width={"86%"} marginLeft={"20px"} marginBottom={"10px"} />
         <Box style={{ paddingRight: "25px" }} className={styles.buttonSpace}>
           <Icon as={CiSettings} w={6} h={6} sx={{ marginLeft: "15px" }} />
-          <button
+          <Button
             type="button"
+            disabled={loadingChunk}
             className="btn btn-secondary btn-lg btn-block"
             style={{
               backgroundColor: "transparent",
@@ -41,15 +60,19 @@ const EndBar = () => {
               marginLeft: "0px",
               fontSize: "15px",
             }}
-            onClick={() => router.push(`/dashboard?briefcase=settings`)}
+            onClick={() => {
+              const caseUrl: string = "settings";
+              handleRouterPath(caseUrl)
+            }}
           >
             Configuración de usuario
-          </button>
+          </Button>
         </Box>
         <Box className={styles.buttonSpace}>
           <Icon as={IoExitOutline} w={5} h={5} sx={{ marginLeft: "19px" }} />
-          <button
+          <Button
             type="button"
+            disabled={loadingChunk}
             className="btn btn-secondary btn-lg btn-block"
             style={{
               backgroundColor: "transparent",
@@ -58,10 +81,13 @@ const EndBar = () => {
               marginLeft: "0px",
               fontSize: "15px",
             }}
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setCurrentWorkSpace(undefined);
+              setIsOpen(true);
+            }}
           >
             Cerrar sesión
-          </button>
+          </Button>
         </Box>
       </Box>
     </>

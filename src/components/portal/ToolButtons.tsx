@@ -12,6 +12,7 @@ import {
   Icon,
   Text,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 
 import { Skeleton } from "@chakra-ui/react";
@@ -39,13 +40,16 @@ import {
   BsPeople,
 } from "react-icons/bs";
 import { TbPigMoney } from "react-icons/tb";
-import { MdOutlineContactMail } from "react-icons/md";
 import { PiProjectorScreenChartDuotone } from "react-icons/pi";
 
 import { LiaCloudSolid } from "react-icons/lia";
-import { IoPeopleOutline } from "react-icons/io5";
+import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 
-const ToolButtons = () => {
+function delayTime(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const ToolButtons = ({setIsTriggerActive}) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const wspUsers = useWorkspace();
   const currentSession = useCurrentUser();
@@ -54,9 +58,21 @@ const ToolButtons = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [item, setItem] = useState<IWspUser>();
   const [currentSelected, setCurrentSelected] = useState<any>("");
+  const { loadingChunk } = useLoadingChunk();
 
   const router = useRouter();
   const { query } = router;
+
+  async function handleRouterPath (caseUrl: string) { 
+       setIsTriggerActive(true)
+
+       currentWorkSpace.setCurrentWorkSpace(undefined);
+       setCurrentSelected("");
+       router.push(`/dashboard?briefcase=${caseUrl}`);
+       await delayTime(200);
+
+       setIsTriggerActive(false)
+  }
 
   return (
     <>
@@ -99,7 +115,7 @@ const ToolButtons = () => {
           className={styles.buttonSpace}
         >
           <Icon as={BsMenuButtonWide} sx={{ marginLeft: "20px" }} />
-          <button
+          <Button
             type="button"
             className="btn btn-secondary btn-lg btn-block"
             style={{
@@ -110,12 +126,12 @@ const ToolButtons = () => {
               fontSize: "15px",
             }}
             onClick={() => {
-              setCurrentSelected("");
-              router.push("/dashboard?briefcase=main");
+              const caseUrl: string = "main";
+              handleRouterPath(caseUrl)
             }}
           >
             Menú principal
-          </button>
+          </Button>
         </Box>
         <Box
           style={{
@@ -141,7 +157,7 @@ const ToolButtons = () => {
                 as={PiProjectorScreenChartDuotone}
                 sx={{ marginLeft: "18px" }}
               />
-              <button
+              <Button
                 type="button"
                 className="btn btn-secondary btn-lg btn-block"
                 style={{
@@ -152,12 +168,12 @@ const ToolButtons = () => {
                   fontSize: "15px",
                 }}
                 onClick={() => {
-                  setCurrentSelected("");
-                  router.push("/dashboard?briefcase=create");
+                  const caseUrl: string = "create";
+                  handleRouterPath(caseUrl)
                 }}
               >
                 Builds
-              </button>
+              </Button>
             </Box>
             <Box>
               <ChevronDownIcon
@@ -194,8 +210,8 @@ const ToolButtons = () => {
               <List>
                 {wspUsers.userWsps.map((todoWorkspace, index) => (
                   <ListItem
+                    cursor={"pointer"}
                     sx={{
-                      cursor: "pointer",
                       display: "flex",
                       justifyContent: "space-between",
                       paddingLeft: "40px",
@@ -206,11 +222,21 @@ const ToolButtons = () => {
                       marginBottom:
                         index === wspUsers.userWsps.length - 1 ? "0px" : "8px",
                     }}
-                    onClick={() => {
-                      setCurrentSelected(todoWorkspace._id);
-                      router.push(
-                        `/dashboard?briefcase=${todoWorkspace.type}&fridgeKey=${todoWorkspace._id}`
-                      );
+                    onClick={async () => {
+                      if (loadingChunk) return
+                      if (currentWorkSpace.currentWorkSpace?._id === todoWorkspace._id) return
+                        setIsTriggerActive(true);
+                        setCurrentSelected(todoWorkspace._id);
+
+                        currentWorkSpace.setCurrentWorkSpace(undefined);
+                        await delayTime(66);
+
+                        router.push(`/dashboard?briefcase=${todoWorkspace.type}&fridgeKey=${todoWorkspace._id}`);
+                        await delayTime(66);
+              
+                        setIsTriggerActive(false);
+                        await delayTime(66);
+
                     }}
                   >
                     <Box
@@ -277,7 +303,7 @@ const ToolButtons = () => {
         className={styles.buttonSpace}
       >
         <Icon as={BsPeople} sx={{ marginLeft: "21px", color: "#252525" }} />
-        <button
+        <Button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
@@ -288,12 +314,12 @@ const ToolButtons = () => {
             fontSize: "15px",
           }}
           onClick={() => {
-            setCurrentSelected("");
-            router.push(`/dashboard?briefcase=friends`);
+            const caseUrl: string = "friends";
+            handleRouterPath(caseUrl)
           }}
         >
           Social
-        </button>
+        </Button>
       </Box>
 
       <Box
@@ -304,7 +330,7 @@ const ToolButtons = () => {
           as={BsCalendarMonth}
           sx={{ marginLeft: "21px", color: "#252525" }}
         />
-        <button
+        <Button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
@@ -315,12 +341,12 @@ const ToolButtons = () => {
             fontSize: "15px",
           }}
           onClick={() => {
-            setCurrentSelected("");
-            router.push(`/dashboard?briefcase=meets`);
+            const caseUrl: string = "meets";
+            handleRouterPath(caseUrl)
           }}
         >
           Calendario
-        </button>
+        </Button>
       </Box>
 
       <Box
@@ -335,7 +361,7 @@ const ToolButtons = () => {
           as={TbPigMoney}
           sx={{ marginLeft: "20px", color: "#252525" }}
         />
-        <button
+        <Button
           type="button"
           className="btn btn-secondary btn-lg btn-block"
           style={{
@@ -346,12 +372,12 @@ const ToolButtons = () => {
             fontSize: "15px",
           }}
           onClick={() => {
-            setCurrentSelected("");
-            router.push(`/dashboard?briefcase=balance`);
+            const caseUrl: string = "balance";
+            handleRouterPath(caseUrl)
           }}
         >
           Mis Ingresos
-        </button>
+        </Button>
       </Box>
     </>
   );

@@ -17,7 +17,6 @@ import {
   FormLabel,
   Input,
   Button,
-  Image,
   Progress,
   Icon,
   TableContainer,
@@ -53,6 +52,9 @@ import PopoverComponent from "../Popover/General";
 import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import currentBiridectionalCommunication from "@/services/socket";
+import { useDrop } from "react-dnd";
+import DraggableImage from "../Draggable/Image";
+import { BsFillTrashFill } from "react-icons/bs";
 
 const statusOptions = [
   { value: "In Proccess", label: "In Proccess" },
@@ -75,8 +77,7 @@ const stringDataForUniqueId: string =
 const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
   const uniqueIdFactory = customAlphabet(stringDataForUniqueId, 12);
   const { currentUser } = useCurrentUser();
-  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
-    useCurrentWorkspace();
+  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
   const [newDate, setNewDate] = useState(data?.createDate);
   const [finishDate, setFinishDate] = useState(data?.finishDate);
   const [status, setStatus] = useState({
@@ -96,6 +97,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
   const [stringPathToRender, setStringPathToRender] = useState<IFilePath[]>([]);
   const [clockTime, setClockTime] = useState<IClockTime[]>([]);
   const [expectedHours, setExpectedHours] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [totalHoursRecorded, setTotalHoursRecorder] = useState<number>(0);
   const [individualClockRegister, setIndividualClockRegister] =
     useState<IClockTime>({
@@ -106,18 +108,24 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
         fullname: currentUser.fullname,
       },
     });
-  const [currentPathSelected, setCurrentPathSelected] = useState<any>({
-    name: "",
-    relativePath: "",
-    index: null,
-  });
-  const [openModalForFiles, setOpenModalForFiles] = useState(false);
   const [currentTaskStorageRefs, setCurrentTaskStorageRefs] = useState<
     StorageReference[]
   >([]);
   const ref = useRef<Element | null>(null);
   const toastNotification = useToast();
   const marginStatusValue = 4;
+
+  const [{ isOver, canDrop }, drop] = useDrop({
+    accept: "IMAGE",
+    drop: async (item: any) => {
+      deleteFileFromDirectory(item.objectToDelete.index);
+      setIsDragging(false);
+    },
+    collect: (monitor) => ({
+      canDrop: monitor.canDrop(),
+      isOver: !!monitor.isOver(),
+    }),
+  });
 
   useEffect(() => {
     ref.current = document.querySelector<HTMLElement>("#root");
@@ -237,12 +245,13 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
   }
 
   async function editCurrentTask(currentTask: any) {
-    const currentWorkSpace : IWspUser | undefined = wspData;
+    const currentWorkSpace: IWspUser | undefined = wspData;
     let workspaceData: IDataToDo[] | undefined = wspData?.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
     workspaceData?.forEach((task, index) => {
-      if (task.taskId === currentTaskUser.taskId && workspaceData) workspaceData[index] = currentTaskUser;
+      if (task.taskId === currentTaskUser.taskId && workspaceData)
+        workspaceData[index] = currentTaskUser;
     });
 
     if (currentWorkSpace?.wspData) currentWorkSpace.wspData = workspaceData;
@@ -267,8 +276,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
 
       toastNotification({
         title: "Correcto",
-        description:
-          "¡Historia guardada con exito!",
+        description: "¡Historia guardada con exito!",
         status: "success",
         duration: 4000,
         isClosable: true,
@@ -306,8 +314,6 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
         currentModifiedTask?.file.splice(indexToDelete, 1);
         setStringPathToRender(mutablePathState);
         editCurrentTask(currentModifiedTask);
-
-        setOpenModalForFiles(false);
       }
     } catch (error) {
       toastNotification({
@@ -357,7 +363,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
           </Text>
         </Modal.Header>
         <Modal.Body
-           css={{
+          css={{
             "&::-webkit-scrollbar": {
               width: "10px",
             },
@@ -369,7 +375,12 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
               borderRadius: "4px",
             },
           }}
-          style={{ display: "flex", flexDirection: "row", cursor: "default" }}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            cursor: "default",
+            overflowX: "hidden",
+          }}
         >
           <Box
             style={{ width: "60%", paddingRight: "20px", paddingLeft: "20px" }}
@@ -509,9 +520,11 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
 
               {clockTime?.length > 0 && (
                 <Box marginTop={"10px"}>
-                  <Text style={{ fontSize: "13px", marginBottom: "15px" }}>Hoja de registro</Text>
+                  <Text style={{ fontSize: "13px", marginBottom: "15px" }}>
+                    Hoja de registro
+                  </Text>
                   <TableContainer>
-                    <Table size="sm" variant='striped' colorScheme="whiteAlpha">
+                    <Table size="sm" variant="striped" colorScheme="whiteAlpha">
                       <Thead>
                         <Tr>
                           <Th textAlign={"center"}>Usuario</Th>
@@ -531,7 +544,6 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                                       <Avatar
                                         w={8}
                                         h={8}
-                                        
                                         marginRight={"10px"}
                                       />
                                       {currentChunk.recordedBy.fullname}
@@ -544,12 +556,16 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                                     {currentChunk.registrationDate}
                                   </Td>
 
-                                  <Td display={"flex"} alignItems={"center"} justifyContent={"center"} textAlign={"center"}>
+                                  <Td
+                                    display={"flex"}
+                                    alignItems={"center"}
+                                    justifyContent={"center"}
+                                    textAlign={"center"}
+                                  >
                                     <IconButton
                                       size={"xs"}
                                       borderRadius={"50%"}
                                       colorScheme="red"
-                                      
                                       variant={"solid"}
                                       icon={<DeleteIcon />}
                                       aria-label="delete"
@@ -573,6 +589,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
             <Select
               value={status}
               options={statusOptions}
+              menuPosition="fixed"
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) {
                   if (e.value === "Finished" || e.value === "For Review")
@@ -583,6 +600,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
             />
             <FormLabel mt={marginStatusValue}>Priority</FormLabel>
             <Select
+              menuPosition="fixed"
               value={priority}
               options={priorityOptions}
               onChange={(e: SingleValue<IPicklistOptions>) => {
@@ -606,7 +624,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
           </Box>
 
           <Box style={{ width: "40%", padding: "20px" }}>
-            <FormLabel marginBottom={"10px"}>Dropzone</FormLabel>
+            <FormLabel marginBottom={"10px"}>{"Dropzone"}</FormLabel>
             <Box
               sx={{
                 display: "flex",
@@ -683,13 +701,15 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
               <label htmlFor="image-input-trigger">
                 <Box
                   backgroundColor={"rgba(247,247,248, 1)"}
-                  padding={"5px 20px 5px 20px"}
                   border={"1px solid #d9d9e3"}
+                  padding={"5px 20px 5px 20px"}
                   borderRadius={"5px"}
                   cursor={"-webkit-grab"}
+                  transition={"all .4s"}
                 >
                   <Text style={{ color: "black" }}>
-                    Haga clic aquí para comenzar a cargar imagenes o documentos
+                    Haga clic aquí para comenzar a cargar imagenes o
+                    documentos
                   </Text>
                 </Box>
               </label>
@@ -717,76 +737,21 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                 {stringPathToRender.length > 0 && !isUploadingImage && (
                   <React.Fragment>
                     {stringPathToRender.map(
-                      (currentPath: IFilePath, index: number) => {
+                      (currentFilePath: IFilePath, index: number) => {
                         return (
-                          <Box
-                            flexDirection={"column"}
-                            justifyContent={"center"}
-                            alignItems={"center"}
-                            display={"flex"}
-                            marginRight={"20px"}
-                          >
-                            <PopoverComponent
-                              content={
-                                <Box padding={"10px 30px 20px 30px"}>
-                                  <Text style={{ marginBottom: "10px" }}>
-                                    Eliminar imagen
-                                  </Text>
-                                  <Box
-                                    display={"flex"}
-                                    justifyContent={"center"}
-                                    alignItems={"center"}
-                                  >
-                                    <Button
-                                      variant={"solid"}
-                                      colorScheme={"red"}
-                                      borderRadius={"50%"}
-                                      width={"5%"}
-                                      onClick={() =>
-                                        deleteFileFromDirectory(
-                                          currentPathSelected.index
-                                        )
-                                      }
-                                    >
-                                      <DeleteIcon aria-label="register-time" />
-                                    </Button>
-                                  </Box>
-                                </Box>
-                              }
-                              trigger={
-                                <Image
-                                  width={100}
-                                  height={100}
-                                  onClick={() => {
-                                    setCurrentPathSelected({
-                                      name: currentPath.name,
-                                      relativePath: currentPath.relativePath,
-                                      index: index,
-                                    });
-                                  }}
-                                  style={{
-                                    borderRadius: "5px",
-                                    maxHeight: "100px",
-                                    maxWidth: "100px",
-                                  }}
-                                  boxShadow={"0 2px 4px rgba(0, 0, 0, 0.4)"}
-                                  cursor={"-webkit-grab"}
-                                  src={currentPath.relativePath}
-                                />
-                              }
-                            />
-                            <Text style={{ fontSize: "10px" }}>
-                              {currentPath.name}{" "}
-                            </Text>
-                          </Box>
+                          <DraggableImage
+                            currentPath={currentFilePath}
+                            index={index}
+                            setIsDragging={setIsDragging}
+                          />
                         );
                       }
                     )}
                   </React.Fragment>
                 )}
-                {pathImage.length === 0 &&
+                { (stringPathToRender.length === 0 &&
                   !isUploadingImage &&
-                  !isGettingImage && (
+                  !isGettingImage) && (
                     <React.Fragment>
                       <Text style={{ width: "100%", textAlign: "center" }}>
                         Por ahora, la sección de archivos está vacía, pero puede
@@ -809,7 +774,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                     <Progress size="xs" isIndeterminate />
                   </Box>
                 )}
-                {(isGettingImage && !stringPathToRender.length) && (
+                {isGettingImage && !stringPathToRender.length && (
                   <Box
                     paddingLeft={"20px"}
                     paddingRight={"20px"}
@@ -826,6 +791,52 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                 )}
               </Box>
             </React.Fragment>
+
+            <Box
+              ref={drop}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              transform={isDragging ? "translateX(0)" : "translateX(2000px)"}
+              transition={"all .5s"}
+              mb={"20px"}
+              mt={"20px"}
+            >
+              <label>
+                <Box
+                  backgroundColor={
+                    isDragging && isOver ? "#FFCCCC" : "rgba(247,247,248, 1)"
+                  }
+                  border={
+                    isDragging && isOver
+                      ? "1px dotted red"
+                      : "1px solid #d9d9e3"
+                  }
+                  padding={"5px 20px 5px 20px"}
+                  borderRadius={"5px"}
+                  cursor={"-webkit-grab"}
+                  transition={"all .3s"}
+                >
+                  <Box
+                    pt={"10px"}
+                    display={"flex"}
+                    justifyContent={"flex-start"}
+                    alignItems={"center"}
+                  >
+                    <Icon marginRight={"10px"} as={BsFillTrashFill} />
+                    <Text>Eliminar elemento</Text>
+                  </Box>
+
+                  <Text style={{ color: "black", paddingBottom: "10px" }}>
+                    Arrastra documentos e imágenes aquí para eliminarlos <br />
+                    Esta acción es irreversible, así que piénsalo 😨
+                  </Text>
+                </Box>
+              </label>
+            </Box>
           </Box>
         </Modal.Body>
         <Modal.Footer>
@@ -846,7 +857,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                   status: "error",
                   duration: 4000,
                   isClosable: true,
-                  position: "bottom-right"
+                  position: "bottom-right",
                 });
               }
             }}

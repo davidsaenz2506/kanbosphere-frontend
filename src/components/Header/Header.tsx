@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Icon, Tooltip } from "@chakra-ui/react";
+import { Box, Button, Icon, Tooltip } from "@chakra-ui/react";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { TbMoodSearch } from "react-icons/tb";
 import { AiFillFileAdd } from "react-icons/ai";
@@ -18,12 +18,11 @@ interface IHeaderProps {
 }
 
 const Header = (Props: IHeaderProps) => {
-  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } =
-    Props;
+  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } = Props;
 
   return (
     <React.Fragment>
-      <div className="header">
+      <Box className="header">
         <h2
           style={{
             textAlign: "start",
@@ -33,7 +32,7 @@ const Header = (Props: IHeaderProps) => {
             fontSize: "25px",
           }}
         >
-          Tablero Kanban / {currentWorkSpace?.name}
+          {currentWorkSpace?.wspData === undefined ? "Obteniendo datos...": `Tablero Kanban / ${currentWorkSpace?.name}`}
         </h2>
         <h2
           style={{
@@ -44,10 +43,11 @@ const Header = (Props: IHeaderProps) => {
             fontWeight: "initial",
           }}
         >
-          Prefijo de historia {currentWorkSpace?.prefix}
+          {currentWorkSpace?.wspData === undefined ? "Esto puede tardar dependiento de tu conexion": `Prefijo de historia ${currentWorkSpace?.prefix}`}
+          
         </h2>
-      </div>
-      <div style={{ marginRight: "30px" }}>
+      </Box>
+      <Box style={{ marginRight: "30px" }}>
         <Tooltip label="Registrar historia">
           <Button
             sx={{ boxShadow: "rgba(0, 0, 0, 0.2) 0px 3px 8px" }}
@@ -67,7 +67,7 @@ const Header = (Props: IHeaderProps) => {
             <Icon w={5} h={5} as={TbMoodSearch} />
           </Button>
         </Tooltip>
-      </div>
+      </Box>
     </React.Fragment>
   );
 };

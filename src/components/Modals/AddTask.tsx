@@ -119,7 +119,7 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
           currentRoomToken: {
             roomToken: data?._id ?? "",
           },
-        }
+        },
       });
       setIsLoading(false);
     } catch (error) {
@@ -129,7 +129,7 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
         status: "error",
         duration: 4000,
         isClosable: true,
-        position: "bottom-right"
+        position: "bottom-right",
       });
     }
   }
@@ -190,6 +190,7 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
           <FormControl mt={0}>
             <FormLabel>Status</FormLabel>
             <Select
+              menuPosition="fixed"
               options={statusOptions}
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) setStatus(e.label);
@@ -200,6 +201,7 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
           <FormControl mt={0}>
             <FormLabel>Priority</FormLabel>
             <Select
+              menuPosition="fixed"
               options={priorityOptions}
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) setSelectedPriority({ value: e.label, color: e.color });

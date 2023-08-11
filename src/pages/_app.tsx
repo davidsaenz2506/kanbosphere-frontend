@@ -6,6 +6,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { CurrentWorkSpaceProvider } from "@/context/currentWorkSpace/currentWsp.provider";
 import { CurrentUserProvider } from "@/context/currentUser/currentUser.provider";
 import { CurrentContactProvider } from "@/context/currentContacts/currentContacts.provider";
+import { LoadingChunkProvider } from "@/context/loadingChunks/loadingChunk.provider";
 
 const theme = extendTheme({
   colors: {
@@ -31,18 +32,20 @@ const theme = extendTheme({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <CurrentContactProvider>
-      <CurrentUserProvider>
-        <CurrentWorkSpaceProvider>
-          <NextUIProvider>
-            <WspProvider>
-              <ChakraProvider theme={theme}>
-                <Component {...pageProps} />
-              </ChakraProvider>
-            </WspProvider>
-          </NextUIProvider>
-        </CurrentWorkSpaceProvider>
-      </CurrentUserProvider>
-    </CurrentContactProvider>
+    <LoadingChunkProvider>
+      <CurrentContactProvider>
+        <CurrentUserProvider>
+          <CurrentWorkSpaceProvider>
+            <NextUIProvider>
+              <WspProvider>
+                <ChakraProvider theme={theme}>
+                  <Component {...pageProps} />
+                </ChakraProvider>
+              </WspProvider>
+            </NextUIProvider>
+          </CurrentWorkSpaceProvider>
+        </CurrentUserProvider>
+      </CurrentContactProvider>
+    </LoadingChunkProvider>
   );
 }

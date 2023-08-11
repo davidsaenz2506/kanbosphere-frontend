@@ -19,7 +19,6 @@ import {
   Box,
   IconButton,
   Text,
-  useToast,
   Spinner,
   Avatar,
   Badge,
@@ -48,6 +47,7 @@ const PortalUser = () => {
   const computedUserItems = useCurrentUser();
   const [loadingServerData, setLoadingServerData] = useState(false);
   const { setCurrentContacts } = useCurrentContact();
+  const [isTriggerActive, setIsTriggerActive] = useState(false);
 
   const [droppedElement, setDroppedElement] = useState<string | undefined>(
     undefined
@@ -55,32 +55,53 @@ const PortalUser = () => {
 
   const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
-  const toastNotification = useToast();
 
-  const handleNotificationAction = async (index: number, requestData: IUserInvitations): Promise<any> => {
+  const handleNotificationAction = async (
+    index: number,
+    requestData: IUserInvitations
+  ): Promise<any> => {
     setDroppedElement(undefined);
-    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
-    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: any, blockIndex: number) => blockIndex !== index);
+    const currentNotifications: IUserInvitations[] =
+      computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] =
+      currentNotifications.filter(
+        (forgotten: any, blockIndex: number) => blockIndex !== index
+      );
 
     computedUserItems.setCurrentUser({
       ...computedUserItems.currentUser,
       invitations: newNotificationsChunk,
     });
 
-    if (computedUserItems.currentUser._id) await HandleInvitation(computedUserItems.currentUser._id, { ...requestData, method: "accept"});
+    if (computedUserItems.currentUser._id)
+      await HandleInvitation(computedUserItems.currentUser._id, {
+        ...requestData,
+        method: "accept",
+      });
   };
 
-  const handleNotificationDelete = async (index: number, requestData: IUserInvitations): Promise<any> => {
+  const handleNotificationDelete = async (
+    index: number,
+    requestData: IUserInvitations
+  ): Promise<any> => {
     setDroppedElement(undefined);
-    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
-    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: any, blockIndex: number) => blockIndex !== index);
+    const currentNotifications: IUserInvitations[] =
+      computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] =
+      currentNotifications.filter(
+        (forgotten: any, blockIndex: number) => blockIndex !== index
+      );
 
     computedUserItems.setCurrentUser({
       ...computedUserItems.currentUser,
       invitations: newNotificationsChunk,
     });
 
-    if (computedUserItems.currentUser._id) await HandleInvitation(computedUserItems.currentUser._id, { ...requestData, method: "delete"});
+    if (computedUserItems.currentUser._id)
+      await HandleInvitation(computedUserItems.currentUser._id, {
+        ...requestData,
+        method: "delete",
+      });
   };
 
   currentBiridectionalCommunication.emit(
@@ -90,15 +111,18 @@ const PortalUser = () => {
 
   currentBiridectionalCommunication.on("currentDataUpdated", (response) => {
     if (response) {
-        const currentUpdatedWorkspace: IWspUser = response[0];
-        const currentUserWorkspaces: IWspUser[] = userWsps;
-        const modifiedUserWorkspaces: IWspUser[] = currentUserWorkspaces.map((currentBlock: IWspUser) => {
-             if (currentBlock._id === currentUpdatedWorkspace._id) return response[0];
-             return currentBlock;
-        })
+      const currentUpdatedWorkspace: IWspUser = response[0];
+      const currentUserWorkspaces: IWspUser[] = userWsps;
+      const modifiedUserWorkspaces: IWspUser[] = currentUserWorkspaces.map(
+        (currentBlock: IWspUser) => {
+          if (currentBlock._id === currentUpdatedWorkspace._id)
+            return response[0];
+          return currentBlock;
+        }
+      );
 
-        setCurrentWorkSpace(currentUpdatedWorkspace);
-        setUsersWsps(modifiedUserWorkspaces);
+      setCurrentWorkSpace(currentUpdatedWorkspace);
+      setUsersWsps(modifiedUserWorkspaces);
     }
   });
 
@@ -106,7 +130,7 @@ const PortalUser = () => {
     if (response) {
       setUsersWsps(response);
     }
-  })
+  });
 
   React.useEffect(() => {
     async function getUserInfoFromServer() {
@@ -142,7 +166,7 @@ const PortalUser = () => {
   }, []);
 
   React.useEffect(() => {
-    if (computedUserItems.currentUser.userID) getUpdatedWorkspace()
+    if (computedUserItems.currentUser.userID) getUpdatedWorkspace();
   }, [computedUserItems.currentUser.userID]);
 
   async function getUpdatedWorkspace() {
@@ -166,29 +190,6 @@ const PortalUser = () => {
         setLoadingServerData
       );
   }, [computedUserItems.currentUser.userID]);
-
-  React.useEffect(() => {
-    if (query.fridgeKey) {
-      const selectedByRouterQuery = userWsps.filter(
-        (currentDocument) => currentDocument._id === query.fridgeKey
-      );
-
-      if (!selectedByRouterQuery.length) {
-        router.push("/dashboard?briefcase=main");
-        toastNotification({
-          title: "Ups, algo ha ocurrido...",
-          description:
-            "El proyecto al que intenta acceder probablemente se haya eliminado o no existe",
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-        });
-        return;
-      }
-
-      setCurrentWorkSpace(selectedByRouterQuery[0]);
-    }
-  }, [userWsps]);
 
   return (
     <React.Fragment>
@@ -246,8 +247,18 @@ const PortalUser = () => {
                           display={"flex"}
                           alignItems={"center"}
                           justifyContent={"space-between"}
-                          transition={droppedElement !== currentInvitation.workspaceToJoinId ? "none" : "all .5s ease-in-out"}
-                          transform={droppedElement === currentInvitation.workspaceToJoinId ? "translateX(1200px)" : "none"}
+                          transition={
+                            droppedElement !==
+                            currentInvitation.workspaceToJoinId
+                              ? "none"
+                              : "all .5s ease-in-out"
+                          }
+                          transform={
+                            droppedElement ===
+                            currentInvitation.workspaceToJoinId
+                              ? "translateX(1200px)"
+                              : "none"
+                          }
                         >
                           <Box display={"flex"} alignItems={"center"}>
                             <Avatar
@@ -291,7 +302,10 @@ const PortalUser = () => {
                                   currentInvitation.workspaceToJoinId
                                 );
                                 setTimeout(() => {
-                                  handleNotificationAction(index, currentInvitation);
+                                  handleNotificationAction(
+                                    index,
+                                    currentInvitation
+                                  );
                                 }, 500);
                               }}
                             />
@@ -302,9 +316,14 @@ const PortalUser = () => {
                               borderRadius={"20px"}
                               icon={<DeleteIcon />}
                               onClick={() => {
-                                setDroppedElement(currentInvitation.workspaceToJoinId);
+                                setDroppedElement(
+                                  currentInvitation.workspaceToJoinId
+                                );
                                 setTimeout(() => {
-                                  handleNotificationDelete(index, currentInvitation);
+                                  handleNotificationDelete(
+                                    index,
+                                    currentInvitation
+                                  );
                                 }, 500);
                               }}
                             />
@@ -382,14 +401,19 @@ const PortalUser = () => {
         <Box className={styles.principalContainer}>
           <Box className={styles.toolSpace}>
             <Box id="toolSpace" className={styles.toolContainer}>
-              <ToolButtons />
-              <EndBar />
+              <ToolButtons setIsTriggerActive={setIsTriggerActive} />
+              <EndBar setIsTriggerActive={setIsTriggerActive} />
             </Box>
 
             <Box id="resizerTool" className={styles.resizerParticle}></Box>
           </Box>
 
-          <Box id="workSpace" className={styles.workSpace}>
+          <Box
+            id="workSpace"
+            opacity={isTriggerActive ? 0 : 1}
+            transition={!isTriggerActive ? "all .2s" : "none"}
+            className={styles.workSpace}
+          >
             {renderComponent(query, loadingServerData)}
           </Box>
         </Box>

@@ -218,18 +218,14 @@ const GridDataEditor = (Props: ISpreadProps) => {
         }}
         {...CustomCells}
         rowMarkers={
-          currentUserWsp.currentWorkSpace?.wspDataPreferences[
-            "isRowSelectionActive"
-          ]
-            ? "both"
-            : "none"
+          // @ts-ignore
+          currentUserWsp.currentWorkSpace?.wspDataPreferences?.isRowSelectionActive ? "both": "none"
         }
         rows={data.length ?? 0}
         getCellContent={getUserData}
         rowSelectionMode={
-          currentUserWsp.currentWorkSpace?.wspDataPreferences[
-            "isMultipleSelectionActive"
-          ]
+           // @ts-ignore
+          currentUserWsp.currentWorkSpace?.wspDataPreferences?.isMultipleSelectionActive
             ? "multi"
             : "auto"
         }

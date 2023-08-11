@@ -7,6 +7,7 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  Spinner,
 } from "@chakra-ui/react";
 
 import { Button } from "@chakra-ui/react";
@@ -23,9 +24,11 @@ interface IDeleteComponentProps {
 }
 
 const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
-  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
+  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
+    useCurrentWorkspace();
   const ref = useRef(null);
   const { isOpen, setIsLoading, onClose, data } = props;
+  const [isDeletingTask, setIsDeletingTask] = useState<boolean>(false);
 
   async function deleteCurrentTask(currentTask: IDataToDo) {
     let workspaceData: IDataToDo[] | undefined = wspData?.wspData;
@@ -57,18 +60,19 @@ const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
               Eliminar tarea
             </AlertDialogHeader>
 
-            <AlertDialogBody>
+            <AlertDialogBody marginTop={"-20px"} marginBottom={"-20px"}>
               Estas a punto de eliminar la siguiente tarea: {data?.title}
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button onClick={() => onClose(false)}>Cancelar</Button>
+              <Button isDisabled={isDeletingTask} onClick={() => onClose(false)}>Cancelar</Button>
               <Button
+                minW={"100px"}
                 colorScheme="red"
                 ml={3}
                 onClick={async () => {
                   setIsLoading(true);
-                  deleteCurrentTask(props?.data);
+                  setIsDeletingTask(true);
                   await DeleteCard(wspData?._id, {
                     body: { taskId: props.data.taskId },
                     transactionObject: {
@@ -78,11 +82,14 @@ const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
                       },
                     },
                   });
+                  deleteCurrentTask(props?.data);
+
+                  setIsDeletingTask(false);
                   setIsLoading(false);
                   onClose(false);
                 }}
               >
-                Eliminar
+                {isDeletingTask ? <Spinner /> : "Eliminar"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

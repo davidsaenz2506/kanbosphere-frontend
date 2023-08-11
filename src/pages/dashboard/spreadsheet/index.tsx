@@ -72,6 +72,8 @@ import PopoverComponent from "@/components/Popover/General";
 import currentBiridectionalCommunication from "@/services/socket";
 import { sortRowsBySelection } from "@/utilities/sortColumns";
 import Calculator from "@/components/Calculator/components/App/App";
+import { getWorkspaceById } from "@/services/workspaces/getOne";
+import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 
 interface ISpreadGrid {
   wch: number;
@@ -87,8 +89,7 @@ const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentSession = useCurrentUser();
-  const { currentWorkSpace: data, setCurrentWorkSpace: setData } = useCurrentWorkspace();
-  const generalWorkspaceData = useWorkspace();
+  const {setLoadingChunk} = useLoadingChunk();
   const keyCodeFromEnterDown = 13;
   const [isSendingQuery, setIsSendingQuery] = useState<boolean>(false);
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
@@ -101,9 +102,7 @@ const Spreadsheet = () => {
   const [selectedColumnToSort, setSelectedColumnToSort] = useState<ISortColumn[]>([]);
   const [spreadDataHasFilter, setSpreadDataHasFilter] = useState<boolean>(false);
   const todoRefHTMLElement = React.createRef<HTMLElement>();
-  const [spreadSheetData, setSpreadSheetData] = useState<any[]>(
-    currentWorkSpace.currentWorkSpace?.spreadSheetData?.data ?? []
-  );
+  const [spreadSheetData, setSpreadSheetData] = useState<any[]>(currentWorkSpace.currentWorkSpace?.spreadSheetData?.data ?? []);
   const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number[]>([]);
   const [typedQueryFromUser, setTypeQueryFromUser] = useState({
@@ -212,59 +211,42 @@ const Spreadsheet = () => {
     });
   }
 
-  function handleCalculatorResult (result: number) {
-     const currentDataArray: any[] | undefined = currentWorkSpace.currentWorkSpace?.spreadSheetData?.data;
-     const currentCell: Item | undefined = currentSelection?.current?.cell;
-     const columnTitle: string = currentCell ? spreadColumns[currentCell[0]].title : "Default";
-     const newCellValue: number = result;
+  function handleCalculatorResult(result: number) {
+    const currentDataArray: any[] | undefined =
+      currentWorkSpace.currentWorkSpace?.spreadSheetData?.data;
+    const currentCell: Item | undefined = currentSelection?.current?.cell;
+    const columnTitle: string = currentCell
+      ? spreadColumns[currentCell[0]].title
+      : "Default";
+    const newCellValue: number = result;
 
-     if (currentCell && currentDataArray && currentWorkSpace.currentWorkSpace?.spreadSheetData?.userId) {
-        currentDataArray[currentCell[1]][columnTitle] = newCellValue;
-        currentWorkSpace.setCurrentWorkSpace({...currentWorkSpace.currentWorkSpace, spreadSheetData: {
+    if (
+      currentCell &&
+      currentDataArray &&
+      currentWorkSpace.currentWorkSpace?.spreadSheetData?.userId
+    ) {
+      currentDataArray[currentCell[1]][columnTitle] = newCellValue;
+      currentWorkSpace.setCurrentWorkSpace({
+        ...currentWorkSpace.currentWorkSpace,
+        spreadSheetData: {
           ...currentWorkSpace.currentWorkSpace?.spreadSheetData,
-          data: currentDataArray
-      }})
-     }
+          data: currentDataArray,
+        },
+      });
+    }
   }
 
   React.useEffect(() => {
-    if (
-      currentWorkSpace.currentWorkSpace &&
-      currentWorkSpace.currentWorkSpace.spreadSheetData
-    ) {
-      setSpreadSheetData(
-        currentWorkSpace.currentWorkSpace.spreadSheetData.data
-      );
-      setSpreadColumns(
-        currentWorkSpace.currentWorkSpace.spreadSheetData.columns
-      );
-    }
-  }, []);
+    if ( currentWorkSpace.currentWorkSpace && currentWorkSpace.currentWorkSpace.spreadSheetData) {
+      setSpreadSheetData(currentWorkSpace.currentWorkSpace.spreadSheetData.data);
+      setSpreadColumns(currentWorkSpace.currentWorkSpace.spreadSheetData.columns);
 
-  React.useEffect(() => {
-    if (
-      currentWorkSpace.currentWorkSpace &&
-      currentWorkSpace.currentWorkSpace.spreadSheetData
-    ) {
-      setSpreadSheetData(
-        currentWorkSpace.currentWorkSpace.spreadSheetData.data
-      );
-      setSpreadColumns(
-        currentWorkSpace.currentWorkSpace.spreadSheetData.columns
-      );
+      // @ts-ignore
+      setIsMultipleSelectionActive(currentWorkSpace?.currentWorkSpace?.wspDataPreferences?.isMultipleSelectionActive);
+      // @ts-ignore
+      setIsRowSelectionActive(currentWorkSpace?.currentWorkSpace?.wspDataPreferences?.isRowSelectionActive);
     }
-
-    setIsMultipleSelectionActive(
-      currentWorkSpace?.currentWorkSpace?.wspDataPreferences[
-        "isMultipleSelectionActive"
-      ]
-    );
-    setIsRowSelectionActive(
-      currentWorkSpace?.currentWorkSpace?.wspDataPreferences[
-        "isRowSelectionActive"
-      ]
-    );
-  }, [currentWorkSpace.currentWorkSpace?.spreadSheetData?.data]);
+  }, [currentWorkSpace.currentWorkSpace]);
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
@@ -280,20 +262,17 @@ const Spreadsheet = () => {
   });
 
   React.useEffect(() => {
-    const currentWorkSpace: IWspUser | undefined =
-      generalWorkspaceData.userWsps.find(
-        (currentWsp) => currentWsp?._id === data?._id
-      );
-    setData(currentWorkSpace);
-  }, [generalWorkspaceData.userWsps]);
-
-  React.useEffect(() => {
-    const { setCurrentWorkSpace } = currentWorkSpace;
-    const relatedWorkspace: IWspUser[] = generalWorkspaceData.userWsps.filter(
-      (currentRecord: IWspUser) => currentRecord._id === router.query?.fridgeKey
-    );
-    setCurrentWorkSpace(relatedWorkspace[0]);
+    getCurrentWorkspace()
   }, [router.query?.fridgeKey]);
+
+  async function getCurrentWorkspace() {
+    setLoadingChunk(true)
+    const { setCurrentWorkSpace } = currentWorkSpace;
+    const relatedWorkspace: any = await getWorkspaceById(router.query?.fridgeKey?.toString() ?? "");
+
+    if (relatedWorkspace) setCurrentWorkSpace(relatedWorkspace);
+    setLoadingChunk(false)
+  }
 
   return (
     <div
@@ -860,7 +839,9 @@ const Spreadsheet = () => {
                   content={
                     <Box width={"320px"}>
                       <Calculator
-                        onChange={(event: number) => handleCalculatorResult(event)}
+                        onChange={(event: number) =>
+                          handleCalculatorResult(event)
+                        }
                         currentResult={
                           spreadSheetData.length && spreadColumns.length
                             ? spreadSheetData[

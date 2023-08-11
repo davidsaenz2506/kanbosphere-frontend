@@ -310,11 +310,9 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
                           <Image
                             w={"150px"}
                             h={"150px"}
-                            style={{
-                              borderRadius: "5px",
-                            }}
+                            style={{borderRadius: "5px"}}
                             boxShadow={"0 2px 4px rgba(0, 0, 0, 0.4)"}
-                            cursor={"-webkit-grab"}
+                            cursor={"pointer"}
                             src={currentPath.relativePath}
                           />
                         </Box>
