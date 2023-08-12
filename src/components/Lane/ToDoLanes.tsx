@@ -66,7 +66,7 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
               bgColor={backGroundLaneColor}
               setSelectedTasks={props.setSelectedTasks}
               isGettingImage={props.isGettingImage}
-              data={ data?.wspData ? data?.wspData?.filter((instance: any) => instance.status === currentItemMapped[1].filterValue) : [] }
+              data={ data?.container?.wspData ? data?.container?.wspData?.filter((instance: any) => instance.status === currentItemMapped[1].filterValue) : [] }
             />
           );
         })}

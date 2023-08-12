@@ -102,7 +102,7 @@ const Spreadsheet = () => {
   const [selectedColumnToSort, setSelectedColumnToSort] = useState<ISortColumn[]>([]);
   const [spreadDataHasFilter, setSpreadDataHasFilter] = useState<boolean>(false);
   const todoRefHTMLElement = React.createRef<HTMLElement>();
-  const [spreadSheetData, setSpreadSheetData] = useState<any[]>(currentWorkSpace.currentWorkSpace?.spreadSheetData?.data ?? []);
+  const [spreadSheetData, setSpreadSheetData] = useState<any[]>(currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.data ?? []);
   const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number[]>([]);
   const [typedQueryFromUser, setTypeQueryFromUser] = useState({
@@ -174,7 +174,7 @@ const Spreadsheet = () => {
     var objectWithProperties: object = {};
 
     const newComputedColumnsForSheet =
-      currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data.map(
+      currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData?.data.map(
         (currentRow) => {
           const lengthValues = Object.values(currentRow);
           const numberValues: number[] = [];
@@ -212,8 +212,7 @@ const Spreadsheet = () => {
   }
 
   function handleCalculatorResult(result: number) {
-    const currentDataArray: any[] | undefined =
-      currentWorkSpace.currentWorkSpace?.spreadSheetData?.data;
+    const currentDataArray: any[] | undefined = currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.data;
     const currentCell: Item | undefined = currentSelection?.current?.cell;
     const columnTitle: string = currentCell
       ? spreadColumns[currentCell[0]].title
@@ -223,28 +222,32 @@ const Spreadsheet = () => {
     if (
       currentCell &&
       currentDataArray &&
-      currentWorkSpace.currentWorkSpace?.spreadSheetData?.userId
+      currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.userId
     ) {
       currentDataArray[currentCell[1]][columnTitle] = newCellValue;
+    
       currentWorkSpace.setCurrentWorkSpace({
         ...currentWorkSpace.currentWorkSpace,
-        spreadSheetData: {
-          ...currentWorkSpace.currentWorkSpace?.spreadSheetData,
-          data: currentDataArray,
+        container: {
+          ...currentWorkSpace.currentWorkSpace?.container,
+          spreadSheetData: {
+            ...currentWorkSpace.currentWorkSpace?.container?.spreadSheetData,
+            data: currentDataArray
+          },
         },
       });
     }
   }
 
   React.useEffect(() => {
-    if ( currentWorkSpace.currentWorkSpace && currentWorkSpace.currentWorkSpace.spreadSheetData) {
-      setSpreadSheetData(currentWorkSpace.currentWorkSpace.spreadSheetData.data);
-      setSpreadColumns(currentWorkSpace.currentWorkSpace.spreadSheetData.columns);
+    if ( currentWorkSpace.currentWorkSpace && currentWorkSpace.currentWorkSpace.container.spreadSheetData) {
+      setSpreadSheetData(currentWorkSpace.currentWorkSpace.container.spreadSheetData.data);
+      setSpreadColumns(currentWorkSpace.currentWorkSpace.container.spreadSheetData.columns);
 
       // @ts-ignore
-      setIsMultipleSelectionActive(currentWorkSpace?.currentWorkSpace?.wspDataPreferences?.isMultipleSelectionActive);
+      setIsMultipleSelectionActive(currentWorkSpace?.currentWorkSpace?.container?.containerPreferences?.isMultipleSelectionActive);
       // @ts-ignore
-      setIsRowSelectionActive(currentWorkSpace?.currentWorkSpace?.wspDataPreferences?.isRowSelectionActive);
+      setIsRowSelectionActive(currentWorkSpace?.currentWorkSpace?.container?.containerPreferences?.isRowSelectionActive);
     }
   }, [currentWorkSpace.currentWorkSpace]);
 
@@ -268,8 +271,7 @@ const Spreadsheet = () => {
   async function getCurrentWorkspace() {
     setLoadingChunk(true)
     const { setCurrentWorkSpace } = currentWorkSpace;
-    const relatedWorkspace: any = await getWorkspaceById(router.query?.fridgeKey?.toString() ?? "");
-
+    const relatedWorkspace: any = await getWorkspaceById(router.query?.fridgeKey?.toString() ?? "", currentBiridectionalCommunication.id, currentSession.currentUser._id ?? "");
     if (relatedWorkspace) setCurrentWorkSpace(relatedWorkspace);
     setLoadingChunk(false)
   }
@@ -337,7 +339,7 @@ const Spreadsheet = () => {
                         typedQueryFromUser.query === undefined
                       ) {
                         setSpreadSheetData(
-                          currentWorkSpace?.currentWorkSpace?.spreadSheetData
+                          currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData
                             ?.data ?? []
                         );
                         setSpreadDataHasFilter(false);
@@ -484,7 +486,7 @@ const Spreadsheet = () => {
                   borderRight={"1px solid #dddddd"}
                   onClick={() =>
                     setSpreadSheetData(
-                      currentWorkSpace?.currentWorkSpace?.spreadSheetData
+                      currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData
                         ?.data ?? []
                     )
                   }
@@ -598,9 +600,7 @@ const Spreadsheet = () => {
                       if (currentWorkSpace.currentWorkSpace) {
                         const workspaceToModify: IWspUser =
                           currentWorkSpace.currentWorkSpace;
-                        workspaceToModify.wspDataPreferences[
-                          "isRowSelectionActive"
-                        ] = e.target.checked;
+                          workspaceToModify.container.containerPreferences["isRowSelectionActive"] = e.target.checked;
                         currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
                       }
                     }}
@@ -616,14 +616,14 @@ const Spreadsheet = () => {
               <Box display={"flex"} alignItems={"center"} marginRight={"10px"}>
                 <Badge colorScheme="purple">
                   {
-                    currentWorkSpace.currentWorkSpace?.spreadSheetData?.data
+                    currentWorkSpace.currentWorkSpace?.container.spreadSheetData?.data
                       .length
                   }{" "}
                   rows{" "}
                 </Badge>
                 <Badge marginLeft={"5px"} colorScheme="orange">
                   {
-                    currentWorkSpace.currentWorkSpace?.spreadSheetData?.columns
+                    currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.columns
                       .length
                   }{" "}
                   columns{" "}
@@ -671,17 +671,13 @@ const Spreadsheet = () => {
                   currentSelection?.columns["items"].length ? false : true
                 }
                 onClick={() => {
-                  const currentColumns: IColumnProjection[] =
-                    currentWorkSpace.currentWorkSpace?.spreadSheetData
-                      ?.columns ?? [];
-                  const currentColumnSelected =
-                    currentSelection?.columns["items"][0][0];
-                  const modifiedWorkspaceTarget: Partial<IWspUser> =
-                    currentWorkSpace.currentWorkSpace ?? {};
+                  const currentColumns: IColumnProjection[] = currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.columns ?? [];
+                  const currentColumnSelected = currentSelection?.columns["items"][0][0];
+                  const modifiedWorkspaceTarget: Partial<IWspUser> = currentWorkSpace.currentWorkSpace ?? {};
                   currentColumns.splice(currentColumnSelected, 1);
-                  modifiedWorkspaceTarget.spreadSheetData =
-                    currentWorkSpace.currentWorkSpace?.spreadSheetData;
 
+                  if (modifiedWorkspaceTarget.container?.spreadSheetData) modifiedWorkspaceTarget.container.spreadSheetData = currentWorkSpace.currentWorkSpace?.container?.spreadSheetData;
+                  
                   sendNewColumnsToServer(
                     currentWorkSpace,
                     currentSession,
@@ -764,11 +760,8 @@ const Spreadsheet = () => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setIsMultipleSelectionActive(e.target.checked);
                     if (currentWorkSpace.currentWorkSpace) {
-                      const workspaceToModify: IWspUser =
-                        currentWorkSpace.currentWorkSpace;
-                      workspaceToModify.wspDataPreferences[
-                        "isMultipleSelectionActive"
-                      ] = e.target.checked;
+                      const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
+                      workspaceToModify.container.containerPreferences["isMultipleSelectionActive"] = e.target.checked;
                       currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
                     }
                   }}

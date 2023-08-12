@@ -9,7 +9,7 @@ export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext,
   const currentWorkspaces: IWspUser[] = userWorkspaces?.userWsps ?? [];
   const newSpreadsheetData: ISpreadSheet = {
     userId:
-      currentWorkspaceData?.spreadSheetData?.userId ??
+      currentWorkspaceData?.container?.spreadSheetData?.userId ??
       currentUser.currentUser.userID,
     columns: userColumns,
     data: data,
@@ -29,7 +29,10 @@ export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext,
   if (currentWorkspaceData) {
     currentUserWsp.setCurrentWorkSpace({
       ...currentWorkspaceData,
-      spreadSheetData: newSpreadsheetData,
+      container: {
+        ...currentWorkspaceData.container,
+        spreadSheetData: newSpreadsheetData
+      }
     });
 
     userWorkspaces?.setUsersWsps(allWorkspacesWithModification);

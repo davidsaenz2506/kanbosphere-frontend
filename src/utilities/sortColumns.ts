@@ -5,7 +5,7 @@ export function sortRowsBySelection(spreadSheetData: any[], setSpreadSheetData: 
     const currentUnsortedSpreadData = spreadSheetData;
 
     if (selectedColumnToSort.length === 0) {
-        setSpreadSheetData(currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data ?? []);
+        setSpreadSheetData(currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData?.data ?? []);
         return;
     }
 

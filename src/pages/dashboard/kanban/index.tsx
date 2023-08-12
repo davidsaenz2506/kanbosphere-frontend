@@ -25,18 +25,20 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { getWorkspaceById } from "@/services/workspaces/getOne";
 import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
+import currentBiridectionalCommunication from "@/services/socket";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const { userWsps } = useWorkspace();
+  const { currentUser } = useCurrentUser();
   const { setLoadingChunk } = useLoadingChunk();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const [currentColor, setCurrentColor] = useState<string>("#FAFAFA");
   const [isGettingImage, setIsGettingImage] = useState<boolean>(false);
   const currentCardHolderElement: HTMLElement | null = document.getElementById("cardHolder");
   const [currentCardHolderHeight, setCurrentCardHolderHeight] = useState<number | undefined>(currentCardHolderElement?.getBoundingClientRect().height);
-  const [triggerToChangeOpacity, setTriggerToChangeOpacity] = useState<boolean | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingOrDeleting, setIsSendingOrDeleting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -128,9 +130,7 @@ const ToDoWorkspace = () => {
     }
   }, [selectedTask?.file]);
 
-  async function getFileDataFromFirebase(
-    currentStorageRefsMatrix: StorageReference[]
-  ) {
+  async function getFileDataFromFirebase(currentStorageRefsMatrix: StorageReference[]) {
     const currentUrlData: IFilePath[] = [];
     setIsGettingImage(true);
     try {
@@ -157,24 +157,20 @@ const ToDoWorkspace = () => {
 
   React.useEffect(() => {
     // @ts-ignore
-    setSelectedTask(currentWorkSpace?.wspData?.filter((currentRecord) => currentRecord?.taskId === currentWorkSpace?.wspDataPreferences?.selectedTask)[0]);
+    setSelectedTask(currentWorkSpace?.container?.wspData?.filter((currentRecord) => currentRecord?.taskId === currentWorkSpace?.container.containerPreferences?.selectedTask)[0]);
   }, [currentWorkSpace]);
   
   React.useEffect(() => {
-      getWorkspaceData()
-      setTimeout(() => {
-         setTriggerToChangeOpacity(true);
-      }, 1000)
-    }, [currentWorkSpace?._id]);
+    // @ts-ignore
+    getWorkspaceData(router.query.fridgeKey)
+  }, [router.query.fridgeKey]);
 
-  async function getWorkspaceData () {
-    if (currentWorkSpace?._id) {
+  async function getWorkspaceData (fridgeKey: string) {
+    if (fridgeKey && router.query.briefcase === "agile") {
       setLoadingChunk(true);
-      const workspaceData: IWspUser | undefined = await getWorkspaceById(currentWorkSpace?._id);
-      if (currentWorkSpace?._id === workspaceData?._id) {
-        if (workspaceData) setCurrentWorkSpace(workspaceData);
-        setLoadingChunk(false);
-      } 
+      const workspaceData: IWspUser | undefined = await getWorkspaceById(fridgeKey ?? "", currentBiridectionalCommunication.id, currentUser._id ?? "");
+      if (workspaceData) setCurrentWorkSpace(workspaceData);
+      setLoadingChunk(false);   
     }
   }
 

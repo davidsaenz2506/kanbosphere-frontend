@@ -56,7 +56,10 @@ const MiniCard = (Props: IMiniCardProps) => {
 
   async function sendToServerTask() {
     await UpdateWorkSpace(currentWorkSpace?._id, {
-      body: { wspDataPreferences: { selectedTask: item.taskId }},
+      body: { container: {
+        ...currentWorkSpace?.container,
+        containerPreferences: { selectedTask: item.taskId }
+      }},
       transactionObject: {
         currentRoomToken: { roomToken: currentWorkSpace?._id ?? ""},
         currentUserSocketId: currentBiridectionalCommunication.id
@@ -89,7 +92,13 @@ const MiniCard = (Props: IMiniCardProps) => {
             setSelectedTasks(item);
 
             // @ts-ignore
-            setCurrentWorkSpace({ ...currentWorkSpace, wspDataPreferences: { selectedTask: item.taskId }});
+            setCurrentWorkSpace({ ...currentWorkSpace, container: { 
+               ...currentWorkSpace?.container,
+               containerPreferences: {
+                ...currentWorkSpace?.container.containerPreferences,
+                selectedTask: item.taskId
+               }
+             }});
             sendToServerTask();
           }
         }}

@@ -246,7 +246,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
 
   async function editCurrentTask(currentTask: any) {
     const currentWorkSpace: IWspUser | undefined = wspData;
-    let workspaceData: IDataToDo[] | undefined = wspData?.wspData;
+    let workspaceData: IDataToDo[] | undefined = wspData?.container?.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
     workspaceData?.forEach((task, index) => {
@@ -254,7 +254,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
         workspaceData[index] = currentTaskUser;
     });
 
-    if (currentWorkSpace?.wspData) currentWorkSpace.wspData = workspaceData;
+    if (currentWorkSpace?.container?.wspData) currentWorkSpace.container.wspData = workspaceData;
 
     setUserTasks(currentWorkSpace);
   }
@@ -650,8 +650,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                       inputComputedReader.onload = async () => {
                         if (inputComputedReader.result) {
                           try {
-                            const uniqueIdFactoryResult: string =
-                              uniqueIdFactory();
+                            const uniqueIdFactoryResult: string = uniqueIdFactory();
                             const newPathToFiles: string = `/users/${currentUser._id}/booklets/agile/${wspData?._id}/records/${data?.taskId}/${uniqueIdFactoryResult}`;
                             const provitionalUploadReference: StorageReference =
                               refStorageObject(storage, newPathToFiles);

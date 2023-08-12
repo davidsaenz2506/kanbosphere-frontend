@@ -52,7 +52,7 @@ export interface ISelectColorOptions {
 const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   const currentWorkspace = useCurrentWorkspace();
   const maxOrderValue: number | undefined =
-    currentWorkspace?.currentWorkSpace?.spreadSheetData?.columns.reduce(
+    currentWorkspace?.currentWorkSpace?.container?.spreadSheetData?.columns.reduce(
       (max, column) => Math.max(max, column.order),
       0
     );
@@ -126,7 +126,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
       currentWorkspace.currentWorkSpace;
 
     if (unmodifiedWorkspace) {
-      unmodifiedWorkspace.spreadSheetData = currentSpreadData;
+      unmodifiedWorkspace.container.spreadSheetData = currentSpreadData;
       currentWorkspace.setCurrentWorkSpace(unmodifiedWorkspace);
     }
 
@@ -153,9 +153,9 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
   }, [triggerPointer]);
 
   React.useEffect(() => {
-    if (currentWorkspace.currentWorkSpace?.spreadSheetData) {
+    if (currentWorkspace.currentWorkSpace?.container?.spreadSheetData) {
       setColumnsSuitableForComposition(
-        currentWorkspace?.currentWorkSpace?.spreadSheetData.columns
+        currentWorkspace?.currentWorkSpace?.container?.spreadSheetData.columns
           .filter((currentProjection) => currentProjection.type === "number")
           .map((currentProjection) => {
             return {

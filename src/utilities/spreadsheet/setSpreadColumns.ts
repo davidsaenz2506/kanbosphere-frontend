@@ -11,13 +11,13 @@ export function setSpreadColumns(
 ) {
   let newUserRows: [] = [];
 
-  if (data.spreadSheetData?.data) {
-    const dataMatrix = data.spreadSheetData?.data;
+  if (data.container.spreadSheetData?.data) {
+    const dataMatrix = data.container.spreadSheetData?.data;
 
-    let newSpreadData = data.spreadSheetData;
+    let newSpreadData = data.container.spreadSheetData;
 
     dataMatrix.forEach((individualRow: object) => {
-      data.spreadSheetData?.columns.forEach((userColumn) => {
+      data.container.spreadSheetData?.columns.forEach((userColumn) => {
         if (!individualRow.hasOwnProperty(userColumn?.title)) {
           individualRow[userColumn?.title] = "";
         }
@@ -29,7 +29,10 @@ export function setSpreadColumns(
     newSpreadData.data = newUserRows;
     setUserTasks({
       ...data,
-      spreadSheetData: newSpreadData,
+      container: {
+        ...data.container,
+        spreadSheetData: newSpreadData
+      }
     });
   }
 
@@ -42,11 +45,11 @@ export function setSpreadColumns(
 
   performanceWorkspaces.setUsersWsps(updatedWorkspaces);
 
-  if (data.spreadSheetData) {
+  if (data.container.spreadSheetData) {
     setCurrentSpreadData({
-      columns: [...(data?.spreadSheetData.columns), newColumn],
+      columns: [...(data?.container.spreadSheetData.columns), newColumn],
       data: newUserRows,
-      userId: data.spreadSheetData?.userId ?? data.createdById,
+      userId: data.container.spreadSheetData?.userId ?? data.createdById,
     });
   }
 

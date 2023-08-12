@@ -34,16 +34,20 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
     if (title === "agile") {
       newWorkspaceToCreate.createdDate = DateTime.now().toString();
       newWorkspaceToCreate.name = nameValue;
-      newWorkspaceToCreate.wspData = [];
-      newWorkspaceToCreate.wspDataPreferences = { selectedTask: null };
-      newWorkspaceToCreate.prefix = currentPrefix;
       newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
       newWorkspaceToCreate.type = title;
       newWorkspaceToCreate.collaborators = [{
-        _id: currentUserInfo.currentUser._id,
+        _id: currentUserInfo.currentUser._id ?? "",
         name: currentUserInfo.currentUser.username,
         role: "HOST"
       }]
+      newWorkspaceToCreate.container = {
+         wspData: [],
+         containerPreferences: {
+            prefix: currentPrefix,
+            selectedTask: null,
+         }
+      }
     }
 
     if (title === "spreadsheet") {
@@ -51,21 +55,23 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
       newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
       newWorkspaceToCreate.type = title;
       newWorkspaceToCreate.name = nameValue;
-      newWorkspaceToCreate.spreadSheetData = {
-        columns: [],
-        data: [],
-        userId: currentUserInfo.currentUser.userID,
-      };
-      newWorkspaceToCreate.wspDataPreferences = {
-        isRowSelectionActive: true,
-        isMultipleSelectionActive: false,
-        freezedColumns: 0,
-      };
       newWorkspaceToCreate.collaborators = [{
-        _id: currentUserInfo.currentUser._id,
+        _id: currentUserInfo.currentUser._id ?? "",
         name: currentUserInfo.currentUser.username,
         role: "HOST"
       }]
+      newWorkspaceToCreate.container = {
+         spreadSheetData: {
+            columns: [],
+            data: [],
+            userId: currentUserInfo.currentUser.userID,
+         },
+         containerPreferences: {
+            isRowSelectionActive: true,
+            isMultipleSelectionActive: false,
+            freezedColumns: 0,
+         }
+      }
     }
 
     const createdWorkspace = await CreateWorkSpaces(newWorkspaceToCreate);

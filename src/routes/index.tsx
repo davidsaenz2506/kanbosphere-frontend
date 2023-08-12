@@ -1,14 +1,10 @@
 import UserWorkSpace from "@/components/UserWorkspace/UserWorkSpace";
-import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { BalanceUser } from "@/pages/dashboard/balance";
 import UserConfig from "@/pages/dashboard/config/UserConfig";
 import { ContactUser } from "@/pages/dashboard/contact";
 import ToDoWorkspace from "@/pages/dashboard/kanban";
 import { MainLoad } from "@/pages/dashboard/main";
 import Spreadsheet from "@/pages/dashboard/spreadsheet";
-import { NextRouter, useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import React from "react";
 import { ReactNode } from "react";

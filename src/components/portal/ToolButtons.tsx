@@ -66,10 +66,12 @@ const ToolButtons = ({setIsTriggerActive}) => {
   async function handleRouterPath (caseUrl: string) { 
        setIsTriggerActive(true)
 
-       currentWorkSpace.setCurrentWorkSpace(undefined);
        setCurrentSelected("");
        router.push(`/dashboard?briefcase=${caseUrl}`);
-       await delayTime(200);
+       await delayTime(150);
+
+       currentWorkSpace.setCurrentWorkSpace(undefined);
+       await delayTime(66);
 
        setIsTriggerActive(false)
   }
@@ -228,15 +230,13 @@ const ToolButtons = ({setIsTriggerActive}) => {
                         setIsTriggerActive(true);
                         setCurrentSelected(todoWorkspace._id);
 
-                        currentWorkSpace.setCurrentWorkSpace(undefined);
-                        await delayTime(66);
-
                         router.push(`/dashboard?briefcase=${todoWorkspace.type}&fridgeKey=${todoWorkspace._id}`);
+                        await delayTime(150);
+
+                        currentWorkSpace.setCurrentWorkSpace(undefined);
                         await delayTime(66);
               
                         setIsTriggerActive(false);
-                        await delayTime(66);
-
                     }}
                   >
                     <Box

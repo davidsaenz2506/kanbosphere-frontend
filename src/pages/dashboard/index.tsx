@@ -112,23 +112,7 @@ const PortalUser = () => {
   currentBiridectionalCommunication.on("currentDataUpdated", (response) => {
     if (response) {
       const currentUpdatedWorkspace: IWspUser = response[0];
-      const currentUserWorkspaces: IWspUser[] = userWsps;
-      const modifiedUserWorkspaces: IWspUser[] = currentUserWorkspaces.map(
-        (currentBlock: IWspUser) => {
-          if (currentBlock._id === currentUpdatedWorkspace._id)
-            return response[0];
-          return currentBlock;
-        }
-      );
-
       setCurrentWorkSpace(currentUpdatedWorkspace);
-      setUsersWsps(modifiedUserWorkspaces);
-    }
-  });
-
-  currentBiridectionalCommunication.on("userWorkspacesUpdated", (response) => {
-    if (response) {
-      setUsersWsps(response);
     }
   });
 

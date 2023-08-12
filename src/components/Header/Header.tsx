@@ -18,7 +18,8 @@ interface IHeaderProps {
 }
 
 const Header = (Props: IHeaderProps) => {
-  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } = Props;
+  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } =
+    Props;
 
   return (
     <React.Fragment>
@@ -32,7 +33,9 @@ const Header = (Props: IHeaderProps) => {
             fontSize: "25px",
           }}
         >
-          {currentWorkSpace?.wspData === undefined ? "Obteniendo datos...": `Tablero Kanban / ${currentWorkSpace?.name}`}
+          {currentWorkSpace?.container?.wspData === undefined
+            ? "Obteniendo datos..."
+            : `Tablero Kanban / ${currentWorkSpace?.name}`}
         </h2>
         <h2
           style={{
@@ -43,8 +46,10 @@ const Header = (Props: IHeaderProps) => {
             fontWeight: "initial",
           }}
         >
-          {currentWorkSpace?.wspData === undefined ? "Esto puede tardar dependiento de tu conexion": `Prefijo de historia ${currentWorkSpace?.prefix}`}
-          
+          {currentWorkSpace?.container?.wspData === undefined
+            ? "Esto puede tardar dependiento de tu conexion"
+            // @ts-ignore
+            : `Prefijo de historia ${currentWorkSpace.container.containerPreferences?.prefix}`}
         </h2>
       </Box>
       <Box style={{ marginRight: "30px" }}>

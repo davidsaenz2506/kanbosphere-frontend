@@ -2,36 +2,24 @@ import React from "react";
 import styles from "../../styles/interfaces/pages/userwsp.module.css";
 
 import Cards from "../Cards/Cards";
+import { Box, Text } from "@chakra-ui/react";
 
 const UserWorkSpace = () => {
   return (
-    <div className={styles.principalContainer}>
-      <div
-        className="header"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column"
-        }}
+    <Box className={styles.principalContainer}>
+      <Text
+        fontSize={"30px"}
+        marginLeft={"20px"}
+        marginTop={"-10px"}
+        marginBottom={"10px"}
+        paddingBottom={"5px"}
+        textAlign={"start"}
+        borderBottom={"2px dashed  #d9d9e3"}
       >
-        <h2
-          style={{
-            fontSize: "40px",
-            marginTop: "20px",
-            fontWeight: "bold",
-            marginBottom: "10px",
-          }}
-        >
-          ¿Que espacio de trabajo deseas utilizar?
-        </h2>
-        <p>
-          Puedes escoger cualquiera de los siguientes espacios de trabajo y
-          guardarlos en tu carpeta de Workspaces en Toolbar Space
-        </p>
-      </div>
+        Empieza a configurar tu contenedor 🚀
+      </Text>
       <Cards />
-    </div>
+    </Box>
   );
 };
 

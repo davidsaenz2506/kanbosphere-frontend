@@ -69,7 +69,8 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
     color: "",
   });
 
-  const title = `${data?.prefix}-${formatedValue}`;
+  // @ts-ignore
+  const title = `${data?.container?.containerPreferences?.prefix}-${formatedValue}`;
 
   const [task, setTask] = useState<IDataToDo>({
     userId: "1000933190",
@@ -104,7 +105,7 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
   async function addTaskToWorkSpace(userTask: IDataToDo) {
     try {
       setIsLoading(true);
-      let workspaceData: IDataToDo[] | undefined = data?.wspData;
+      let workspaceData: IDataToDo[] | undefined = data?.container?.wspData;
       let newTask: IDataToDo = userTask;
 
       if (workspaceData) workspaceData.push(newTask);

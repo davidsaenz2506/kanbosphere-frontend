@@ -20,9 +20,6 @@ import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook"
 import { UpdateCard } from "@/services/workspaces/updateCard";
 import currentBiridectionalCommunication from "@/services/socket";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
-import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
-import { IWspContext } from "@/context/usersWorkSpaces/wsp.context";
-import { handleAndUpdateAllWorkspacesAfterDatabaseChange } from "@/utilities/updateAllWorkspaces";
 import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 
 const statusColorValues = {
@@ -50,7 +47,7 @@ const LaneComponent = ({
     drop: async (item: { type: string; item: IDataToDo }) => {
       if (item.item.status !== instance) {
         const currentWorkspaceData: IDataToDo[] | undefined =
-          currentWorkSpace?.wspData;
+          currentWorkSpace?.container.wspData;
         const modifiedWorkspaceData: IDataToDo[] | undefined =
           currentWorkspaceData?.map((currentRecord) =>
             currentRecord.taskId === item.item.taskId
@@ -65,7 +62,11 @@ const LaneComponent = ({
         // @ts-ignore
         const modifiedWorkspace: IWspUser | undefined = {
           ...currentWorkSpace,
-          wspData: modifiedWorkspaceData,
+          // @ts-ignore
+          container: {
+            ...currentWorkSpace?.container,
+            wspData: modifiedWorkspaceData
+          },
         };
 
         // @ts-ignore
@@ -114,7 +115,7 @@ const LaneComponent = ({
           width: "250px",
           minWidth: "250px",
           backgroundColor: bgColor,
-          overflowY: currentWorkSpace?.wspData === undefined ? "hidden" : "auto",
+          overflowY: currentWorkSpace?.container?.wspData === undefined ? "hidden" : "auto",
           zIndex: 1,
           boxShadow: "rgba(0, 0, 0, 0.15) 0px 3px 8px;",
           height: "100%",
@@ -161,7 +162,7 @@ const LaneComponent = ({
               : bgColor,
           }}
         >
-          {(currentWorkSpace?.wspData === undefined) &&
+          {(currentWorkSpace?.container?.wspData === undefined) &&
             Array.from({ length: skeletonAmount }, (_, index) => index + 1).map(
               (_: number) => {
                 return (

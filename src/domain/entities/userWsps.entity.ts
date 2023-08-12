@@ -2,6 +2,7 @@ import { ISpreadSheet } from "./spreadsheet.entity";
 import { IDataToDo, ITransactionData } from "./todo.entity";
 
 export interface IAgilePreferences {
+    prefix?: string;
     selectedTask: string | null
 }
 
@@ -12,9 +13,15 @@ export interface ISpreadSheetPreferences {
 }
 
 export interface ICollaborators {
-    _id?: string;
+    _id: string;
     name: string;
     role: string;
+}
+
+export interface IContainer {
+    containerPreferences: IAgilePreferences | ISpreadSheetPreferences;
+    wspData?: IDataToDo[];
+    spreadSheetData?: ISpreadSheet;
 }
 
 export interface IWspUser {
@@ -23,11 +30,8 @@ export interface IWspUser {
     createdDate: Date;
     createdById: string;
     type: string;
+    container: IContainer;
     collaborators: ICollaborators[];
-    prefix?: string;
-    wspData?: IDataToDo[];
-    wspDataPreferences: IAgilePreferences | ISpreadSheetPreferences;
-    spreadSheetData?: ISpreadSheet;
 }
 
 export interface ITransactionWorkspace {

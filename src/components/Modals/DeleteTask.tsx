@@ -24,14 +24,13 @@ interface IDeleteComponentProps {
 }
 
 const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
-  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
-    useCurrentWorkspace();
+  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
   const ref = useRef(null);
   const { isOpen, setIsLoading, onClose, data } = props;
   const [isDeletingTask, setIsDeletingTask] = useState<boolean>(false);
 
   async function deleteCurrentTask(currentTask: IDataToDo) {
-    let workspaceData: IDataToDo[] | undefined = wspData?.wspData;
+    let workspaceData: IDataToDo[] | undefined = wspData?.container?.wspData;
     let currentTaskUser: IDataToDo = currentTask;
 
     let modifiedWorkSpaceData = workspaceData?.map((task, index) => {

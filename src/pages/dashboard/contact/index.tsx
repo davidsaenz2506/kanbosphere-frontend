@@ -56,19 +56,11 @@ export const ContactUser = () => {
   const [isAcceptingRequest, setIsAcceptingRequest] = useState(false);
   const [isSendingInvitation, setIsSendingInvitation] = useState(false);
   const [isDeletingFriend, setIsDeletingFriend] = useState(false);
-  const [workspacesToShare, setWorkspacesToShare] = useState(
-    workspaces.userWsps
-  );
-  const [relatedUsers, setRelatedUsers] = useState<ICurrentUser[] | undefined>(
-    []
-  );
+  const [workspacesToShare, setWorkspacesToShare] = useState(workspaces.userWsps);
+  const [relatedUsers, setRelatedUsers] = useState<ICurrentUser[] | undefined>([]);
   const [currentQuery, setCurrentQuery] = useState("");
-  const [friends, setFriends] = useState(
-    currentContact.currentContacts?.friends
-  );
-  const [requests, setRequests] = useState(
-    currentContact.currentContacts?.requests
-  );
+  const [friends, setFriends] = useState(currentContact.currentContacts?.friends);
+  const [requests, setRequests] = useState(currentContact.currentContacts?.requests);
 
   const { isOpen, onToggle, onClose } = useDisclosure();
 

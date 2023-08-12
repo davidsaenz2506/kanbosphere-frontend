@@ -3,16 +3,19 @@ import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
 export async function deleteGridRow(rowIndex: number[] | undefined, currentWorkSpace: ICurrentWspContext, toastNotification: any) {
     try {
-        const spreadData = currentWorkSpace?.currentWorkSpace?.spreadSheetData?.data ?? [];
+        const spreadData = currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData?.data ?? [];
         const currentRowIndex: number[] | undefined = rowIndex;
 
-        let newSpreadData: ISpreadSheet | undefined = currentWorkSpace?.currentWorkSpace?.spreadSheetData;
+        let newSpreadData: ISpreadSheet | undefined = currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData;
 
         const filteredDataSheet: any = spreadData.filter((item, index: number) => !currentRowIndex?.includes(index));
 
         if (newSpreadData) newSpreadData.data = filteredDataSheet;
 
-        if (currentWorkSpace.currentWorkSpace) currentWorkSpace.setCurrentWorkSpace({ ...currentWorkSpace.currentWorkSpace, spreadSheetData: newSpreadData});
+        if (currentWorkSpace.currentWorkSpace) currentWorkSpace.setCurrentWorkSpace({ ...currentWorkSpace.currentWorkSpace, container: {
+            ...currentWorkSpace.currentWorkSpace.container,
+            spreadSheetData: newSpreadData
+        }});
 
 
     } catch (error) {

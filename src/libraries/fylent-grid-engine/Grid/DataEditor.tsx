@@ -63,7 +63,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   const [userSelection, setUserSelection] = React.useState<GridSelection>(selection);
   const [userColumns, setUserColumns] = React.useState<IColumnProjection[]>(
-    currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns ?? []
+    currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns ?? []
   );
 
   const CustomCells = useCustomCells([
@@ -76,12 +76,12 @@ const GridDataEditor = (Props: ISpreadProps) => {
   ]);
 
   React.useEffect(() => {
-    if (currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns) {
-      const sortedColumns: IColumnProjection[] = currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns.sort((a, b) => a.order - b.order);
+    if (currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns) {
+      const sortedColumns: IColumnProjection[] = currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns.sort((a, b) => a.order - b.order);
       setUserColumns(sortedColumns);
     }
   }, [
-    currentUserWsp?.currentWorkSpace?.spreadSheetData?.columns,
+    currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns,
     internalTriggerPointer,
   ]);
 
@@ -123,7 +123,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
       currentUserWsp,
       currentUser,
       assignNewOrderValues,
-      currentUserWsp.currentWorkSpace?.spreadSheetData?.data,
+      currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data,
       currentUserWorkspaces
     );
   };
@@ -133,7 +133,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
       const validationExportedFromUtils: boolean = await editGridCell(
         cell,
         userColumns,
-        currentUserWsp.currentWorkSpace?.spreadSheetData?.data,
+        currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data,
         newValue,
         currentUserWsp
       );
@@ -207,7 +207,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
             currentUserWsp,
             currentUser,
             userColumns,
-            currentUserWsp.currentWorkSpace?.spreadSheetData?.data,
+            currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data,
             currentUserWorkspaces
           )
         }
@@ -219,13 +219,13 @@ const GridDataEditor = (Props: ISpreadProps) => {
         {...CustomCells}
         rowMarkers={
           // @ts-ignore
-          currentUserWsp.currentWorkSpace?.wspDataPreferences?.isRowSelectionActive ? "both": "none"
+          currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isRowSelectionActive ? "both": "none"
         }
         rows={data.length ?? 0}
         getCellContent={getUserData}
         rowSelectionMode={
            // @ts-ignore
-          currentUserWsp.currentWorkSpace?.wspDataPreferences?.isMultipleSelectionActive
+          currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isMultipleSelectionActive
             ? "multi"
             : "auto"
         }
