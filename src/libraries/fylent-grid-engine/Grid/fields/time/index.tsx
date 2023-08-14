@@ -19,7 +19,9 @@ interface TimePickerCellProps {
 const tagHeight = 25;
 const innerPad = 12;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function TopEditor(p: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cell: any = p.value;
   const currentValue: string = cell.data.time;
 
@@ -46,6 +48,7 @@ export type TimePickerCell = CustomCell<TimePickerCellProps>;
 const renderer: CustomRenderer<TimePickerCell> = {
   kind: GridCellKind.Custom,
   isMatch: (cell: CustomCell): cell is TimePickerCell => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (cell.data as any).type === "time";
   },
 

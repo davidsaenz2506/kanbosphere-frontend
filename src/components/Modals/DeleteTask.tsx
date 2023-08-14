@@ -24,24 +24,32 @@ interface IDeleteComponentProps {
 }
 
 const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
-  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
+  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
+    useCurrentWorkspace();
   const ref = useRef(null);
   const { isOpen, setIsLoading, onClose, data } = props;
   const [isDeletingTask, setIsDeletingTask] = useState<boolean>(false);
 
   async function deleteCurrentTask(currentTask: IDataToDo) {
-    let workspaceData: IDataToDo[] | undefined = wspData?.container?.wspData;
-    let currentTaskUser: IDataToDo = currentTask;
+    const workspaceData: IDataToDo[] | undefined = wspData?.container?.wspData;
+    const currentTaskUser: IDataToDo = currentTask;
 
-    let modifiedWorkSpaceData = workspaceData?.map((task, index) => {
+    const modifiedWorkSpaceData = workspaceData?.map((task, index) => {
       if (task.taskId === currentTaskUser.taskId) {
         workspaceData?.splice(index, 1);
       }
       return task;
     });
 
-    // @ts-ignore
-    setUserTasks({ ...wspData, data: modifiedWorkSpaceData });
+    if (wspData) {
+      setUserTasks({
+        ...wspData,
+        container: {
+          ...wspData?.container,
+          wspData: modifiedWorkSpaceData,
+        },
+      });
+    }
   }
 
   return (
@@ -64,7 +72,12 @@ const DeleteTask: React.FC<IDeleteComponentProps> = (props) => {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button isDisabled={isDeletingTask} onClick={() => onClose(false)}>Cancelar</Button>
+              <Button
+                isDisabled={isDeletingTask}
+                onClick={() => onClose(false)}
+              >
+                Cancelar
+              </Button>
               <Button
                 minW={"100px"}
                 colorScheme="red"

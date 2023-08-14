@@ -9,14 +9,15 @@ export default handler.get(async (req: NextApiRequest, res: NextApiResponse) => 
 
     try {
         const { data } = req.query;
-        // @ts-ignore
-        const { data: workspaces } = await axios.get<IWspUser>(`${process.env.WORKSPACE_API}/workspaces/${data.split("_")[0]}?socketId=${data.split("_")[1]}&userId=${data.split("_")[2]}`, {
-            headers: {
-                Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`
-            }
-        });
-        return res.status(200).json(workspaces);
 
+        if (typeof data === "string") {
+            const { data: workspaces } = await axios.get<IWspUser>(`${process.env.WORKSPACE_API}/workspaces/${data.split("_")[0]}?socketId=${data.split("_")[1]}&userId=${data.split("_")[2]}`, {
+                headers: {
+                    Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`
+                }
+            });
+            return res.status(200).json(workspaces);
+        }
     } catch (err: any) {
         return res.status(err.response?.status || 500).json(err.response?.data);
     }

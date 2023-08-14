@@ -12,7 +12,6 @@ import {
   FormLabel,
   Input,
   Box,
-  Badge,
   Tag,
   TagLabel,
   TagCloseButton,
@@ -35,7 +34,6 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 import { mathematicalEnginedEncapsuled } from "@/libraries/fylent-math-engine/index";
-import { indexOf, uniqBy } from "lodash";
 import iconsForCols from "@/libraries/fylent-grid-engine/Grid/utils/iconsForCols";
 
 export interface IPicklistOptions {
@@ -49,7 +47,14 @@ export interface ISelectColorOptions {
   color?: string;
 }
 
-const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
+interface ICreateColumnProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const CreateColumn: React.FunctionComponent<ICreateColumnProps> = (props) => {
+  const { isOpen, setIsLoading, onClose } = props;
   const currentWorkspace = useCurrentWorkspace();
   const maxOrderValue: number | undefined =
     currentWorkspace?.currentWorkSpace?.container?.spreadSheetData?.columns.reduce(
@@ -70,6 +75,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
 
   const [userClick, setUserClick] = useState<number>(0);
   const [userTypedValue, setUserTypedValue] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [engineStatements, setEngineStatements] = useState<any>();
   const [triggerPointer, setTriggerPointer] = useState<number>(0);
   const [columnsSuitableForComposition, setColumnsSuitableForComposition] =
@@ -98,7 +104,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
     columnType,
     userClick,
     userPicklistValues,
-    currentCompoundColumnValues,
+    currentCompoundColumnValues
   ]);
 
   const statusOptions: IPicklistOptions[] = [
@@ -111,7 +117,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
     { value: "mail", label: "📩 Correo electronico" },
     { value: "phone", label: "📞 Numero celular" },
     { value: "boolean", label: "📦 Checkbox" },
-    { value: "compound", label: "🎨 Compuesta" }
+    { value: "compound", label: "🎨 Compuesta" },
   ];
 
   const mathEngineOperations: IPicklistOptions[] = [
@@ -239,8 +245,9 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
                 }}
               >
                 {userPicklistValues.map((individualPicklistValue, index) => (
-                  <React.Fragment>
+                  <React.Fragment key={index}>
                     <Tag
+                      key={index}
                       size={"lg"}
                       bgColor={individualPicklistValue.color}
                       cursor={"pointer"}
@@ -302,11 +309,7 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
                     })}
                     onChange={(e: SingleValue<IPicklistOptions>) => {
                       if (engineOperation && e) {
-                        setEngineStatements(
-                          mathematicalEnginedEncapsuled[engineOperation][
-                            e.value
-                          ]
-                        );
+                        setEngineStatements( mathematicalEnginedEncapsuled[engineOperation][e.value]);
                         setCurrentCompoundColumnValues({
                           formulaName:
                             mathematicalEnginedEncapsuled[engineOperation][
@@ -322,9 +325,9 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
                   <Box mt={4}>
                     <FormLabel>Selecciona las columnas</FormLabel>
                     {Object.entries(engineStatements.requiredValues).map(
-                      (currentStatement: any) => {
+                      (currentStatement: [string, unknown], index: number) => {
                         return (
-                          <Box marginBottom={"10px"}>
+                          <Box key={index} marginBottom={"10px"}>
                             <Select
                               options={columnsSuitableForComposition ?? []}
                               placeholder={currentStatement[0]}
@@ -337,9 +340,9 @@ const CreateColumn = ({ isOpen, onClose, setIsLoading }) => {
                                     name: e.value ?? "",
                                     columnValue: currentStatement[1],
                                   };
-                                  var propertyAlreadyExistInArray: boolean =
+                                  let propertyAlreadyExistInArray: boolean =
                                     false;
-                                  var indexOfDuplicate: number | undefined;
+                                  let indexOfDuplicate: number | undefined;
 
                                   const currentCompounds: IChildCompounds[] =
                                     currentCompoundColumnValues?.compounds ??

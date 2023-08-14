@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Modal, Popover, Text } from "@nextui-org/react";
-import _ from "lodash";
+import React, { useEffect, useRef, useState } from "react";
+import { Modal, Text } from "@nextui-org/react";
 
 import { DateTime } from "luxon";
 
@@ -74,10 +73,20 @@ const priorityOptions: IPicklistOptions[] = [
 const stringDataForUniqueId: string =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
+interface IEditTaskProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  data: IDataToDo;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
+  const { isOpen, onClose, data, isLoading, setIsLoading } = props;
   const uniqueIdFactory = customAlphabet(stringDataForUniqueId, 12);
   const { currentUser } = useCurrentUser();
-  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
+  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
+    useCurrentWorkspace();
   const [newDate, setNewDate] = useState(data?.createDate);
   const [finishDate, setFinishDate] = useState(data?.finishDate);
   const [status, setStatus] = useState({
@@ -115,8 +124,9 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
   const toastNotification = useToast();
   const marginStatusValue = 4;
 
-  const [{ isOver, canDrop }, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: "IMAGE",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop: async (item: any) => {
       deleteFileFromDirectory(item.objectToDelete.index);
       setIsDragging(false);
@@ -183,7 +193,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
     setPriority({
       value: data?.priority?.value,
       label: data?.priority?.value,
-      color: data?.priority?.color,
+      color: data?.priority?.color ?? "blue",
     });
     setNewDate(data?.createDate);
     setFinishDate(data?.finishDate);
@@ -244,17 +254,18 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
     setStringPathToRender(currentUrlData);
   }
 
-  async function editCurrentTask(currentTask: any) {
+  async function editCurrentTask(currentTask: IDataToDo) {
     const currentWorkSpace: IWspUser | undefined = wspData;
-    let workspaceData: IDataToDo[] | undefined = wspData?.container?.wspData;
-    let currentTaskUser: IDataToDo = currentTask;
+    const workspaceData: IDataToDo[] | undefined = wspData?.container?.wspData;
+    const currentTaskUser: IDataToDo = currentTask;
 
     workspaceData?.forEach((task, index) => {
       if (task.taskId === currentTaskUser.taskId && workspaceData)
         workspaceData[index] = currentTaskUser;
     });
 
-    if (currentWorkSpace?.container?.wspData) currentWorkSpace.container.wspData = workspaceData;
+    if (currentWorkSpace?.container?.wspData)
+      currentWorkSpace.container.wspData = workspaceData;
 
     setUserTasks(currentWorkSpace);
   }
@@ -475,7 +486,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                               ).toISODate(),
                               recordedBy: {
                                 _id: currentUser._id,
-                                fullname: currentUser.username,
+                                fullname: currentUser.fullname,
                               },
                             });
                           }}
@@ -538,13 +549,14 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                           clockTime.map(
                             (currentChunk: IClockTime, chunkIndex: number) => {
                               return (
-                                <Tr>
+                                <Tr key={chunkIndex}>
                                   <Td fontSize={"13px"} textAlign={"center"}>
                                     <Box display={"flex"} alignItems={"center"}>
                                       <Avatar
                                         w={8}
                                         h={8}
                                         marginRight={"10px"}
+                                        name={currentChunk.recordedBy.fullname}
                                       />
                                       {currentChunk.recordedBy.fullname}
                                     </Box>
@@ -605,7 +617,6 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
               options={priorityOptions}
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) {
-                  // @ts-ignore
                   setPriority({
                     value: e.label,
                     label: e.label,
@@ -619,7 +630,9 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
               type="date"
               width="100%"
               value={DateTime.fromISO(newDate).toISODate()}
-              onChange={(e) => setNewDate(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewDate(e.target.value)
+              }
             />
           </Box>
 
@@ -639,9 +652,9 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                 accept="image/*"
                 style={{ display: "none" }}
                 id="image-input-trigger"
-                onChange={(e: any) => {
+                onChange={(e) => {
                   if (e.target.files && e.target.files.length > 0) {
-                    const userFiles: any = e.target.files[0];
+                    const userFiles: File = e.target.files[0];
 
                     if (userFiles.type.includes("image")) {
                       const inputComputedReader = new FileReader();
@@ -650,7 +663,8 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                       inputComputedReader.onload = async () => {
                         if (inputComputedReader.result) {
                           try {
-                            const uniqueIdFactoryResult: string = uniqueIdFactory();
+                            const uniqueIdFactoryResult: string =
+                              uniqueIdFactory();
                             const newPathToFiles: string = `/users/${currentUser._id}/booklets/agile/${wspData?._id}/records/${data?.taskId}/${uniqueIdFactoryResult}`;
                             const provitionalUploadReference: StorageReference =
                               refStorageObject(storage, newPathToFiles);
@@ -707,8 +721,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                   transition={"all .4s"}
                 >
                   <Text style={{ color: "black" }}>
-                    Haga clic aquí para comenzar a cargar imagenes o
-                    documentos
+                    Haga clic aquí para comenzar a cargar imagenes o documentos
                   </Text>
                 </Box>
               </label>
@@ -739,6 +752,7 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                       (currentFilePath: IFilePath, index: number) => {
                         return (
                           <DraggableImage
+                            key={index}
                             currentPath={currentFilePath}
                             index={index}
                             setIsDragging={setIsDragging}
@@ -748,9 +762,9 @@ const EditTask = ({ isOpen, onClose, data, isLoading, setIsLoading }) => {
                     )}
                   </React.Fragment>
                 )}
-                { (stringPathToRender.length === 0 &&
+                {stringPathToRender.length === 0 &&
                   !isUploadingImage &&
-                  !isGettingImage) && (
+                  !isGettingImage && (
                     <React.Fragment>
                       <Text style={{ width: "100%", textAlign: "center" }}>
                         Por ahora, la sección de archivos está vacía, pero puede

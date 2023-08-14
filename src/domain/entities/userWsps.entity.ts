@@ -27,7 +27,7 @@ export interface IContainer {
 export interface IWspUser {
     _id: string;
     name: string;
-    createdDate: Date;
+    createdDate: string;
     createdById: string;
     type: string;
     container: IContainer;

@@ -3,7 +3,6 @@ import {
   Rectangle,
   measureTextCached,
   CustomRenderer,
-  getMiddleCenterBias,
   GridCellKind,
 } from "@glideapps/glide-data-grid";
 import * as React from "react";
@@ -28,6 +27,7 @@ const innerPad = 12;
 
 const renderer: CustomRenderer<TagsCell> = {
   kind: GridCellKind.Custom,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   isMatch: (c): c is TagsCell => (c.data as any).type === "multipicklist",
   draw: (args, cell) => {
     const { ctx, theme, rect } = args;

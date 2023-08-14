@@ -8,7 +8,7 @@ type PropTypes = {
   children?: ReactNode;
 };
 
-export const CurrentUserProvider: FC<PropTypes> = ({ children }: any) => {
+export const CurrentUserProvider: FC<PropTypes> = ({ children }) => {
   const [currentUser, setCurrentUser] = React.useState<ICurrentUser>({
     username: "",
     fullname: "",
@@ -21,6 +21,7 @@ export const CurrentUserProvider: FC<PropTypes> = ({ children }: any) => {
     invitations: []
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fetchCurrentUser = useCallback(async (credentials: any) => {
     try {
       setCurrentUser(credentials);

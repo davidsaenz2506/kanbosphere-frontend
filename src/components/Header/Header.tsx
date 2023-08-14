@@ -48,8 +48,9 @@ const Header = (Props: IHeaderProps) => {
         >
           {currentWorkSpace?.container?.wspData === undefined
             ? "Esto puede tardar dependiento de tu conexion"
-            // @ts-ignore
-            : `Prefijo de historia ${currentWorkSpace.container.containerPreferences?.prefix}`}
+            : "prefix" in currentWorkSpace.container.containerPreferences
+            ? `Prefijo de historia ${currentWorkSpace.container.containerPreferences?.prefix}`
+            : "Sin definir..."}
         </h2>
       </Box>
       <Box style={{ marginRight: "30px" }}>

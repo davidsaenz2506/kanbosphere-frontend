@@ -10,6 +10,7 @@ interface IQuillEditorProps {
   style?: React.CSSProperties;
   readOnly: boolean;
   onChangeMethod?: React.Dispatch<React.SetStateAction<string>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modules: any;
 }
 

@@ -11,12 +11,9 @@ export async function middleware(request) {
     }
 
     try {
-      const { payload } = await jwtVerify(
-        finalToken,
-        new TextEncoder().encode(process.env.NEXTAUTH_SECRET || "super-secret")
-      );
+      const { payload } = await jwtVerify( finalToken, new TextEncoder().encode(process.env.NEXTAUTH_SECRET || "super-secret"));
 
-      return NextResponse.next();
+      if (payload) return NextResponse.next();
     } catch (error) {
       return NextResponse.redirect(new URL("/", request.url));
     }

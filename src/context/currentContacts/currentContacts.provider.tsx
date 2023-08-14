@@ -7,10 +7,10 @@ type PropTypes = {
   children?: ReactNode;
 };
 
-export const CurrentContactProvider: FC<PropTypes> = ({ children }: any) => {
+export const CurrentContactProvider: FC<PropTypes> = ({ children }) => {
   const [currentContacts, setCurrentContacts] = React.useState<ICurrentContact>({
-    friends: null,
-    requests: null
+    friends: undefined,
+    requests: undefined
   });
 
   return (

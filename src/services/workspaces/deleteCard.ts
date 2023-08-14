@@ -1,6 +1,6 @@
 
 import httpService from '../../lib/httpClient';
-import { IDataToDo, ITransactionToDo } from '@/domain/entities/todo.entity';
+import { ITransactionToDo } from '@/domain/entities/todo.entity';
 
 export const DeleteCard = async (workspaceId: string | undefined, toDelete: ITransactionToDo): Promise<void> => {
 

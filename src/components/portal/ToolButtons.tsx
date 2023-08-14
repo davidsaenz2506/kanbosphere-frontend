@@ -46,10 +46,15 @@ import { LiaCloudSolid } from "react-icons/lia";
 import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 
 function delayTime(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const ToolButtons = ({setIsTriggerActive}) => {
+interface IToolButtonsProps {
+  setIsTriggerActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ToolButtons: React.FunctionComponent<IToolButtonsProps>  = (props) => {
+  const { setIsTriggerActive } = props;
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const wspUsers = useWorkspace();
   const currentSession = useCurrentUser();
@@ -57,33 +62,41 @@ const ToolButtons = ({setIsTriggerActive}) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [item, setItem] = useState<IWspUser>();
-  const [currentSelected, setCurrentSelected] = useState<any>("");
+  const [currentSelected, setCurrentSelected] = useState<string>("");
   const { loadingChunk } = useLoadingChunk();
 
   const router = useRouter();
   const { query } = router;
 
-  async function handleRouterPath (caseUrl: string) { 
-       setIsTriggerActive(true)
+  async function handleRouterPath(caseUrl: string) {
+    setIsTriggerActive(true);
 
-       setCurrentSelected("");
-       router.push(`/dashboard?briefcase=${caseUrl}`);
-       await delayTime(150);
+    setCurrentSelected("");
+    router.push(`/dashboard?briefcase=${caseUrl}`);
+    await delayTime(150);
 
-       currentWorkSpace.setCurrentWorkSpace(undefined);
-       await delayTime(66);
+    currentWorkSpace.setCurrentWorkSpace(undefined);
+    await delayTime(66);
 
-       setIsTriggerActive(false)
+    setIsTriggerActive(false);
   }
 
   return (
     <>
-      <DeleteWorkSpace
-        isOpen={openDelete}
-        onClose={setOpenDelete}
-        data={item}
-      />
-      <EditWorkSpaceName isOpen={openEdit} onClose={setOpenEdit} data={item} />
+      {item && (
+        <DeleteWorkSpace
+          isOpen={openDelete}
+          onClose={setOpenDelete}
+          data={item}
+        />
+      )}
+      {item && (
+        <EditWorkSpaceName
+          isOpen={openEdit}
+          onClose={setOpenEdit}
+          data={item}
+        />
+      )}
       <Box
         className={styles.generalButtons}
         style={{ marginTop: "10px", color: "#252525" }}
@@ -129,7 +142,7 @@ const ToolButtons = ({setIsTriggerActive}) => {
             }}
             onClick={() => {
               const caseUrl: string = "main";
-              handleRouterPath(caseUrl)
+              handleRouterPath(caseUrl);
             }}
           >
             Menú principal
@@ -171,7 +184,7 @@ const ToolButtons = ({setIsTriggerActive}) => {
                 }}
                 onClick={() => {
                   const caseUrl: string = "create";
-                  handleRouterPath(caseUrl)
+                  handleRouterPath(caseUrl);
                 }}
               >
                 Builds
@@ -201,7 +214,8 @@ const ToolButtons = ({setIsTriggerActive}) => {
                 style={{
                   width: "90%",
                   marginTop: "0px",
-                  marginBottom: "10px",marginLeft: "13px"
+                  marginBottom: "10px",
+                  marginLeft: "13px",
                 }}
               >
                 <Skeleton height="20px" />
@@ -212,6 +226,7 @@ const ToolButtons = ({setIsTriggerActive}) => {
               <List>
                 {wspUsers.userWsps.map((todoWorkspace, index) => (
                   <ListItem
+                    key={index}
                     cursor={"pointer"}
                     sx={{
                       display: "flex",
@@ -223,20 +238,6 @@ const ToolButtons = ({setIsTriggerActive}) => {
                       marginTop: index === 0 ? "-10px" : "0px",
                       marginBottom:
                         index === wspUsers.userWsps.length - 1 ? "0px" : "8px",
-                    }}
-                    onClick={async () => {
-                      if (loadingChunk) return
-                      if (currentWorkSpace.currentWorkSpace?._id === todoWorkspace._id) return
-                        setIsTriggerActive(true);
-                        setCurrentSelected(todoWorkspace._id);
-
-                        router.push(`/dashboard?briefcase=${todoWorkspace.type}&fridgeKey=${todoWorkspace._id}`);
-                        await delayTime(150);
-
-                        currentWorkSpace.setCurrentWorkSpace(undefined);
-                        await delayTime(66);
-              
-                        setIsTriggerActive(false);
                     }}
                   >
                     <Box
@@ -267,6 +268,26 @@ const ToolButtons = ({setIsTriggerActive}) => {
                             ? "bolder"
                             : "normal"
                         }
+                        onClick={async () => {
+                          if (loadingChunk) return;
+                          if (
+                            currentWorkSpace.currentWorkSpace?._id ===
+                            todoWorkspace._id
+                          )
+                            return;
+                          setIsTriggerActive(true);
+                          setCurrentSelected(todoWorkspace._id);
+
+                          router.push(
+                            `/dashboard?briefcase=${todoWorkspace.type}&fridgeKey=${todoWorkspace._id}`
+                          );
+                          await delayTime(150);
+
+                          currentWorkSpace.setCurrentWorkSpace(undefined);
+                          await delayTime(66);
+
+                          setIsTriggerActive(false);
+                        }}
                       >
                         {" "}
                         {todoWorkspace.name}
@@ -315,7 +336,7 @@ const ToolButtons = ({setIsTriggerActive}) => {
           }}
           onClick={() => {
             const caseUrl: string = "friends";
-            handleRouterPath(caseUrl)
+            handleRouterPath(caseUrl);
           }}
         >
           Social
@@ -342,7 +363,7 @@ const ToolButtons = ({setIsTriggerActive}) => {
           }}
           onClick={() => {
             const caseUrl: string = "meets";
-            handleRouterPath(caseUrl)
+            handleRouterPath(caseUrl);
           }}
         >
           Calendario
@@ -373,7 +394,7 @@ const ToolButtons = ({setIsTriggerActive}) => {
           }}
           onClick={() => {
             const caseUrl: string = "balance";
-            handleRouterPath(caseUrl)
+            handleRouterPath(caseUrl);
           }}
         >
           Mis Ingresos

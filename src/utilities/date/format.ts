@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-export const formatDate = (currentDateFromSQL: Date, format: string) => {
+export const formatDate = (currentDateFromSQL: string, format: string) => {
     const newUserDate = new Date(new Date(currentDateFromSQL)).toUTCString();
     const jsonDate = new Date(newUserDate).toJSON();
 

@@ -3,7 +3,7 @@ import { createContext } from "react";
 
 export interface IWspContext {
     userWsps: IWspUser[],
-    setUsersWsps: (value: any) => void,
+    setUsersWsps: (value: IWspUser[]) => void,
     fetchWorkSpaces: (userId: string, setLoadingServerData?: React.Dispatch<React.SetStateAction<boolean>>) => Promise<void>
 }
 

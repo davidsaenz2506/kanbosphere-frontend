@@ -32,8 +32,8 @@ export interface IDataToDo {
     title: string,
     clockTime: IClockTime[],
     expectedWorkingHours: number,
-    createDate: Date | undefined,
-    finishDate?: Date | undefined
+    createDate: string | undefined,
+    finishDate?: string | undefined
     file: IFilePath[] | undefined,
 }
 

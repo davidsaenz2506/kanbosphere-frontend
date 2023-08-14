@@ -123,6 +123,7 @@ export const ContactUser = () => {
               return (
                 <Box
                   width={"100%"}
+                  key={index}
                   display={"flex"}
                   justifyContent={"space-between"}
                   alignItems={"center"}
@@ -173,35 +174,20 @@ export const ContactUser = () => {
                         if (itemSelected) {
                           await SendInvitation(itemSelected, toSend);
 
-                          if (
-                            currentContact.currentContacts?.friends !== null
-                          ) {
-                            const existentObjectInFriends =
-                              currentContact.currentContacts?.friends.find(
-                                (object) => object?._id === itemSelected
-                              );
-                            const dataShakeFriend = await GetUsersByArray([
-                              itemSelected,
-                            ]);
+                          if (currentContact.currentContacts?.friends !== undefined) {
+                            const existentObjectInFriends = currentContact.currentContacts?.friends.find((object) => object?._id === itemSelected);
+                            const dataShakeFriend = await GetUsersByArray([itemSelected]);
 
-                            if (existentObjectInFriends) {
-                              let index =
-                                currentContact.currentContacts?.friends.indexOf(
-                                  existentObjectInFriends
-                                );
-                              //@ts-ignore
+                            if (existentObjectInFriends && dataShakeFriend) {
+                              const index = currentContact.currentContacts?.friends.indexOf(existentObjectInFriends);
                               currentContact.currentContacts.friends[index] = dataShakeFriend[0];
 
                               const currentRequestAndFriendData = {
-                                friends:
-                                  currentContact.currentContacts?.friends,
-                                requests:
-                                  currentContact.currentContacts?.requests,
+                                friends: currentContact?.currentContacts?.friends,
+                                requests: currentContact?.currentContacts?.requests,
                               };
 
-                              currentContact.setCurrentContacts(
-                                currentRequestAndFriendData
-                              );
+                              if (currentRequestAndFriendData) currentContact.setCurrentContacts( currentRequestAndFriendData );
                             }
                           }
 
@@ -475,17 +461,8 @@ export const ContactUser = () => {
                         aria-label="Share workspace"
                         icon={<ExternalLinkIcon />}
                         onClick={() => {
-                          const currentInvitationIds = result?.invitations?.map(
-                            (currentInv) => currentInv.workspaceToJoinId
-                          );
-
-                          setWorkspacesToShare(
-                            workspaces.userWsps.filter(
-                              (currentWsp: IWspUser) =>
-                                // @ts-ignore
-                                !currentInvitationIds?.includes(currentWsp._id)
-                            )
-                          );
+                          const currentInvitationIds = result?.invitations?.map((currentInv) => currentInv.workspaceToJoinId);
+                          setWorkspacesToShare(workspaces.userWsps.filter((currentWsp: IWspUser) => !currentInvitationIds?.includes(currentWsp._id)));
 
                           setItemSelected(result?._id);
                           onToggle();
@@ -566,6 +543,7 @@ export const ContactUser = () => {
               {requests?.map((currentRequest, index) => {
                 return (
                   <Box
+                    key={index}
                     display={"flex"}
                     margin={"15px"}
                     padding={"8px"}

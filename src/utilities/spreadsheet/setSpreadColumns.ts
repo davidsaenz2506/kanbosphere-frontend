@@ -9,23 +9,24 @@ export function setSpreadColumns(
   newColumn: IColumnProjection,
   performanceWorkspaces: IWspContext,
 ) {
-  let newUserRows: [] = [];
+  const newUserRows: any[] = [];
 
   if (data.container.spreadSheetData?.data) {
     const dataMatrix = data.container.spreadSheetData?.data;
 
-    let newSpreadData = data.container.spreadSheetData;
+    const newSpreadData = data.container.spreadSheetData;
 
     dataMatrix.forEach((individualRow: object) => {
       data.container.spreadSheetData?.columns.forEach((userColumn) => {
+         // eslint-disable-next-line no-prototype-builtins
         if (!individualRow.hasOwnProperty(userColumn?.title)) {
           individualRow[userColumn?.title] = "";
         }
       });
-      // @ts-ignore
+
       newUserRows.push(individualRow);
     });
-    // @ts-ignore
+
     newSpreadData.data = newUserRows;
     setUserTasks({
       ...data,
@@ -47,7 +48,7 @@ export function setSpreadColumns(
 
   if (data.container.spreadSheetData) {
     setCurrentSpreadData({
-      columns: [...(data?.container.spreadSheetData.columns), newColumn],
+      columns: [...(data.container.spreadSheetData.columns), newColumn],
       data: newUserRows,
       userId: data.container.spreadSheetData?.userId ?? data.createdById,
     });

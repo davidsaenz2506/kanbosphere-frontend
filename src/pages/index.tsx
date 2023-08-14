@@ -1,9 +1,12 @@
+import React from "react";
+
 import styles from "../styles/login.module.css";
-import "bootstrap/dist/css/bootstrap.css";
 import { LoginUser } from "@/services/user/login";
 import { useState } from "react";
 import WrongLogin from "@/components/Modals/WrongLogin";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+
+import "bootstrap/dist/css/bootstrap.css";
 
 import {
   Spinner,
@@ -27,7 +30,7 @@ export default function Home() {
         window.open("/dashboard", "_self");
         debounce(() => setIsLoginSession(false), 10000);
       })
-      .catch((err) => {
+      .catch(() => {
         setIsLoginSession(false);
         setOpenAlert(true);
       });

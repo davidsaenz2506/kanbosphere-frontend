@@ -1,6 +1,6 @@
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
-import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function sortRowsBySelection(spreadSheetData: any[], setSpreadSheetData: React.Dispatch<React.SetStateAction<any[]>>, selectedColumnToSort: any, isDescendingActive: boolean, currentWorkSpace: ICurrentWspContext) {
     const currentUnsortedSpreadData = spreadSheetData;
 

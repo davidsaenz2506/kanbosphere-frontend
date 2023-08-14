@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import {
   Item,
   GridCell,
@@ -20,7 +20,6 @@ import PickList from "./fields/picklist";
 import Multipicklist from "./fields/multipicklist";
 import Time from "./fields/time";
 import Phone from "./fields/phone";
-import Engineer from "./fields/calculator";
 
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
@@ -31,12 +30,13 @@ import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 
 
 interface ISpreadProps {
-  data: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any[];
   internalTriggerPointer: number;
   setCurrentRowsSelected: React.Dispatch<React.SetStateAction<number[]>>;
   currentSelection: GridSelection | undefined,
   setCurrentSelection: React.Dispatch<React.SetStateAction<GridSelection | undefined>>;
-  freezeColumns: any;
+  freezeColumns: number;
   useTheme: Partial<Theme>;
 }
 
@@ -71,8 +71,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
     PickList,
     Multipicklist,
     Time,
-    Phone,
-    Engineer
+    Phone
   ]);
 
   React.useEffect(() => {
@@ -123,7 +122,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
       currentUserWsp,
       currentUser,
       assignNewOrderValues,
-      currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data,
+      currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data ?? [],
       currentUserWorkspaces
     );
   };
@@ -134,8 +133,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
         cell,
         userColumns,
         currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data,
-        newValue,
-        currentUserWsp
+        newValue
       );
 
       handleStateForNotificationSnack(validationExportedFromUtils);
@@ -144,12 +142,11 @@ const GridDataEditor = (Props: ISpreadProps) => {
   );
 
   React.useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const transformItemObjectToArray = userSelection.rows?.items.length ? userSelection.rows?.items : undefined;
-    const iterateObjectPlanning: number[][] = transformItemObjectToArray?.map(
-      (currentMappedBox) => {
+    const iterateObjectPlanning: number[][] = transformItemObjectToArray?.map((currentMappedBox: number[]) => {
         const indexValues: number[] = [];
-
         for (let i = currentMappedBox[0]; i < currentMappedBox[1]; i++) {
           indexValues.push(i);
         }
@@ -207,7 +204,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
             currentUserWsp,
             currentUser,
             userColumns,
-            currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data,
+            currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data ?? [],
             currentUserWorkspaces
           )
         }
@@ -217,24 +214,16 @@ const GridDataEditor = (Props: ISpreadProps) => {
           setUserSelection(e);
         }}
         {...CustomCells}
-        rowMarkers={
-          // @ts-ignore
-          currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isRowSelectionActive ? "both": "none"
-        }
+        rowMarkers={currentUserWsp.currentWorkSpace && "isRowSelectionActive" in currentUserWsp.currentWorkSpace.container.containerPreferences ? currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isRowSelectionActive ? "both": "none" : "none"}
         rows={data.length ?? 0}
         getCellContent={getUserData}
-        rowSelectionMode={
-           // @ts-ignore
-          currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isMultipleSelectionActive
-            ? "multi"
-            : "auto"
-        }
+        rowSelectionMode={currentUserWsp.currentWorkSpace && "isMultipleSelectionActive" in currentUserWsp.currentWorkSpace.container.containerPreferences ? currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isMultipleSelectionActive ? "multi" : "auto" : "auto"}
         width={"100%"}
         theme={useTheme}
         height={"100%"}
         smoothScrollX={true}
         smoothScrollY={true}
-        freezeColumns={freezeColumns.value}
+        freezeColumns={freezeColumns}
         gridSelection={userSelection}
         key={internalTriggerPointer}
       />

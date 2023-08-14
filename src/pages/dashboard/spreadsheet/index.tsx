@@ -42,9 +42,8 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import styles from "@/libraries/fylent-grid-engine/styles/spreadsheet.module.css";
 import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
-import { GridSelection, Item, Theme } from "@glideapps/glide-data-grid";
+import { GridSelection, Item } from "@glideapps/glide-data-grid";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
-import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { useRouter } from "next/router";
 import {
@@ -89,20 +88,26 @@ const Spreadsheet = () => {
   const [addTask, setAddTask] = useState<boolean>(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const currentSession = useCurrentUser();
-  const {setLoadingChunk} = useLoadingChunk();
+  const { setLoadingChunk } = useLoadingChunk();
   const keyCodeFromEnterDown = 13;
   const [isSendingQuery, setIsSendingQuery] = useState<boolean>(false);
   const currentWorkSpace: ICurrentWspContext = useCurrentWorkspace();
   const [freezeColumns, setFreezeColums] = useState(0);
   const [isDescendingActive, setIsDescendingActive] = useState(true);
   const [internalTriggerPointer, setInternalTriggerPointer] = useState(0);
-  const [isMultipleSelectionActive, setIsMultipleSelectionActive] = useState<boolean>();
+  const [isMultipleSelectionActive, setIsMultipleSelectionActive] =
+    useState<boolean>();
   const [isRowSelectionActive, setIsRowSelectionActive] = useState<boolean>();
   const [currentSelection, setCurrentSelection] = useState<GridSelection>();
-  const [selectedColumnToSort, setSelectedColumnToSort] = useState<ISortColumn[]>([]);
-  const [spreadDataHasFilter, setSpreadDataHasFilter] = useState<boolean>(false);
+  const [selectedColumnToSort, setSelectedColumnToSort] = useState<
+    ISortColumn[]
+  >([]);
+  const [spreadDataHasFilter, setSpreadDataHasFilter] =
+    useState<boolean>(false);
   const todoRefHTMLElement = React.createRef<HTMLElement>();
-  const [spreadSheetData, setSpreadSheetData] = useState<any[]>(currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.data ?? []);
+  const [spreadSheetData, setSpreadSheetData] = useState(
+    currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.data ?? []
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [currentRowsSelected, setCurrentRowsSelected] = useState<number[]>([]);
   const [typedQueryFromUser, setTypeQueryFromUser] = useState({
@@ -129,7 +134,8 @@ const Spreadsheet = () => {
     window.onresize = function onResize() {
       const todoDocument: HTMLDivElement | null =
         document.querySelector(".todoContainer");
-      const navBarDocument: any = document.getElementById("navbarHome");
+      const navBarDocument: HTMLElement | null =
+        document.getElementById("navbarHome");
       const bodyDocumentData: HTMLBodyElement | null =
         document.querySelector("body");
 
@@ -143,7 +149,8 @@ const Spreadsheet = () => {
         bodyDocument &&
         bodyDocumentData &&
         resizetToolData &&
-        workSpaceContainer
+        workSpaceContainer &&
+        navBarDocument
       ) {
         todoDocument.style.height = `${
           bodyDocument.getBoundingClientRect().height -
@@ -167,11 +174,11 @@ const Spreadsheet = () => {
   }
 
   function exportToExcel() {
-    var workBook: WorkBook = utils.book_new();
-    var workSheet: WorkSheet = utils.json_to_sheet(spreadSheetData);
+    const workBook: WorkBook = utils.book_new();
+    const workSheet: WorkSheet = utils.json_to_sheet(spreadSheetData);
 
-    var widthColumnsForGrid: ISpreadGrid[] = [];
-    var objectWithProperties: object = {};
+    const widthColumnsForGrid: ISpreadGrid[] = [];
+    const objectWithProperties: object = {};
 
     const newComputedColumnsForSheet =
       currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData?.data.map(
@@ -179,7 +186,7 @@ const Spreadsheet = () => {
           const lengthValues = Object.values(currentRow);
           const numberValues: number[] = [];
 
-          lengthValues.forEach((individualStringBook: any) =>
+          lengthValues.forEach((individualStringBook) =>
             numberValues.push(String(individualStringBook).length)
           );
           return numberValues;
@@ -187,7 +194,8 @@ const Spreadsheet = () => {
       );
 
     newComputedColumnsForSheet?.forEach((item) => {
-      for (let currentVectorValue in item) {
+      for (const currentVectorValue in item) {
+        // eslint-disable-next-line no-prototype-builtins
         if (!objectWithProperties.hasOwnProperty(currentVectorValue)) {
           objectWithProperties[currentVectorValue] = [];
         }
@@ -212,7 +220,9 @@ const Spreadsheet = () => {
   }
 
   function handleCalculatorResult(result: number) {
-    const currentDataArray: any[] | undefined = currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentDataArray: any[] | undefined =
+      currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.data;
     const currentCell: Item | undefined = currentSelection?.current?.cell;
     const columnTitle: string = currentCell
       ? spreadColumns[currentCell[0]].title
@@ -225,14 +235,14 @@ const Spreadsheet = () => {
       currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.userId
     ) {
       currentDataArray[currentCell[1]][columnTitle] = newCellValue;
-    
+
       currentWorkSpace.setCurrentWorkSpace({
         ...currentWorkSpace.currentWorkSpace,
         container: {
           ...currentWorkSpace.currentWorkSpace?.container,
           spreadSheetData: {
             ...currentWorkSpace.currentWorkSpace?.container?.spreadSheetData,
-            data: currentDataArray
+            data: currentDataArray,
           },
         },
       });
@@ -240,23 +250,41 @@ const Spreadsheet = () => {
   }
 
   React.useEffect(() => {
-    if ( currentWorkSpace.currentWorkSpace && currentWorkSpace.currentWorkSpace.container.spreadSheetData) {
-      setSpreadSheetData(currentWorkSpace.currentWorkSpace.container.spreadSheetData.data);
-      setSpreadColumns(currentWorkSpace.currentWorkSpace.container.spreadSheetData.columns);
+    if (
+      currentWorkSpace.currentWorkSpace &&
+      currentWorkSpace.currentWorkSpace.container.spreadSheetData
+    ) {
+      setSpreadSheetData(
+        currentWorkSpace.currentWorkSpace.container.spreadSheetData.data
+      );
+      setSpreadColumns(
+        currentWorkSpace.currentWorkSpace.container.spreadSheetData.columns
+      );
 
-      // @ts-ignore
-      setIsMultipleSelectionActive(currentWorkSpace?.currentWorkSpace?.container?.containerPreferences?.isMultipleSelectionActive);
-      // @ts-ignore
-      setIsRowSelectionActive(currentWorkSpace?.currentWorkSpace?.container?.containerPreferences?.isRowSelectionActive);
+      setIsMultipleSelectionActive(
+        "isMultipleSelectionActive" in
+          currentWorkSpace.currentWorkSpace.container.containerPreferences
+          ? currentWorkSpace?.currentWorkSpace?.container?.containerPreferences
+              ?.isMultipleSelectionActive
+          : false
+      );
+      setIsRowSelectionActive(
+        "isRowSelectionActive" in
+          currentWorkSpace.currentWorkSpace.container.containerPreferences
+          ? currentWorkSpace?.currentWorkSpace?.container?.containerPreferences
+              ?.isRowSelectionActive
+          : false
+      );
     }
   }, [currentWorkSpace.currentWorkSpace]);
 
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
       document.querySelector(".todoContainer");
-    const InitialNavBarDocument: any = document.getElementById("navbarHome");
+    const InitialNavBarDocument: HTMLElement | null =
+      document.getElementById("navbarHome");
 
-    if (InitialTodoDocument && bodyDocument) {
+    if (InitialTodoDocument && bodyDocument && InitialNavBarDocument) {
       InitialTodoDocument.style.height = `${
         bodyDocument.getBoundingClientRect().height -
         InitialNavBarDocument.getBoundingClientRect().height
@@ -265,15 +293,19 @@ const Spreadsheet = () => {
   });
 
   React.useEffect(() => {
-    getCurrentWorkspace()
+    getCurrentWorkspace();
   }, [router.query?.fridgeKey]);
 
   async function getCurrentWorkspace() {
-    setLoadingChunk(true)
+    setLoadingChunk(true);
     const { setCurrentWorkSpace } = currentWorkSpace;
-    const relatedWorkspace: any = await getWorkspaceById(router.query?.fridgeKey?.toString() ?? "", currentBiridectionalCommunication.id, currentSession.currentUser._id ?? "");
+    const relatedWorkspace: IWspUser | undefined = await getWorkspaceById(
+      router.query?.fridgeKey?.toString() ?? "",
+      currentBiridectionalCommunication.id,
+      currentSession.currentUser._id ?? ""
+    );
     if (relatedWorkspace) setCurrentWorkSpace(relatedWorkspace);
-    setLoadingChunk(false)
+    setLoadingChunk(false);
   }
 
   return (
@@ -339,8 +371,8 @@ const Spreadsheet = () => {
                         typedQueryFromUser.query === undefined
                       ) {
                         setSpreadSheetData(
-                          currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData
-                            ?.data ?? []
+                          currentWorkSpace?.currentWorkSpace?.container
+                            ?.spreadSheetData?.data ?? []
                         );
                         setSpreadDataHasFilter(false);
                         return;
@@ -382,7 +414,7 @@ const Spreadsheet = () => {
                             };
                           }) ?? []
                         }
-                        onChange={(e: any) => {
+                        onChange={(e) => {
                           if (e) {
                             if (e.value && selectedColumnToSort.length <= 2)
                               setSelectedColumnToSort(uniqBy([e], "label"));
@@ -486,8 +518,8 @@ const Spreadsheet = () => {
                   borderRight={"1px solid #dddddd"}
                   onClick={() =>
                     setSpreadSheetData(
-                      currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData
-                        ?.data ?? []
+                      currentWorkSpace?.currentWorkSpace?.container
+                        ?.spreadSheetData?.data ?? []
                     )
                   }
                 >
@@ -511,23 +543,23 @@ const Spreadsheet = () => {
                     >
                       <Text marginBottom={"5px"}>Congelar columnas</Text>
                       <Select
-                        options={
-                          spreadColumns.map(
-                            (value: IColumnProjection, index: number) => {
-                              return {
-                                value: index + 1,
-                                label: index + 1,
-                              };
-                            }
-                          ) ?? []
-                        }
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        options={spreadColumns.map(
+                          (value: IColumnProjection, index: number) => {
+                            return {
+                              value: index + 1,
+                              label: index + 1,
+                            };
+                          }
+                        )}
                         value={freezeColumns}
                         menuPortalTarget={document.body}
                         styles={{
                           menuPortal: (base) => ({ ...base, zIndex: 1000000 }),
                           option: (
                             styles,
-                            { data, isDisabled, isFocused, isSelected }
+                            { isDisabled, isFocused, isSelected }
                           ) => {
                             const color = chroma("rgba(33,42,62,1)");
                             return {
@@ -542,9 +574,9 @@ const Spreadsheet = () => {
                             };
                           },
                         }}
-                        onChange={(e: any) => {
+                        onChange={(e) => {
                           if (e) {
-                            if (e.value) setFreezeColums(e);
+                            if (e) setFreezeColums(e);
                           }
                         }}
                         placeholder="Congelar columnas"
@@ -566,24 +598,6 @@ const Spreadsheet = () => {
                   borderRight={"1px solid #dddddd"}
                   height={"30px"}
                   borderRadius={"0px"}
-                  onClick={async () => {
-                    setIsLoading(true);
-                    await UpdateWorkSpace(
-                      currentWorkSpace?.currentWorkSpace?._id,
-                      //@ts-ignore
-                      currentWorkSpace?.currentWorkSpace
-                    );
-
-                    setIsLoading(false);
-                    toastNotification({
-                      title: "Correcto",
-                      description:
-                        "¡Sus datos se han guardado con éxito en la base de datos de Tumble!",
-                      status: "success",
-                      duration: 4000,
-                      isClosable: true,
-                    });
-                  }}
                 >
                   <Icon as={FcCloseUpMode} />
                 </Button>
@@ -600,7 +614,9 @@ const Spreadsheet = () => {
                       if (currentWorkSpace.currentWorkSpace) {
                         const workspaceToModify: IWspUser =
                           currentWorkSpace.currentWorkSpace;
-                          workspaceToModify.container.containerPreferences["isRowSelectionActive"] = e.target.checked;
+                        workspaceToModify.container.containerPreferences[
+                          "isRowSelectionActive"
+                        ] = e.target.checked;
                         currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
                       }
                     }}
@@ -616,15 +632,15 @@ const Spreadsheet = () => {
               <Box display={"flex"} alignItems={"center"} marginRight={"10px"}>
                 <Badge colorScheme="purple">
                   {
-                    currentWorkSpace.currentWorkSpace?.container.spreadSheetData?.data
-                      .length
+                    currentWorkSpace.currentWorkSpace?.container.spreadSheetData
+                      ?.data.length
                   }{" "}
                   rows{" "}
                 </Badge>
                 <Badge marginLeft={"5px"} colorScheme="orange">
                   {
-                    currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.columns
-                      .length
+                    currentWorkSpace.currentWorkSpace?.container
+                      ?.spreadSheetData?.columns.length
                   }{" "}
                   columns{" "}
                 </Badge>
@@ -671,13 +687,19 @@ const Spreadsheet = () => {
                   currentSelection?.columns["items"].length ? false : true
                 }
                 onClick={() => {
-                  const currentColumns: IColumnProjection[] = currentWorkSpace.currentWorkSpace?.container?.spreadSheetData?.columns ?? [];
-                  const currentColumnSelected = currentSelection?.columns["items"][0][0];
-                  const modifiedWorkspaceTarget: Partial<IWspUser> = currentWorkSpace.currentWorkSpace ?? {};
+                  const currentColumns: IColumnProjection[] =
+                    currentWorkSpace.currentWorkSpace?.container
+                      ?.spreadSheetData?.columns ?? [];
+                  const currentColumnSelected =
+                    currentSelection?.columns["items"][0][0];
+                  const modifiedWorkspaceTarget: Partial<IWspUser> =
+                    currentWorkSpace.currentWorkSpace ?? {};
                   currentColumns.splice(currentColumnSelected, 1);
 
-                  if (modifiedWorkspaceTarget.container?.spreadSheetData) modifiedWorkspaceTarget.container.spreadSheetData = currentWorkSpace.currentWorkSpace?.container?.spreadSheetData;
-                  
+                  if (modifiedWorkspaceTarget.container?.spreadSheetData)
+                    modifiedWorkspaceTarget.container.spreadSheetData =
+                      currentWorkSpace.currentWorkSpace?.container?.spreadSheetData;
+
                   sendNewColumnsToServer(
                     currentWorkSpace,
                     currentSession,
@@ -760,8 +782,11 @@ const Spreadsheet = () => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setIsMultipleSelectionActive(e.target.checked);
                     if (currentWorkSpace.currentWorkSpace) {
-                      const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
-                      workspaceToModify.container.containerPreferences["isMultipleSelectionActive"] = e.target.checked;
+                      const workspaceToModify: IWspUser =
+                        currentWorkSpace.currentWorkSpace;
+                      workspaceToModify.container.containerPreferences[
+                        "isMultipleSelectionActive"
+                      ] = e.target.checked;
                       currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
                     }
                   }}

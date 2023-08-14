@@ -1,15 +1,14 @@
-import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
+
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
-import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { EditableGridCell, Item } from "@glideapps/glide-data-grid";
 import { DateTime } from "luxon";
 
 export const editGridCell = async (
     cell: Item,
     columns: IColumnProjection[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any,
-    newValue: EditableGridCell,
-    currentUserWsp: ICurrentWspContext
+    newValue: EditableGridCell
 ) => {
     const [col, row]: Item = cell;
     const key: string | undefined = columns[col]?.title;
@@ -20,31 +19,54 @@ export const editGridCell = async (
     if (type === "number") data[row][key] = newValue.data;
 
     if (type === "date") {
-        // @ts-ignore
-        let ISODate: Date = new Date(newValue.data.date);
-        let newDate: Date = DateTime.fromISO(ISODate.toISOString()).toISO();
+        const currentDate =
+            newValue.data &&
+                typeof newValue.data === "object" &&
+                "date" in newValue.data
+                ? newValue.data.date
+                : "";
+        const ISODate: Date = new Date(
+            typeof currentDate === "string" ? currentDate : ""
+        );
+        const newDate: Date = DateTime.fromISO(ISODate.toISOString()).toISO();
 
         data[row][key] = newDate;
     }
-    // @ts-ignore
-    if (type === "picklist") data[row][key] = newValue?.data?.value;
 
-    // @ts-ignore
-    if (type === "multipicklist") data[row][key] = newValue.data.tags.join(";");
+    if (type === "picklist")
+        data[row][key] =
+            newValue.data &&
+                typeof newValue.data === "object" &&
+                "value" in newValue.data
+                ? newValue.data.value
+                : "";
 
-    // @ts-ignore
-    if (type === "phone") data[row][key] = newValue.data.phone;
+    if (type === "multipicklist")
+        data[row][key] =
+            newValue.data &&
+                typeof newValue.data === "object" &&
+                "tags" in newValue.data &&
+                Array.isArray(newValue.data.tags)
+                ? newValue.data.tags.join(";")
+                : "";
 
-    // @ts-ignore
-    if (type === "calculator") data[row][key] = newValue.data.data;
+    if (type === "phone") data[row][key] = newValue.data &&
+        typeof newValue.data === "object" &&
+        "phone" in newValue.data
+        ? newValue.data.phone
+        : "";
 
-    // @ts-ignore
-    if (type === "time") data[row][key] = newValue.data.date
+    if (type === "time") data[row][key] = newValue.data &&
+        typeof newValue.data === "object" &&
+        "time" in newValue.data
+        ? newValue.data.time
+        : "";
 
     if (type === "mail") {
         const errors: string[] = [];
         if (typeof newValue.data === "string") {
-            let res = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            // eslint-disable-next-line no-useless-escape
+            const res = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
             const valor = res.test(newValue.data);
 
@@ -57,5 +79,4 @@ export const editGridCell = async (
     }
 
     return true;
-
 };

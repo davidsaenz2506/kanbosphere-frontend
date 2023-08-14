@@ -12,12 +12,7 @@ import {
 import { Modal } from "@nextui-org/react";
 
 import Select, { SingleValue } from "react-select";
-import {
-  IClockTime,
-  IDataToDo,
-  IFilePath,
-  IPriority,
-} from "@/domain/entities/todo.entity";
+import { IDataToDo, IPriority } from "@/domain/entities/todo.entity";
 
 import { DateTime } from "luxon";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
@@ -46,8 +41,16 @@ const priorityOptions: IPicklistOptions[] = [
   { label: "Crítica", value: "critical", color: "#FF9999" },
 ];
 
-const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
+interface IAddTaskProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
   const toastNotification = useToast();
+  const { isOpen, onClose, isLoading, setIsLoading } = props;
   const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
     useCurrentWorkspace();
   const [status, setStatus] = useState<string>("");
@@ -58,8 +61,6 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
   const formatedValue = mathRandomValue.toString().padStart(3, "0");
   const [taskInfo, setTaskInfo] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [clockTime, setClockTime] = useState<IClockTime[]>([]);
-  const [file, setFile] = useState<IFilePath[]>([]);
   const [expectedHours, setExpectedHours] = useState<number>(0);
   const [taskId, setTaskId] = useState<string>(
     Math.random().toString(36).substr(2, 18)
@@ -68,9 +69,12 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
     value: "",
     color: "",
   });
+  const containerPreferences = data?.container?.containerPreferences;
 
-  // @ts-ignore
-  const title = `${data?.container?.containerPreferences?.prefix}-${formatedValue}`;
+  const title =
+    containerPreferences && "prefix" in containerPreferences
+      ? `${containerPreferences.prefix}-${formatedValue}`
+      : "undefined";
 
   const [task, setTask] = useState<IDataToDo>({
     userId: "1000933190",
@@ -95,9 +99,9 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
       priority: selectedPriority,
       info: taskInfo,
       title: title,
-      file: file,
+      file: [],
       createDate: DateTime.now().toISO(),
-      clockTime: clockTime,
+      clockTime: [],
       expectedWorkingHours: expectedHours,
     });
   }, [status, taskInfo, title, selectedPriority]);
@@ -105,24 +109,31 @@ const AddTask = ({ isOpen, onClose, isLoading, setIsLoading }) => {
   async function addTaskToWorkSpace(userTask: IDataToDo) {
     try {
       setIsLoading(true);
-      let workspaceData: IDataToDo[] | undefined = data?.container?.wspData;
-      let newTask: IDataToDo = userTask;
+      const workspaceData: IDataToDo[] | undefined = data?.container?.wspData;
+      const newTask: IDataToDo = userTask;
 
       if (workspaceData) workspaceData.push(newTask);
 
-      // @ts-ignore
-      setUserTasks({ ...data, wspData: workspaceData });
-
-      await AddCard(data?._id, {
-        body: newTask,
-        transactionObject: {
-          currentUserSocketId: currentBiridectionalCommunication.id,
-          currentRoomToken: {
-            roomToken: data?._id ?? "",
+      if (data) {
+        setUserTasks({
+          ...data,
+          container: {
+            ...data?.container,
+            wspData: workspaceData,
           },
-        },
-      });
-      setIsLoading(false);
+        });
+
+        await AddCard(data?._id, {
+          body: newTask,
+          transactionObject: {
+            currentUserSocketId: currentBiridectionalCommunication.id,
+            currentRoomToken: {
+              roomToken: data?._id ?? "",
+            },
+          },
+        });
+        setIsLoading(false);
+      }
     } catch (error) {
       toastNotification({
         title: "Ups, algo ha ocurrido...",

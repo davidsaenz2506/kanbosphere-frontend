@@ -1,18 +1,16 @@
 import React from "react";
 import {
-    IconButton,
+  IconButton,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
-  Tfoot,
   Th,
   Thead,
   Tr,
   Text,
   Icon,
-  Box
+  Box,
 } from "@chakra-ui/react";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { formatDate } from "@/utilities/date/format";
@@ -21,7 +19,7 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 import { useCurrentContact } from "@/context/currentContacts/currentContacts.hook";
 import { DeleteIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 
-import {FcDataSheet} from "react-icons/fc"
+import { FcDataSheet } from "react-icons/fc";
 
 interface SpreadTableComponent {
   spreadChunkData: IWspUser[];
@@ -42,36 +40,54 @@ const TableSpread: React.FC<SpreadTableComponent> = (props) => {
       <Table variant={"simple"}>
         <Thead>
           <Tr bg={tableCssProperties.bgColor}>
-            <Th textAlign={"center"} color={tableCssProperties.textColor}>Nombre</Th>
-            <Th textAlign={"center"} color={tableCssProperties.textColor}>Tipo</Th>
-            <Th textAlign={"center"} color={tableCssProperties.textColor}>Fecha de creación</Th>
-            <Th textAlign={"center"} color={tableCssProperties.textColor}>Id creador</Th>
-            <Th textAlign={"center"} color={tableCssProperties.textColor}>Usuarios activos</Th>
-            <Th textAlign={"center"} color={tableCssProperties.textColor}>Opciones</Th>
+            <Th textAlign={"center"} color={tableCssProperties.textColor}>
+              Nombre
+            </Th>
+            <Th textAlign={"center"} color={tableCssProperties.textColor}>
+              Tipo
+            </Th>
+            <Th textAlign={"center"} color={tableCssProperties.textColor}>
+              Fecha de creación
+            </Th>
+            <Th textAlign={"center"} color={tableCssProperties.textColor}>
+              Id creador
+            </Th>
+            <Th textAlign={"center"} color={tableCssProperties.textColor}>
+              Usuarios activos
+            </Th>
+            <Th textAlign={"center"} color={tableCssProperties.textColor}>
+              Opciones
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
-          {spreadChunkData.map((currentChunk) => {
+          {spreadChunkData.map((currentChunk, index: number) => {
             const activeUsers = [
               currentChunk.createdById,
               ...currentChunk.collaborators,
             ];
 
             return (
-              <Tr bg={"gray.100"}>
+              <Tr bg={"gray.100"} key={index}>
                 <Td textAlign={"center"}>{currentChunk.name}</Td>
                 <Td textAlign={"center"}>
-                  <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
                     <Icon w={7} h={7} marginRight={"10px"} as={FcDataSheet} />
                     <Text>{currentChunk.type.toUpperCase()}</Text>
                   </Box>
                 </Td>
-                <Td textAlign={"center"}>{formatDate(currentChunk.createdDate, "DDD")} </Td>
+                <Td textAlign={"center"}>
+                  {formatDate(currentChunk.createdDate, "DDD")}{" "}
+                </Td>
                 <Td textAlign={"center"}>{currentChunk.createdById} </Td>
                 <Td justifyContent={"center"} display={"flex"}>
                   {currentContact.currentContacts?.friends &&
                     currentContact.currentContacts.friends.map(
-                      (currentDataInfo) => {
+                      (currentDataInfo, index: number) => {
                         if (
                           currentDataInfo?._id &&
                           activeUsers.includes(currentDataInfo?._id)
@@ -81,6 +97,7 @@ const TableSpread: React.FC<SpreadTableComponent> = (props) => {
 
                         return (
                           <Avatar
+                            key={index}
                             src={currentDataInfo?.profilePicture}
                             style={{ marginRight: "-10px" }}
                             width={10}
@@ -96,9 +113,29 @@ const TableSpread: React.FC<SpreadTableComponent> = (props) => {
                   />
                 </Td>
                 <Td textAlign={"center"}>
-                  <IconButton borderRadius={"50%"} colorScheme='blue' variant={"solid"} icon={<ExternalLinkIcon/>} aria-label="info" />
-                  <IconButton borderRadius={"50%"} marginLeft={"5px"} marginRight={"5px"} colorScheme='green' variant={"solid"} icon={<EditIcon/>} aria-label="edit" />
-                  <IconButton borderRadius={"50%"} colorScheme='red' variant={"solid"} icon={<DeleteIcon/>} aria-label="delete" />
+                  <IconButton
+                    borderRadius={"50%"}
+                    colorScheme="blue"
+                    variant={"solid"}
+                    icon={<ExternalLinkIcon />}
+                    aria-label="info"
+                  />
+                  <IconButton
+                    borderRadius={"50%"}
+                    marginLeft={"5px"}
+                    marginRight={"5px"}
+                    colorScheme="green"
+                    variant={"solid"}
+                    icon={<EditIcon />}
+                    aria-label="edit"
+                  />
+                  <IconButton
+                    borderRadius={"50%"}
+                    colorScheme="red"
+                    variant={"solid"}
+                    icon={<DeleteIcon />}
+                    aria-label="delete"
+                  />
                 </Td>
               </Tr>
             );

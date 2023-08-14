@@ -18,7 +18,12 @@ function delayTime(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const EndBar = ({setIsTriggerActive}) => {
+interface IEndBarProps {
+  setIsTriggerActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const EndBar: React.FunctionComponent<IEndBarProps> = (props) => {
+  const {setIsTriggerActive} = props;
   const { setCurrentWorkSpace } = useCurrentWorkspace();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +41,7 @@ const EndBar = ({setIsTriggerActive}) => {
 
   return (
     <>
-      <EndSession isOpen={isOpen} setIsOpen={setIsOpen} router={router} />
+      <EndSession isOpen={isOpen} setIsOpen={setIsOpen} />
       <Box
         style={{
           position: "absolute",

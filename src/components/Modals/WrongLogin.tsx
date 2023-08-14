@@ -11,7 +11,12 @@ import {
 
 import { Button } from "@chakra-ui/react";
 
-const DeleteTask = (props) => {
+interface IWrongLoginProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const WrongLoginComponent: React.FunctionComponent<IWrongLoginProps> = (props) => {
   const ref = useRef(null);
 
   return (
@@ -19,7 +24,7 @@ const DeleteTask = (props) => {
       <AlertDialog
         leastDestructiveRef={ref}
         isOpen={props.isOpen}
-        onClose={props.onClose}
+        onClose={() => props.onClose(false)}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
@@ -41,4 +46,4 @@ const DeleteTask = (props) => {
   );
 };
 
-export default DeleteTask;
+export default WrongLoginComponent;

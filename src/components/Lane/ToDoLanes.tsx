@@ -40,12 +40,9 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
   const backGroundLaneColor = "#f5f6fA";
 
   React.useEffect(() => {
-    const currentWorkSpace: IWspUser | undefined =
-      generalWorkspaceData.userWsps.find(
-        (currentWsp) => currentWsp?._id === data?._id
-      );
-    setData(currentWorkSpace);
-  }, [generalWorkspaceData.userWsps]);
+    const currentWorkSpace: IWspUser | undefined = generalWorkspaceData.userWsps.find((currentWsp) => currentWsp?._id === data?._id);
+    setData(currentWorkSpace); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [generalWorkspaceData.userWsps, data?._id]);
 
   return (
     <div
@@ -57,16 +54,17 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
         height: "90%",
       }}
     >
-        {Object.entries(filterItemsMap).map((currentItemMapped) => {
+        {Object.entries(filterItemsMap).map((currentItemMapped, index: number) => {
           return (
             <LaneComponent
+              key={index}
               currentCardHolderHeight={props.currentCardHolderHeight}
               title={currentItemMapped[1].title}
               instance={currentItemMapped[1].filterValue}
               bgColor={backGroundLaneColor}
               setSelectedTasks={props.setSelectedTasks}
               isGettingImage={props.isGettingImage}
-              data={ data?.container?.wspData ? data?.container?.wspData?.filter((instance: any) => instance.status === currentItemMapped[1].filterValue) : [] }
+              data={data?.container?.wspData ? data?.container?.wspData?.filter((instance: IDataToDo) => instance.status === currentItemMapped[1].filterValue) : []}
             />
           );
         })}

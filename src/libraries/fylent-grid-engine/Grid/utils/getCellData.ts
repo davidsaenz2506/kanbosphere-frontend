@@ -5,9 +5,11 @@ import { DateTime } from "luxon";
 
 export const getCellData = (
     [col, row]: Item,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: Array<any>,
     columns: IColumnProjection[]
 ): GridCell => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataRow: any = data[row];
     const columnsCol: IColumnProjection = columns[col];
     const columnType: string | undefined = columnsCol?.type;
@@ -22,9 +24,10 @@ export const getCellData = (
                 displayData: dataRow[field] ? dataRow[field] : "",
             };
 
-        case "compound":
+        case "compound": {
             let currentColumnParameters: ICompoundProjection;
             let valueToRender: string | undefined;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let currentMethod: any = undefined;
 
             if (columnsCol.compoundValues) {
@@ -32,13 +35,14 @@ export const getCellData = (
 
                 const currentFormulaName = currentColumnParameters.formulaName;
                 const parameters: IChildCompounds[] = currentColumnParameters.compounds;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const dataEntryValues: Array<any> = parameters.map((currentEntryPoint) => {
                     return {
                         [currentEntryPoint.columnValue]: dataRow[currentEntryPoint.name]
                     }
                 })
 
-                const newEntryPoint: Object = dataEntryValues.reduce((currentChunk, object) => {
+                const newEntryPoint: object = dataEntryValues.reduce((currentChunk, object) => {
                     return {
                         ...currentChunk,
                         ...object
@@ -63,6 +67,8 @@ export const getCellData = (
                 allowOverlay: false,
                 displayData: dataRow[field] ?? "",
             };
+        }
+
 
         case "mail":
             return {
@@ -87,7 +93,7 @@ export const getCellData = (
                 displayData: dataRow[field]?.toString() ?? "",
             };
 
-        case "date":
+        case "date": {
             const newUserDate = new Date(new Date(dataRow[field])).toUTCString();
             const jsonDate = new Date(newUserDate).toJSON();
 
@@ -110,6 +116,8 @@ export const getCellData = (
                 allowOverlay: true,
                 copyData: "",
             };
+
+        }
 
         case "time":
 

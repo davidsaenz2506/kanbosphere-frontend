@@ -8,6 +8,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Spinner,
 } from "@chakra-ui/react";
 
 import { Button, Input, FormControl, FormLabel } from "@chakra-ui/react";
@@ -21,33 +22,44 @@ import { IWspContext } from "@/context/usersWorkSpaces/wsp.context";
 import { ICurrentUserContext } from "@/context/currentUser/currentUser.context";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
-const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
+interface IEditTaskProps {
+  isOpen: boolean;
+  title: string;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleConfettiAction: () => void;
+}
+
+const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
+  const { isOpen, title, setIsOpen, handleConfettiAction } = props;
   const [nameValue, setNameValue] = useState<string>("");
   const [currentPrefix, setCurrentPrefix] = useState<string>("");
   const wspUser: IWspContext = useWorkspace();
   const currentUserInfo: ICurrentUserContext = useCurrentUser();
+  const [sendingStatus, setSendingStatus] = useState<boolean>(false);
 
   async function handleCreate() {
-    let newWorkspaceToCreate: Partial<IWspUser> = {};
-    setIsLoading(true);
+    const newWorkspaceToCreate: Partial<IWspUser> = {};
+    setSendingStatus(true);
 
     if (title === "agile") {
       newWorkspaceToCreate.createdDate = DateTime.now().toString();
       newWorkspaceToCreate.name = nameValue;
       newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
       newWorkspaceToCreate.type = title;
-      newWorkspaceToCreate.collaborators = [{
-        _id: currentUserInfo.currentUser._id ?? "",
-        name: currentUserInfo.currentUser.username,
-        role: "HOST"
-      }]
+      newWorkspaceToCreate.collaborators = [
+        {
+          _id: currentUserInfo.currentUser._id ?? "",
+          name: currentUserInfo.currentUser.username,
+          role: "HOST",
+        },
+      ];
       newWorkspaceToCreate.container = {
-         wspData: [],
-         containerPreferences: {
-            prefix: currentPrefix,
-            selectedTask: null,
-         }
-      }
+        wspData: [],
+        containerPreferences: {
+          prefix: currentPrefix,
+          selectedTask: null,
+        },
+      };
     }
 
     if (title === "spreadsheet") {
@@ -55,30 +67,39 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
       newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
       newWorkspaceToCreate.type = title;
       newWorkspaceToCreate.name = nameValue;
-      newWorkspaceToCreate.collaborators = [{
-        _id: currentUserInfo.currentUser._id ?? "",
-        name: currentUserInfo.currentUser.username,
-        role: "HOST"
-      }]
+      newWorkspaceToCreate.collaborators = [
+        {
+          _id: currentUserInfo.currentUser._id ?? "",
+          name: currentUserInfo.currentUser.username,
+          role: "HOST",
+        },
+      ];
       newWorkspaceToCreate.container = {
-         spreadSheetData: {
-            columns: [],
-            data: [],
-            userId: currentUserInfo.currentUser.userID,
-         },
-         containerPreferences: {
-            isRowSelectionActive: true,
-            isMultipleSelectionActive: false,
-            freezedColumns: 0,
-         }
-      }
+        spreadSheetData: {
+          columns: [],
+          data: [],
+          userId: currentUserInfo.currentUser.userID,
+        },
+        containerPreferences: {
+          isRowSelectionActive: true,
+          isMultipleSelectionActive: false,
+          freezedColumns: 0,
+        },
+      };
     }
 
     const createdWorkspace = await CreateWorkSpaces(newWorkspaceToCreate);
-    wspUser.setUsersWsps([...wspUser.userWsps, createdWorkspace.data]);
 
-    setIsLoading(false);
-    setIsOpen(false);
+    if (createdWorkspace.data) {
+      wspUser.setUsersWsps([...wspUser.userWsps, createdWorkspace.data]);
+
+      setSendingStatus(false);
+      setIsOpen(false);
+
+      setTimeout(() => {
+        handleConfettiAction();
+      }, 500);
+    }
   }
 
   return (
@@ -113,9 +134,12 @@ const OpenWorkSpace = ({ isOpen, title, setIsOpen, setIsLoading }) => {
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={() => handleCreate()}>
-              Crear
+              {sendingStatus && <Spinner />}
+              {!sendingStatus && <>Crear</>}
             </Button>
-            <Button onClick={() => setIsOpen(false)}>Cancelar</Button>
+            <Button isDisabled={sendingStatus} onClick={() => setIsOpen(false)}>
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

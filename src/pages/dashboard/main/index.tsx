@@ -5,7 +5,12 @@ import styles from "./main.module.css";
 import { Box } from "@chakra-ui/react";
 import Projections from "@/components/Projection";
 
-export const MainLoad = ({ loadingServerData }) => {
+interface IMainLoadProps {
+  loadingServerData: boolean;
+}
+
+export const MainLoad: React.FunctionComponent<IMainLoadProps> = (props) => {
+  const { loadingServerData } = props;
   return (
     <React.Fragment>
       <div className={styles.mainContainer}>

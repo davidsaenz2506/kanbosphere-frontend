@@ -1,14 +1,16 @@
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 import { ISpreadSheet } from "@/domain/entities/spreadsheet.entity";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function deleteGridRow(rowIndex: number[] | undefined, currentWorkSpace: ICurrentWspContext, toastNotification: any) {
     try {
         const spreadData = currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData?.data ?? [];
         const currentRowIndex: number[] | undefined = rowIndex;
 
-        let newSpreadData: ISpreadSheet | undefined = currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData;
+        const newSpreadData: ISpreadSheet | undefined = currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData;
 
-        const filteredDataSheet: any = spreadData.filter((item, index: number) => !currentRowIndex?.includes(index));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const filteredDataSheet: any[] = spreadData.filter((item: any[], index: number) => !currentRowIndex?.includes(index));
 
         if (newSpreadData) newSpreadData.data = filteredDataSheet;
 

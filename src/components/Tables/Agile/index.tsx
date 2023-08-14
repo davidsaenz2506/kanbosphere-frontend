@@ -72,86 +72,89 @@ const TableAgile: React.FC<AgileComponent> = (props) => {
             </Tr>
           </Thead>
           <Tbody>
-            {agileSpaceChunkData.map((currentChunk) => {
-              const activeUsers = [
-                currentChunk.createdById,
-                ...currentChunk.collaborators,
-              ];
+            {agileSpaceChunkData.map(
+              (currentChunk: IWspUser, index: number) => {
+                const activeUsers = [
+                  currentChunk.createdById,
+                  ...currentChunk.collaborators,
+                ];
 
-              return (
-                <Tr bg={"gray.100"}>
-                  <Td textAlign={"center"}>{currentChunk.name}</Td>
-                  <Td textAlign={"center"}>
-                    <Box
-                      display={"flex"}
-                      justifyContent={"flex-start"}
-                      alignItems={"center"}
-                    >
-                      <Icon as={() => getChunkIcon(currentChunk.type)} />
-                      <Text marginLeft={"10px"} fontWeight={"bolder"}>
-                        {currentChunk.type.toUpperCase()}
-                      </Text>
-                    </Box>
-                  </Td>
-                  <Td textAlign={"center"}>
-                    {formatDate(currentChunk.createdDate, "DDD")}{" "}
-                  </Td>
-                  <Td textAlign={"center"}>{currentChunk.createdById} </Td>
-                  <Td justifyContent={"center"} display={"flex"}>
-                    {currentContact.currentContacts?.friends &&
-                      currentContact.currentContacts.friends.map(
-                        (currentDataInfo) => {
-                          if (
-                            currentDataInfo?._id &&
-                            activeUsers.includes(currentDataInfo?._id)
-                          ) {
-                            return;
+                return (
+                  <Tr bg={"gray.100"} key={index}>
+                    <Td textAlign={"center"}>{currentChunk.name}</Td>
+                    <Td textAlign={"center"}>
+                      <Box
+                        display={"flex"}
+                        justifyContent={"flex-start"}
+                        alignItems={"center"}
+                      >
+                        <Icon as={() => getChunkIcon(currentChunk.type)} />
+                        <Text marginLeft={"10px"} fontWeight={"bolder"}>
+                          {currentChunk.type.toUpperCase()}
+                        </Text>
+                      </Box>
+                    </Td>
+                    <Td textAlign={"center"}>
+                      {formatDate(currentChunk.createdDate, "DDD")}{" "}
+                    </Td>
+                    <Td textAlign={"center"}>{currentChunk.createdById} </Td>
+                    <Td justifyContent={"center"} display={"flex"}>
+                      {currentContact.currentContacts?.friends &&
+                        currentContact.currentContacts.friends.map(
+                          (currentDataInfo, index: number) => {
+                            if (
+                              currentDataInfo?._id &&
+                              activeUsers.includes(currentDataInfo?._id)
+                            ) {
+                              return;
+                            }
+
+                            return (
+                              <Avatar
+                                key={index}
+                                src={currentDataInfo?.profilePicture}
+                                style={{ marginRight: "-10px" }}
+                                width={10}
+                                height={10}
+                              />
+                            );
                           }
-
-                          return (
-                            <Avatar
-                              src={currentDataInfo?.profilePicture}
-                              style={{ marginRight: "-10px" }}
-                              width={10}
-                              height={10}
-                            />
-                          );
-                        }
-                      )}
-                    <Avatar
-                      src={currentSession.currentUser.profilePicture}
-                      width={10}
-                      height={10}
-                    />
-                  </Td>
-                  <Td textAlign={"center"}>
-                    <IconButton
-                      borderRadius={"50%"}
-                      colorScheme="blue"
-                      variant={"solid"}
-                      icon={<ExternalLinkIcon />}
-                      aria-label="info"
-                    />
-                    <IconButton
-                      borderRadius={"50%"}
-                      marginLeft={"5px"}
-                      marginRight={"5px"}
-                      colorScheme="green"
-                      variant={"solid"}
-                      icon={<EditIcon />}
-                      aria-label="edit"
-                    />
-                    <IconButton
-                      borderRadius={"50%"}
-                      colorScheme="red"
-                      variant={"solid"}
-                      icon={<DeleteIcon />}
-                      aria-label="delete"
-                    />
-                  </Td>
-                </Tr>
-              );
-            })}
+                        )}
+                      <Avatar
+                        src={currentSession.currentUser.profilePicture}
+                        width={10}
+                        height={10}
+                      />
+                    </Td>
+                    <Td textAlign={"center"}>
+                      <IconButton
+                        borderRadius={"50%"}
+                        colorScheme="blue"
+                        variant={"solid"}
+                        icon={<ExternalLinkIcon />}
+                        aria-label="info"
+                      />
+                      <IconButton
+                        borderRadius={"50%"}
+                        marginLeft={"5px"}
+                        marginRight={"5px"}
+                        colorScheme="green"
+                        variant={"solid"}
+                        icon={<EditIcon />}
+                        aria-label="edit"
+                      />
+                      <IconButton
+                        borderRadius={"50%"}
+                        colorScheme="red"
+                        variant={"solid"}
+                        icon={<DeleteIcon />}
+                        aria-label="delete"
+                      />
+                    </Td>
+                  </Tr>
+                );
+              }
+            )}
           </Tbody>
         </Table>
       </TableContainer>

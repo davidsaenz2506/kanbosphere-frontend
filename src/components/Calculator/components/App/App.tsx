@@ -175,7 +175,7 @@ export const Calculator: FunctionComponent<ICalculatorProps> = ({
     if (typeof onChange === "function") {
       onChange(resultToReturn);
     }
-  }, [resultToReturn]);
+  }, [resultToReturn, onChange]);
 
   return (
     <StyledApp>

@@ -1,7 +1,6 @@
 import nextConnect from 'next-connect';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { IUser } from '@/domain/entities/users.entity';
 import ICurrentUser from '@/domain/entities/user.entity';
 const handler = nextConnect();
 

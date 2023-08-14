@@ -1,12 +1,12 @@
 
 import ICurrentUser from "@/domain/entities/user.entity";
-import { m } from "framer-motion";
 import { createContext } from "react";
 
 
 export interface ICurrentUserContext {
     currentUser: ICurrentUser,
-    setCurrentUser: (value: any) => void,
+    setCurrentUser: (value: ICurrentUser) => void,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fetchCurrentUser: (credentials: any) => Promise<void>
 }
 
@@ -22,6 +22,6 @@ export const CurrentUserContext = createContext<ICurrentUserContext>({
         requests: [],
         invitations: []
     },
-    setCurrentUser: () => {},
-    fetchCurrentUser: async () => {}
+    setCurrentUser: () => { },
+    fetchCurrentUser: async () => { }
 })

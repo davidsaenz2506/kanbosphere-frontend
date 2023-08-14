@@ -1,7 +1,6 @@
 import nextConnect from 'next-connect';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { IWspUser } from '@/domain/entities/userWsps.entity';
 import { IDataToDo, ITransactionToDo } from '@/domain/entities/todo.entity';
 
 const handler = nextConnect();

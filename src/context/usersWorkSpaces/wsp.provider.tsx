@@ -3,13 +3,14 @@ import React, { ReactNode, useCallback } from "react";
 import { FC } from "react";
 
 import { WorkspaceContext } from "./wsp.context";
+import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 type PropTypes = {
   children?: ReactNode;
 };
 
-export const WspProvider: FC<PropTypes> = ({ children }: any) => {
-  const [userWsps, setUsersWsps] = React.useState<any>([]);
+export const WspProvider: FC<PropTypes> = ({ children }) => {
+  const [userWsps, setUsersWsps] = React.useState<IWspUser[]>([]);
 
   const fetchWorkSpaces = useCallback(
     async (
@@ -20,7 +21,7 @@ export const WspProvider: FC<PropTypes> = ({ children }: any) => {
         const response = await getAllWorkSpaces(userId);
 
         if (setLoadingServerData) setLoadingServerData(true);
-        setUsersWsps(response);
+        if (response) setUsersWsps(response);
       } catch (error) {
         console.log(error);
       }

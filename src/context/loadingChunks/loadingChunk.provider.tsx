@@ -7,7 +7,7 @@ type PropTypes = {
   children?: ReactNode;
 };
 
-export const LoadingChunkProvider: FC<PropTypes> = ({ children }: any) => {
+export const LoadingChunkProvider: FC<PropTypes> = ({ children }) => {
   const [loadingChunk, setLoadingChunk] = React.useState<boolean>(false);
 
   return (

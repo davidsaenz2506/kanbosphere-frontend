@@ -3,9 +3,7 @@ import {
   Card,
   CardHeader,
   CardBody,
-  Heading,
   Text,
-  Skeleton,
   Box,
   SkeletonCircle,
   SkeletonText,
@@ -30,16 +28,27 @@ const statusColorValues = {
   Blocked: "#FF3333",
 };
 
-const LaneComponent = ({
-  title,
-  instance,
-  bgColor,
-  data,
-  setSelectedTasks,
-  isGettingImage,
-  currentCardHolderHeight,
-}) => {
+interface ILaneComponentProps {
+  title: string;
+  instance: string;
+  bgColor: string;
+  data: IDataToDo[];
+  setSelectedTasks: React.Dispatch<React.SetStateAction<IDataToDo | undefined>>;
+  isGettingImage: boolean;
+  currentCardHolderHeight: number;
+}
+
+const LaneComponent: React.FunctionComponent<ILaneComponentProps> = (props) => {
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
+  const {
+    title,
+    instance,
+    bgColor,
+    data,
+    setSelectedTasks,
+    isGettingImage,
+    currentCardHolderHeight,
+  } = props;
   const { loadingChunk } = useLoadingChunk();
   const [skeletonAmount, setSkeletonAmount] = useState<number>(0);
   const [{ isOver, canDrop }, drop] = useDrop({
@@ -59,29 +68,28 @@ const LaneComponent = ({
             (currentRecord) => currentRecord.taskId === item.item.taskId
           );
 
-        // @ts-ignore
-        const modifiedWorkspace: IWspUser | undefined = {
-          ...currentWorkSpace,
-          // @ts-ignore
-          container: {
-            ...currentWorkSpace?.container,
-            wspData: modifiedWorkspaceData
-          },
-        };
-
-        // @ts-ignore
-        setCurrentWorkSpace(modifiedWorkspace);
-
-        if (modifiedRecord)
-          await UpdateCard(currentWorkSpace?._id, {
-            body: modifiedRecord,
-            transactionObject: {
-              currentUserSocketId: currentBiridectionalCommunication.id,
-              currentRoomToken: {
-                roomToken: currentWorkSpace?._id ?? "",
-              },
+        if (modifiedWorkspaceData && currentWorkSpace) {
+          const modifiedWorkspace: IWspUser | undefined = {
+            ...currentWorkSpace,
+            container: {
+              ...currentWorkSpace.container,
+              wspData: modifiedWorkspaceData,
             },
-          });
+          };
+
+          setCurrentWorkSpace(modifiedWorkspace);
+
+          if (modifiedRecord)
+            await UpdateCard(currentWorkSpace?._id, {
+              body: modifiedRecord,
+              transactionObject: {
+                currentUserSocketId: currentBiridectionalCommunication.id,
+                currentRoomToken: {
+                  roomToken: currentWorkSpace?._id ?? "",
+                },
+              },
+            });
+        }
       }
     },
     canDrop: (item) => {
@@ -99,9 +107,14 @@ const LaneComponent = ({
   }, [currentCardHolderHeight]);
 
   useEffect(() => {
-    const currentCardHolderElement: HTMLElement | null = document.getElementById("cardHolder");
+    const currentCardHolderElement: HTMLElement | null =
+      document.getElementById("cardHolder");
     if (currentCardHolderElement) {
-      setSkeletonAmount(Math.floor(currentCardHolderElement?.getBoundingClientRect().height / 80));
+      setSkeletonAmount(
+        Math.floor(
+          currentCardHolderElement?.getBoundingClientRect().height / 80
+        )
+      );
     }
   }, []);
 
@@ -115,7 +128,10 @@ const LaneComponent = ({
           width: "250px",
           minWidth: "250px",
           backgroundColor: bgColor,
-          overflowY: currentWorkSpace?.container?.wspData === undefined ? "hidden" : "auto",
+          overflowY:
+            currentWorkSpace?.container?.wspData === undefined
+              ? "hidden"
+              : "auto",
           zIndex: 1,
           boxShadow: "rgba(0, 0, 0, 0.15) 0px 3px 8px;",
           height: "100%",
@@ -162,11 +178,12 @@ const LaneComponent = ({
               : bgColor,
           }}
         >
-          {(currentWorkSpace?.container?.wspData === undefined) &&
-            Array.from({ length: skeletonAmount }, (_, index) => index + 1).map(
+          {currentWorkSpace?.container?.wspData === undefined &&
+            Array.from({ length: skeletonAmount }, (_, index) => index + 1).map( // eslint-disable-line @typescript-eslint/no-unused-vars
               (_: number) => {
                 return (
                   <Box
+                    key={_}
                     marginBottom={"10px"}
                     padding="2"
                     boxShadow="lg"

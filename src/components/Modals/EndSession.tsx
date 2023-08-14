@@ -1,6 +1,5 @@
 import React from "react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/router";
 
 import {
   AlertDialog,
@@ -13,7 +12,12 @@ import {
 
 import { Button } from "@chakra-ui/react";
 
-const EndSession = (props) => {
+interface IEndSessionProps {
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const EndSession: React.FunctionComponent<IEndSessionProps> = (props) => {
   async function clearUserSessionCookie() {
     window.open("/", "_self");
     const tokenValue = await Cookies.get("tumbleToken");
@@ -22,7 +26,7 @@ const EndSession = (props) => {
 
   return (
     <>
-      <AlertDialog isOpen={props.isOpen}>
+      <AlertDialog isOpen={props.isOpen} onClose={() => props.setIsOpen(false)}>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader marginBottom={"-15px"} fontSize="lg" fontWeight="bold">

@@ -1,4 +1,5 @@
-import "@/styles/globals.css";
+import React from "react";
+
 import type { AppProps } from "next/app";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { WspProvider } from "@/context/usersWorkSpaces/wsp.provider";
@@ -7,6 +8,8 @@ import { CurrentWorkSpaceProvider } from "@/context/currentWorkSpace/currentWsp.
 import { CurrentUserProvider } from "@/context/currentUser/currentUser.provider";
 import { CurrentContactProvider } from "@/context/currentContacts/currentContacts.provider";
 import { LoadingChunkProvider } from "@/context/loadingChunks/loadingChunk.provider";
+
+import "@/styles/globals.css";
 
 const theme = extendTheme({
   colors: {

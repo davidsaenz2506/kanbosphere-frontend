@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   CustomCell,
   CustomRenderer,
-  drawTextCell,
   GridCellKind,
   measureTextCached,
   Rectangle,
@@ -23,9 +22,8 @@ export type DatePickerCell = CustomCell<DatePickerCellProps>;
 
 const renderer: CustomRenderer<DatePickerCell> = {
   kind: GridCellKind.Custom,
-  isMatch: (cell: CustomCell): cell is DatePickerCell => {
-    return (cell.data as any).type === "date";
-  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  isMatch: (cell: CustomCell): cell is DatePickerCell => { return (cell.data as any).type === "date"},
 
   draw: (args, cell) => {
     const { ctx, theme, rect } = args;

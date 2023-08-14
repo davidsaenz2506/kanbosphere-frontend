@@ -5,7 +5,6 @@ import {
   Card,
   CardBody,
   CardFooter,
-  Portal,
   StatHelpText,
   StatLabel,
   StatNumber,
@@ -19,7 +18,6 @@ import {
 import { Stack, Image, Heading, Button, Text } from "@chakra-ui/react";
 
 import OpenWorkSpace from "../Modals/OpenWorkSpace";
-import Loading from "@/components/Loading";
 
 interface ICardComponentProps {
   name: string;
@@ -99,9 +97,13 @@ const workspacesInfo: ICardComponentProps[] = [
   },
 ];
 
-const Cards = () => {
+interface ICardProviderProps {
+  handleConfettiAction: () => void;
+}
+
+const Cards: React.FunctionComponent<ICardProviderProps> = (props) => {
+  const { handleConfettiAction } = props;
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [currentHoveredItemSelected, setCurrentHoveredItemSelected] =
     useState<number>();
@@ -118,22 +120,18 @@ const Cards = () => {
         marginBottom: "80px",
       }}
     >
-      {isLoading && (
-        <Portal>
-          <Loading message="Agregando espacio de trabajo a su portafolio" />
-        </Portal>
-      )}
       <OpenWorkSpace
         isOpen={isOpenModal}
         title={title}
         setIsOpen={setIsOpenModal}
-        setIsLoading={setIsLoading}
+        handleConfettiAction={handleConfettiAction}
       />
       {workspacesInfo.map(
         (currentInfoTarget: ICardComponentProps, index: number) => {
           return (
             <Card
               direction={{ base: "column", sm: "row" }}
+              key={index}
               overflow="hidden"
               variant="outline"
               transition={"all .5s"}
@@ -238,7 +236,12 @@ const Cards = () => {
                           </StatHelpText>
                         </Stat>
 
-                        <HStack flexWrap={"wrap"} display={"flex"} marginTop={"20px"} spacing={2}>
+                        <HStack
+                          flexWrap={"wrap"}
+                          display={"flex"}
+                          marginTop={"20px"}
+                          spacing={2}
+                        >
                           {currentInfoTarget.tags.map(
                             (tagInfo: string, index: number) => (
                               <Tag

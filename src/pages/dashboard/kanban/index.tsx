@@ -37,8 +37,11 @@ const ToDoWorkspace = () => {
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const [currentColor, setCurrentColor] = useState<string>("#FAFAFA");
   const [isGettingImage, setIsGettingImage] = useState<boolean>(false);
-  const currentCardHolderElement: HTMLElement | null = document.getElementById("cardHolder");
-  const [currentCardHolderHeight, setCurrentCardHolderHeight] = useState<number | undefined>(currentCardHolderElement?.getBoundingClientRect().height);
+  const currentCardHolderElement: HTMLElement | null =
+    document.getElementById("cardHolder");
+  const [currentCardHolderHeight, setCurrentCardHolderHeight] = useState<
+    number | undefined
+  >(currentCardHolderElement?.getBoundingClientRect().height);
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingOrDeleting, setIsSendingOrDeleting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -67,23 +70,26 @@ const ToDoWorkspace = () => {
 
   if (isBrowser()) {
     window.onresize = function onResize() {
-      setCurrentCardHolderHeight(currentCardHolderElement?.getBoundingClientRect().height)
-      const todoDocument: HTMLDivElement | null = document.querySelector(".todoContainer");
-      const navBarDocument: any = document.getElementById("navbarHome");
+      setCurrentCardHolderHeight(
+        currentCardHolderElement?.getBoundingClientRect().height
+      );
+      const todoDocument: HTMLDivElement | null =
+        document.querySelector(".todoContainer");
+      const navBarDocument: HTMLElement | null =
+        document.getElementById("navbarHome");
       const bodyDocumentData: HTMLBodyElement | null =
         document.querySelector("body");
-
-      const workSpaceContainer = document.getElementById("workSpace");
-
       const resizetToolData: HTMLElement | null =
         document.getElementById("resizerTool");
+      const workSpaceContainer = document.getElementById("workSpace");
 
       if (
         todoDocument &&
         bodyDocument &&
         bodyDocumentData &&
         resizetToolData &&
-        workSpaceContainer
+        workSpaceContainer &&
+        navBarDocument
       ) {
         todoDocument.style.height = `${
           bodyDocument.getBoundingClientRect().height -
@@ -103,9 +109,10 @@ const ToDoWorkspace = () => {
   React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
       document.querySelector(".todoContainer");
-    const InitialNavBarDocument: any = document.getElementById("navbarHome");
+    const InitialNavBarDocument: HTMLElement | null =
+      document.getElementById("navbarHome");
 
-    if (InitialTodoDocument && bodyDocument) {
+    if (InitialTodoDocument && bodyDocument && InitialNavBarDocument) {
       InitialTodoDocument.style.height = `${
         bodyDocument.getBoundingClientRect().height -
         InitialNavBarDocument.getBoundingClientRect().height
@@ -118,7 +125,7 @@ const ToDoWorkspace = () => {
 
     if (selectedTask?.file && selectedTask?.file?.length > 0) {
       const currentStorageRefsMatrix: StorageReference[] = [];
-      for (const currentPathObject of selectedTask?.file) {
+      for (const currentPathObject of selectedTask.file) {
         const storageRef: StorageReference = refStorageObject(
           storage,
           currentPathObject.relativePath
@@ -130,7 +137,9 @@ const ToDoWorkspace = () => {
     }
   }, [selectedTask?.file]);
 
-  async function getFileDataFromFirebase(currentStorageRefsMatrix: StorageReference[]) {
+  async function getFileDataFromFirebase(
+    currentStorageRefsMatrix: StorageReference[]
+  ) {
     const currentUrlData: IFilePath[] = [];
     setIsGettingImage(true);
     try {
@@ -156,117 +165,130 @@ const ToDoWorkspace = () => {
   }
 
   React.useEffect(() => {
-    // @ts-ignore
-    setSelectedTask(currentWorkSpace?.container?.wspData?.filter((currentRecord) => currentRecord?.taskId === currentWorkSpace?.container.containerPreferences?.selectedTask)[0]);
+    setSelectedTask(
+      currentWorkSpace?.container?.wspData?.filter((currentRecord) => {
+        if ("selectedTask" in currentWorkSpace.container.containerPreferences) {
+          currentRecord?.taskId ===
+            currentWorkSpace?.container.containerPreferences?.selectedTask;
+        }
+      })[0]
+    );
   }, [currentWorkSpace]);
-  
+
   React.useEffect(() => {
-    // @ts-ignore
-    getWorkspaceData(router.query.fridgeKey)
+    if (typeof router.query.fridgeKey === "string")
+      getWorkspaceData(router.query.fridgeKey);
   }, [router.query.fridgeKey]);
 
-  async function getWorkspaceData (fridgeKey: string) {
+  async function getWorkspaceData(fridgeKey: string) {
     if (fridgeKey && router.query.briefcase === "agile") {
       setLoadingChunk(true);
-      const workspaceData: IWspUser | undefined = await getWorkspaceById(fridgeKey ?? "", currentBiridectionalCommunication.id, currentUser._id ?? "");
+      const workspaceData: IWspUser | undefined = await getWorkspaceById(
+        fridgeKey ?? "",
+        currentBiridectionalCommunication.id,
+        currentUser._id ?? ""
+      );
       if (workspaceData) setCurrentWorkSpace(workspaceData);
-      setLoadingChunk(false);   
+      setLoadingChunk(false);
     }
   }
 
   return (
     <>
       <DndProvider backend={HTML5Backend}>
-      <EditTask
-        isOpen={openEdit}
-        onClose={setOpenEdit}
-        data={selectedTask}
-        isLoading={isSendingOrDeleting}
-        setIsLoading={setIsSendingOrDeleting}
-      />
-      <DeleteTask
-        isOpen={openDelete}
-        onClose={setOpenDelete}
-        //@ts-ignore
-        data={selectedTask}
-        isLoading={isSendingOrDeleting}
-        setIsLoading={setIsSendingOrDeleting}
-      />
-      <Box
-        className="todoContainer"
-        style={{
-          backgroundColor: currentColor,
-          display: "flex",
-          width: "100%",
-          overflowX: "hidden",
-        }}
-      >
-        <AddTask
-          isOpen={addTask}
-          onClose={setAddTask}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        />
-        <Box
-          width={isOpenSliderTask ? "60%" : "100%"}
-          transition={"all .3s ease"}
-          css={{
-            "&::-webkit-scrollbar": {
-              height: "10px",
-            },
-            "&::-webkit-scrollbar-track": {
-              background: "transparent",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: "#D3D3D3",
-              borderRadius: "4px",
-            },
-          }}
-          overflowX={"scroll"}
-          overflowY={"hidden"}
-        >
-          <Box
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              position: "sticky",
-              height: "12%",
-              left: 0,
-              transition: "all .5s"
-            }}
-          >
-            <Header
-              currentWorkSpace={currentWorkSpace}
-              setAddTask={setAddTask}
-              setCurrentColor={setCurrentColor}
-              currentColor={currentColor}
-              setIsOpen={setIsOpen}
-              colorObject={colorObject}
-              isOpen={isOpen}
-              isOpenSliderTask={isOpenSliderTask}
-              setOpenSliderTask={setOpenSliderTask}
+        {selectedTask && (
+          <>
+            <EditTask
+              isOpen={openEdit}
+              onClose={setOpenEdit}
+              data={selectedTask}
+              isLoading={isSendingOrDeleting}
+              setIsLoading={setIsSendingOrDeleting}
             />
-          </Box>
-          <Box style={{ height: "90%" }}>
-            <ToDoLanes
-              currentCardHolderHeight={currentCardHolderHeight ?? 0}
-              isGettingImage={isGettingImage}
-              setSelectedTasks={setSelectedTask}
+            <DeleteTask
+              isOpen={openDelete}
+              onClose={setOpenDelete}
+              data={selectedTask}
+              setIsLoading={setIsSendingOrDeleting}
             />
-          </Box>
-        </Box>
+          </>
+        )}
 
-        <SlideTask
-          isGettingImage={isGettingImage}
-          isOpenSliderTask={isOpenSliderTask}
-          selectedTask={selectedTask}
-          setOpenDelete={setOpenDelete}
-          setOpenEdit={setOpenEdit}
-          statusColorValues={statusColorValues}
-          stringPathToRender={stringPathToRender}
-        />
-      </Box>
+        <Box
+          className="todoContainer"
+          style={{
+            backgroundColor: currentColor,
+            display: "flex",
+            width: "100%",
+            overflowX: "hidden",
+          }}
+        >
+          <AddTask
+            isOpen={addTask}
+            onClose={setAddTask}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+          />
+          <Box
+            width={isOpenSliderTask ? "60%" : "100%"}
+            transition={"all .3s ease"}
+            css={{
+              "&::-webkit-scrollbar": {
+                height: "10px",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "transparent",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "#D3D3D3",
+                borderRadius: "4px",
+              },
+            }}
+            overflowX={"scroll"}
+            overflowY={"hidden"}
+          >
+            <Box
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                position: "sticky",
+                height: "12%",
+                left: 0,
+                transition: "all .5s",
+              }}
+            >
+              <Header
+                currentWorkSpace={currentWorkSpace}
+                setAddTask={setAddTask}
+                setCurrentColor={setCurrentColor}
+                currentColor={currentColor}
+                setIsOpen={setIsOpen}
+                colorObject={colorObject}
+                isOpen={isOpen}
+                isOpenSliderTask={isOpenSliderTask}
+                setOpenSliderTask={setOpenSliderTask}
+              />
+            </Box>
+            <Box style={{ height: "90%" }}>
+              <ToDoLanes
+                currentCardHolderHeight={currentCardHolderHeight ?? 0}
+                isGettingImage={isGettingImage}
+                setSelectedTasks={setSelectedTask}
+              />
+            </Box>
+          </Box>
+
+          <SlideTask
+            isGettingImage={isGettingImage}
+            isOpenSliderTask={isOpenSliderTask}
+            selectedTask={selectedTask}
+            setOpenDelete={setOpenDelete}
+            setOpenEdit={setOpenEdit}
+            statusColorValues={statusColorValues}
+            stringPathToRender={stringPathToRender}
+          />
+        </Box>
       </DndProvider>
     </>
   );

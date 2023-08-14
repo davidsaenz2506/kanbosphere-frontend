@@ -42,7 +42,6 @@ const PortalUser = () => {
   const cookies = new Cookies();
   const router = useRouter();
   const { query } = router;
-  const { userWsps, setUsersWsps } = useWorkspace();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const computedUserItems = useCurrentUser();
   const [loadingServerData, setLoadingServerData] = useState(false);
@@ -56,17 +55,10 @@ const PortalUser = () => {
   const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
 
-  const handleNotificationAction = async (
-    index: number,
-    requestData: IUserInvitations
-  ): Promise<any> => {
+  const handleNotificationAction = async (index: number, requestData: IUserInvitations) => {
     setDroppedElement(undefined);
-    const currentNotifications: IUserInvitations[] =
-      computedUserItems.currentUser.invitations;
-    const newNotificationsChunk: IUserInvitations[] =
-      currentNotifications.filter(
-        (forgotten: any, blockIndex: number) => blockIndex !== index
-      );
+    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: IUserInvitations, blockIndex: number) => blockIndex !== index );
 
     computedUserItems.setCurrentUser({
       ...computedUserItems.currentUser,
@@ -80,17 +72,10 @@ const PortalUser = () => {
       });
   };
 
-  const handleNotificationDelete = async (
-    index: number,
-    requestData: IUserInvitations
-  ): Promise<any> => {
+  const handleNotificationDelete = async ( index: number, requestData: IUserInvitations ) => {
     setDroppedElement(undefined);
-    const currentNotifications: IUserInvitations[] =
-      computedUserItems.currentUser.invitations;
-    const newNotificationsChunk: IUserInvitations[] =
-      currentNotifications.filter(
-        (forgotten: any, blockIndex: number) => blockIndex !== index
-      );
+    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: IUserInvitations, blockIndex: number) => blockIndex !== index);
 
     computedUserItems.setCurrentUser({
       ...computedUserItems.currentUser,
@@ -118,32 +103,27 @@ const PortalUser = () => {
 
   React.useEffect(() => {
     async function getUserInfoFromServer() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const decodedInfoFromServer: any = jwtDecode(userPrivateToken);
 
-      const userInfoFromDataBase = await GetCurrentUser(
-        decodedInfoFromServer.username
-      );
+      const userInfoFromDataBase = await GetCurrentUser(decodedInfoFromServer.username);
 
-      //@ts-ignore
-      const friendsData: string[] = userInfoFromDataBase?.friends.map(
-        (currentCanonicalId) => currentCanonicalId.canonicalId
-      );
+      const friendsData: string[] | undefined = userInfoFromDataBase?.friends.map((currentCanonicalId) => currentCanonicalId.canonicalId);
 
-      //@ts-ignore
-      const requestData: string[] = userInfoFromDataBase?.requests.map(
-        (currentCanonicalId) => currentCanonicalId.canonicalId
-      );
+      const requestData: string[] | undefined = userInfoFromDataBase?.requests.map((currentCanonicalId) => currentCanonicalId.canonicalId);
 
-      const dataShakeFriends = await GetUsersByArray(friendsData);
-      const dataShakeRequests = await GetUsersByArray(requestData);
-
-      const currentRequestAndFriendData = {
-        friends: dataShakeFriends,
-        requests: dataShakeRequests,
-      };
-
-      computedUserItems.setCurrentUser(userInfoFromDataBase);
-      setCurrentContacts(currentRequestAndFriendData);
+      if (friendsData && requestData && userInfoFromDataBase) {
+        const dataShakeFriends = await GetUsersByArray(friendsData);
+        const dataShakeRequests = await GetUsersByArray(requestData);
+  
+        const currentRequestAndFriendData = {
+          friends: dataShakeFriends,
+          requests: dataShakeRequests,
+        };
+  
+        computedUserItems.setCurrentUser(userInfoFromDataBase);
+        setCurrentContacts(currentRequestAndFriendData);
+      }
     }
 
     getUserInfoFromServer();
@@ -227,6 +207,7 @@ const PortalUser = () => {
                     (currentInvitation: IUserInvitations, index: number) => {
                       return (
                         <Box
+                          key={index}
                           padding={"10px 0 0 0"}
                           display={"flex"}
                           alignItems={"center"}
@@ -320,36 +301,38 @@ const PortalUser = () => {
               }
               trigger={
                 <IconButton
-                  className={styles.buttonNotification}
-                  marginRight={"15px"}
+                  marginRight={"10px"}
                   variant={"unstyled"}
                   border={"none"}
                   aria-label="notifications"
                   icon={
                     <Box style={{ position: "relative" }}>
-                      <BellIcon color={"white"} w={7} h={7} />
-                      {computedUserItems.currentUser.invitations?.length !==
-                        0 && (
-                        <Box
-                          style={{
-                            position: "absolute",
-                            top: "0px",
-                            right: "0px",
-                            width: "16px",
-                            height: "16px",
-                            borderRadius: "50%",
-                            backgroundColor: "red",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            color: "white",
-                            fontSize: "10px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {computedUserItems.currentUser.invitations?.length}
-                        </Box>
-                      )}
+                      <BellIcon
+                        transition={"all .2s"}
+                        className={styles.buttonNotification}
+                        color={"white"}
+                        w={7}
+                        h={7}
+                      />
+                      <Box
+                        style={{
+                          position: "absolute",
+                          top: "0px",
+                          right: "0px",
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          display: "flex",
+                          backgroundColor: computedUserItems.currentUser.invitations.length > 0 ? "red" : "green",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          color: "white",
+                          fontSize: "10px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {computedUserItems.currentUser.invitations?.length}
+                      </Box>
                     </Box>
                   }
                 />

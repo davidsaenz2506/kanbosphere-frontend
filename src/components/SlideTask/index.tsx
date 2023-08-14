@@ -33,6 +33,7 @@ interface ISlideTaskProps {
   selectedTask: IDataToDo | undefined;
   setOpenEdit: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenDelete: React.Dispatch<React.SetStateAction<boolean>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   statusColorValues: any;
   isGettingImage: boolean;
   stringPathToRender: IFilePath[];
@@ -211,7 +212,10 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
             <Box display={"flex"} alignItems={"center"}>
               <Icon marginRight={"5px"} as={TbCalendarBolt} />
               <Text>
-                {formatDate(selectedTask?.createDate ?? new Date(), "DDD")}
+                {formatDate(
+                  selectedTask?.createDate ?? new Date().toISOString(),
+                  "DDD"
+                )}
               </Text>
             </Box>
           </Box>
@@ -300,6 +304,7 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
                     (currentPath: IFilePath, index: number) => {
                       return (
                         <Box
+                          key={index}
                           flexDirection={"row"}
                           justifyContent={"center"}
                           alignItems={"center"}
@@ -310,7 +315,7 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
                           <Image
                             w={"150px"}
                             h={"150px"}
-                            style={{borderRadius: "5px"}}
+                            style={{ borderRadius: "5px" }}
                             boxShadow={"0 2px 4px rgba(0, 0, 0, 0.4)"}
                             cursor={"pointer"}
                             src={currentPath.relativePath}

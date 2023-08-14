@@ -16,7 +16,12 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 import styles from "../../pages/dashboard/main/main.module.css"
 
-const Projections = ({ loadingServerData }) => {
+interface IProjectionsProps {
+  loadingServerData: boolean;
+}
+
+const Projections: React.FunctionComponent<IProjectionsProps> = (props) => {
+  const { loadingServerData } = props;
   const currentWorkspaces = useWorkspace();
   const currentSession = useCurrentUser();
   const agileSpaceChunkData = currentWorkspaces.userWsps;

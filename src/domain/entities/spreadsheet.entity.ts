@@ -23,5 +23,6 @@ export interface IColumnProjection {
 export interface ISpreadSheet {
     userId: string,
     columns: IColumnProjection[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any[]
 }

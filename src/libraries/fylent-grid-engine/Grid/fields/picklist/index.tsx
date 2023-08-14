@@ -11,6 +11,7 @@ import Select, { MenuProps, components } from "react-select";
 
 import chroma from 'chroma-js';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface CustomMenuProps extends MenuProps<any> {}
 
 const CustomMenu: React.FC<CustomMenuProps> = (p) => {
@@ -58,7 +59,7 @@ const Editor: ReturnType<ProvideEditorCallback<DropdownCell>> = (p) => {
           border: 0,
           boxShadow: "none"
         }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+        option: (styles, { isDisabled, isFocused, isSelected }) => {
           const color = chroma("rgba(33,42,62,1)");
           return {
             ...styles,
@@ -101,6 +102,7 @@ const Editor: ReturnType<ProvideEditorCallback<DropdownCell>> = (p) => {
 
 const renderer: CustomRenderer<DropdownCell> = {
   kind: GridCellKind.Custom,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   isMatch: (c): c is DropdownCell => (c.data as any).type === "picklist",
   draw: (args, cell) => {
     const { ctx, theme, rect } = args;

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 
 import {
   AlertDialog,
@@ -18,14 +18,20 @@ import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 import { useRouter } from "next/router";
 
-const DeleteWorkSpace = (props) => {
+interface IDeleteWorkspaceProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  data: IWspUser;
+}
+
+const DeleteWorkSpace: React.FunctionComponent<IDeleteWorkspaceProps> = (props) => {
   const ref = useRef(null);
   const workSpace = useWorkspace();
 
   const router = useRouter();
 
   async function handleDeleteWorkSpace(wspId: string) {
-    let workSpacesList: IWspUser[] = workSpace.userWsps;
+    const workSpacesList: IWspUser[] = workSpace.userWsps;
 
     workSpacesList.forEach((individualItemEnable, workspaceIndex) => {
       if (individualItemEnable._id === wspId) {
@@ -43,12 +49,18 @@ const DeleteWorkSpace = (props) => {
     <>
       <AlertDialog
         isOpen={props.isOpen}
-        onClose={props.onClose}
+        onClose={() => {
+          props.onClose(false)
+        }}
         leastDestructiveRef={ref}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader marginBottom={"-20px"} fontSize="lg" fontWeight="bold">
+            <AlertDialogHeader
+              marginBottom={"-20px"}
+              fontSize="lg"
+              fontWeight="bold"
+            >
               Eliminar WorkSpace
             </AlertDialogHeader>
 

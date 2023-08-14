@@ -18,13 +18,19 @@ import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 import currentBiridectionalCommunication from "@/services/socket";
 
-const EditWorkSpaceName = ({ isOpen, onClose, data }) => {
-  const { currentWorkSpace: wspData, setCurrentWorkSpace } =
-    useCurrentWorkspace();
+interface IEditWorkSpaceNameProps {
+  isOpen: boolean;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  data: IWspUser;
+}
+
+const EditWorkSpaceName: React.FunctionComponent<IEditWorkSpaceNameProps> = (props) => {
+  const { isOpen, onClose, data } = props;
+  const { currentWorkSpace: wspData, setCurrentWorkSpace } = useCurrentWorkspace();
   const [wspName, setWspName] = useState<string>();
 
   async function editCurrentWorkspace(currentWorkSpace: IWspUser) {
-    let workSpace = currentWorkSpace;
+    const workSpace = currentWorkSpace;
     workSpace.name = wspName ?? "";
 
     setCurrentWorkSpace({ ...workSpace });

@@ -8,7 +8,7 @@ type PropTypes = {
   children?: ReactNode;
 };
 
-export const CurrentWorkSpaceProvider: FC<PropTypes> = ({ children }: any) => {
+export const CurrentWorkSpaceProvider: FC<PropTypes> = ({ children }) => {
   const [currentWorkSpace, setCurrentWorkSpace] = React.useState<IWspUser>();
 
   return (

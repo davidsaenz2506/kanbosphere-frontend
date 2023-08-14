@@ -1,4 +1,4 @@
-import React from "react";
+import React, { RefObject } from "react";
 
 import { Badge, Box, Icon, Text, useOutsideClick } from "@chakra-ui/react";
 import { IDataToDo } from "@/domain/entities/todo.entity";
@@ -10,7 +10,6 @@ import {
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 
-import { RiDragMove2Fill } from "react-icons/ri";
 import { FcClock } from "react-icons/fc";
 import { useDrag } from "react-dnd";
 import currentBiridectionalCommunication from "@/services/socket";
@@ -48,22 +47,28 @@ const MiniCard = (Props: IMiniCardProps) => {
     }),
   });
 
-  const ref: any = React.useRef();
+  const ref: RefObject<HTMLElement | null | undefined> = React.useRef();
+
   useOutsideClick({
-    ref: ref,
+    ref: ref as RefObject<HTMLElement>,
     handler: () => setIsClicked(false),
   });
 
   async function sendToServerTask() {
     await UpdateWorkSpace(currentWorkSpace?._id, {
-      body: { container: {
-        ...currentWorkSpace?.container,
-        containerPreferences: { selectedTask: item.taskId }
-      }},
+      body: {
+        container: {
+          ...currentWorkSpace?.container,
+          containerPreferences: {
+            ...currentWorkSpace?.container.containerPreferences,
+            selectedTask: item.taskId,
+          },
+        },
+      },
       transactionObject: {
-        currentRoomToken: { roomToken: currentWorkSpace?._id ?? ""},
-        currentUserSocketId: currentBiridectionalCommunication.id
-      }
+        currentRoomToken: { roomToken: currentWorkSpace?._id ?? "" },
+        currentUserSocketId: currentBiridectionalCommunication.id,
+      },
     });
   }
 
@@ -91,15 +96,19 @@ const MiniCard = (Props: IMiniCardProps) => {
             setIsClicked(true);
             setSelectedTasks(item);
 
-            // @ts-ignore
-            setCurrentWorkSpace({ ...currentWorkSpace, container: { 
-               ...currentWorkSpace?.container,
-               containerPreferences: {
-                ...currentWorkSpace?.container.containerPreferences,
-                selectedTask: item.taskId
-               }
-             }});
-            sendToServerTask();
+            if (currentWorkSpace) {
+              setCurrentWorkSpace({
+                ...currentWorkSpace,
+                container: {
+                  ...currentWorkSpace?.container,
+                  containerPreferences: {
+                    ...currentWorkSpace?.container.containerPreferences,
+                    selectedTask: item.taskId,
+                  },
+                },
+              });
+              sendToServerTask();
+            }
           }
         }}
       >

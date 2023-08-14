@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import { Popover, PopoverPlacement, Text } from "@nextui-org/react";
+import { Popover, PopoverPlacement } from "@nextui-org/react";
 import React, { ReactNode } from "react";
 
 interface IPopoverProps {

@@ -22,8 +22,8 @@ const UserConfig = () => {
 
   async function handleSendingData() {
     const userUpdated = await UpdateUser(currentUser.username, userObject);
-    setCurrentUser(userUpdated);
 
+    if (userUpdated) setCurrentUser(userUpdated);
     setIsSendingData(false);
   }
 
@@ -60,7 +60,7 @@ const UserConfig = () => {
                 variant="filled"
                 sx={{ backgroundColor: "rgba(0, 0, 0, 0.06)" }}
                 value={userObject.fullname}
-                onChange={(e: any) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setUserObject({ ...userObject, fullname: e.target.value });
                 }}
               />
@@ -71,7 +71,7 @@ const UserConfig = () => {
                 variant="filled"
                 sx={{ backgroundColor: "rgba(0, 0, 0, 0.06)" }}
                 value={userObject.email}
-                onChange={(e: any) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setUserObject({ ...userObject, email: e.target.value });
                 }}
               />
@@ -84,7 +84,7 @@ const UserConfig = () => {
                   sx={{ backgroundColor: "rgba(0, 0, 0, 0.06)" }}
                   value={userObject.userID}
                   disabled={true}
-                  onChange={(e: any) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setUserObject({ ...userObject, userID: e.target.value });
                   }}
                 />
@@ -99,7 +99,7 @@ const UserConfig = () => {
                   sx={{ backgroundColor: "rgba(0, 0, 0, 0.06)" }}
                   value={userObject.username}
                   disabled={true}
-                  onChange={(e: any) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setUserObject({ ...userObject, username: e.target.value });
                   }}
                 />
