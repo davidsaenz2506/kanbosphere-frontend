@@ -19,6 +19,8 @@ import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook"
 import { AddCard } from "@/services/workspaces/addCard";
 import QuillEditor from "../RichText.tsx";
 import currentBiridectionalCommunication from "@/services/socket";
+import { ICollaborators } from "@/domain/entities/userWsps.entity";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 export interface IPicklistOptions {
   value: string;
@@ -32,6 +34,15 @@ const statusOptions: IPicklistOptions[] = [
   { value: "For Review", label: "For Review" },
   { value: "Blocked", label: "Blocked" },
   { value: "New", label: "New" },
+];
+
+const typeOptions: IPicklistOptions[] = [
+  { value: "history", label: "📘 Historia" },
+  { value: "bug", label: "📕 Bug" },
+  { value: "review", label: "📒 Revisión" },
+  { value: "feature", label: "📙 Feature" },
+  { value: "technical", label: "📗 Técnico" },
+  { value: "epic", label: "📓 Épico" },
 ];
 
 const priorityOptions: IPicklistOptions[] = [
@@ -50,9 +61,9 @@ interface IAddTaskProps {
 
 const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
   const toastNotification = useToast();
+  const { currentUser } = useCurrentUser();
   const { isOpen, onClose, isLoading, setIsLoading } = props;
-  const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
-    useCurrentWorkspace();
+  const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
   const [status, setStatus] = useState<string>("");
   const mathRandomValue = React.useMemo(
     () => Math.floor(Math.random() * 999) + 1,
@@ -62,30 +73,23 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
   const [taskInfo, setTaskInfo] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [expectedHours, setExpectedHours] = useState<number>(0);
-  const [taskId, setTaskId] = useState<string>(
-    Math.random().toString(36).substr(2, 18)
-  );
-  const [selectedPriority, setSelectedPriority] = useState<IPriority>({
-    value: "",
-    color: "",
-  });
-  const containerPreferences = data?.container?.containerPreferences;
-
-  const title =
-    containerPreferences && "prefix" in containerPreferences
-      ? `${containerPreferences.prefix}-${formatedValue}`
-      : "undefined";
+  const [taskId, setTaskId] = useState<string>(Math.random().toString(36).substr(2, 18));
+  const [selectedPriority, setSelectedPriority] = useState<IPriority>({ value: "", color: "" });
+  const [ selectedType, setSelectedType ] = useState({ value: "", label: "" });
+  const containerPreferences = data?.collaborators.find((currentCollaborator: ICollaborators) => currentCollaborator._id === currentUser._id)?.containerPreferences;
+  const title = containerPreferences && "prefix" in containerPreferences ? `${containerPreferences.prefix}-${formatedValue}` : "undefined";
 
   const [task, setTask] = useState<IDataToDo>({
     userId: "1000933190",
     taskId: "",
     status: "",
+    type: selectedType,
     priority: selectedPriority,
     description: description,
     info: "",
     title: "",
     file: [],
-    createDate: DateTime.now(),
+    createDate: DateTime.now().toISODate(),
     clockTime: [],
     expectedWorkingHours: expectedHours,
   });
@@ -95,16 +99,17 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
       userId: "1000933190",
       taskId: taskId,
       status: status,
+      type: selectedType,
       description: description,
       priority: selectedPriority,
       info: taskInfo,
       title: title,
       file: [],
-      createDate: DateTime.now().toISO(),
+      createDate: DateTime.now().toISODate(),
       clockTime: [],
       expectedWorkingHours: expectedHours,
     });
-  }, [status, taskInfo, title, selectedPriority]);
+  }, [status, taskInfo, title, selectedPriority, selectedType]);
 
   async function addTaskToWorkSpace(userTask: IDataToDo) {
     try {
@@ -167,6 +172,17 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
               }
             />
           </FormControl>
+
+          <FormControl mt={0}>
+            <FormLabel>Tipo de historia</FormLabel>
+            <Select
+              options={typeOptions}
+              onChange={(e: SingleValue<IPicklistOptions>) => {
+                if (e) setSelectedType(e);
+              }}
+            />
+          </FormControl>
+
           <FormControl>
             <FormLabel>Información</FormLabel>
             <QuillEditor

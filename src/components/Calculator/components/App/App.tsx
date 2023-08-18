@@ -25,7 +25,7 @@ export const Calculator: FunctionComponent<ICalculatorProps> = ({
   const [result, setResult] = useState<number>(0);
   const [waitingForOperand, setWaitingForOperand] = useState<boolean>(true);
   const [pendingOperator, setPendingOperator] = useState<Operator>();
-  const [display, setDisplay] = useState<string>(currentResult.toString());
+  const [display, setDisplay] = useState<string>(currentResult?.toString() ?? "0");
   const [resultToReturn, setResultToReturn] = useState<number>(currentResult);
 
   const calculate = (

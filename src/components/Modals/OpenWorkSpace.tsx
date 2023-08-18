@@ -9,6 +9,8 @@ import {
   ModalBody,
   ModalCloseButton,
   Spinner,
+  Checkbox,
+  Text,
 } from "@chakra-ui/react";
 
 import { Button, Input, FormControl, FormLabel } from "@chakra-ui/react";
@@ -36,6 +38,7 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
   const wspUser: IWspContext = useWorkspace();
   const currentUserInfo: ICurrentUserContext = useCurrentUser();
   const [sendingStatus, setSendingStatus] = useState<boolean>(false);
+  const [workspaceHasGoals, setWorkspaceHasGoals] = useState<boolean>(false);
 
   async function handleCreate() {
     const newWorkspaceToCreate: Partial<IWspUser> = {};
@@ -46,19 +49,21 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
       newWorkspaceToCreate.name = nameValue;
       newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
       newWorkspaceToCreate.type = title;
+      newWorkspaceToCreate.isGoalsModeActive = workspaceHasGoals;
       newWorkspaceToCreate.collaborators = [
         {
           _id: currentUserInfo.currentUser._id ?? "",
           name: currentUserInfo.currentUser.username,
           role: "HOST",
+          containerPreferences: {
+            prefix: currentPrefix,
+            selectedTask: null,
+          },
         },
       ];
       newWorkspaceToCreate.container = {
         wspData: [],
-        containerPreferences: {
-          prefix: currentPrefix,
-          selectedTask: null,
-        },
+        sprints: []
       };
     }
 
@@ -72,6 +77,12 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
           _id: currentUserInfo.currentUser._id ?? "",
           name: currentUserInfo.currentUser.username,
           role: "HOST",
+          containerPreferences: {
+            isAutoSaveOpen: true,
+            isRowSelectionActive: true,
+            isMultipleSelectionActive: false,
+            freezedColumns: 0,
+          },
         },
       ];
       newWorkspaceToCreate.container = {
@@ -79,11 +90,6 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
           columns: [],
           data: [],
           userId: currentUserInfo.currentUser.userID,
-        },
-        containerPreferences: {
-          isRowSelectionActive: true,
-          isMultipleSelectionActive: false,
-          freezedColumns: 0,
         },
       };
     }
@@ -109,7 +115,7 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
         <ModalContent>
           <ModalHeader>Crear {title} workspace</ModalHeader>
           <ModalCloseButton />
-          <ModalBody pb={6}>
+          <ModalBody pb={5}>
             <FormControl>
               <FormLabel>Nombre de tu nuevo workspace</FormLabel>
               <Input
@@ -118,18 +124,44 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
                   setNameValue(e.target.value)
                 }
               />
+              {title === "agile" && (
+                <>
+                  <FormLabel pt={5}>
+                    Escribe el prefijo de tus objetivos
+                  </FormLabel>
+                  <Input
+                    placeholder="Ej: TMS, TD, DSW"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setCurrentPrefix(e.target.value)
+                    }
+                  />
+
+                  <FormLabel pt={5}>
+                    ¿Deseas configurar objetivos en tu espacio agil?
+                  </FormLabel>
+                  <Checkbox
+                    isChecked={workspaceHasGoals}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setWorkspaceHasGoals(event.target.checked);
+                    }}
+                  >
+                    Haz click aqui para confirmar
+                  </Checkbox>
+                  {workspaceHasGoals && (
+                    <Text
+                      marginTop={"10px"}
+                      textAlign={"justify"}
+                      color={"GrayText"}
+                    >
+                      Si configuras los objetivos podrás establecer intervalos
+                      de tiempo durante los cuales se asignaran un determinado
+                      número de historias por terminar, de esta manera podrás
+                      tener una mejor gestión del proyecto o desarrollo.
+                    </Text>
+                  )}
+                </>
+              )}
             </FormControl>
-            {title === "agile" && (
-              <FormControl pt={6}>
-                <FormLabel>Escribe el prefijo de tus objetivos</FormLabel>
-                <Input
-                  placeholder="Ej: TMS, TD, DSW"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCurrentPrefix(e.target.value)
-                  }
-                />
-              </FormControl>
-            )}
           </ModalBody>
 
           <ModalFooter>

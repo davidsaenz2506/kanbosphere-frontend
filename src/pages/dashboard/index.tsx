@@ -148,11 +148,7 @@ const PortalUser = () => {
   }
 
   React.useEffect(() => {
-    if (computedUserItems.currentUser.userID)
-      workSpaces.fetchWorkSpaces(
-        computedUserItems.currentUser._id ?? "",
-        setLoadingServerData
-      );
+    if (computedUserItems.currentUser.userID) workSpaces.fetchWorkSpaces(computedUserItems.currentUser._id ?? "", setLoadingServerData);
   }, [computedUserItems.currentUser.userID]);
 
   return (

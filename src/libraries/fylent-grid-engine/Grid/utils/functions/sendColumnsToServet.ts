@@ -5,9 +5,8 @@ import { IColumnProjection, ISpreadSheet } from "@/domain/entities/spreadsheet.e
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext, currentUser: ICurrentUserContext, userColumns: IColumnProjection[], data: any[], userWorkspaces?: IWspContext) {
+export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext, currentUser: ICurrentUserContext, userColumns: IColumnProjection[], data: any[]) {
   const currentWorkspaceData: IWspUser | undefined = currentUserWsp.currentWorkSpace;
-  const currentWorkspaces: IWspUser[] = userWorkspaces?.userWsps ?? [];
   const newSpreadsheetData: ISpreadSheet = {
     userId:
       currentWorkspaceData?.container?.spreadSheetData?.userId ??
@@ -15,17 +14,6 @@ export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext,
     columns: userColumns,
     data: data,
   };
-
-  const allWorkspacesWithModification: IWspUser[] = currentWorkspaces.map((currentSpaceContext: IWspUser) => {
-    if (currentSpaceContext._id === currentWorkspaceData?._id) {
-      return {
-        ...currentSpaceContext,
-        spreadSheetData: newSpreadsheetData,
-      }
-    }
-
-    return currentSpaceContext;
-  })
 
   if (currentWorkspaceData) {
     currentUserWsp.setCurrentWorkSpace({
@@ -35,7 +23,5 @@ export async function sendNewColumnsToServer(currentUserWsp: ICurrentWspContext,
         spreadSheetData: newSpreadsheetData
       }
     });
-
-    userWorkspaces?.setUsersWsps(allWorkspacesWithModification);
   }
 }

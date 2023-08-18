@@ -67,10 +67,9 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
 
   return (
     <Box
-      borderLeft={"1px solid gray"}
       boxShadow={"0 4px 6px rgba(0, 0, 0, 0.5)"}
       transition={"all .3s ease"}
-      transform={isOpenSliderTask ? "translateX(0)" : "translateX(400px)"}
+      transform={isOpenSliderTask ? "translateX(0px)" : "translateX(400px)"}
       css={{
         "&::-webkit-scrollbar": {
           width: "8px",
@@ -83,7 +82,7 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
           borderRadius: "4px",
         },
       }}
-      overflowY={"scroll"}
+      overflowY={"auto"}
       zIndex={1000}
       width={isOpenSliderTask ? "40%" : "0%"}
     >

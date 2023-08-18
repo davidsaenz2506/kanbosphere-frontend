@@ -10,17 +10,29 @@ export interface ISpreadSheetPreferences {
     isRowSelectionActive: boolean;
     isMultipleSelectionActive: boolean;
     freezedColumns: number;
+    isAutoSaveOpen: boolean;
 }
 
 export interface ICollaborators {
     _id: string;
     name: string;
     role: string;
+    containerPreferences: IAgilePreferences | ISpreadSheetPreferences;
+}
+
+export interface ISprintsData {
+    sprintId: string;
+    sprintPurpose: string;
+    sprintDescription: string;
+    isSprintActive: boolean;
+    sprintStartDate: string | null;
+    sprintEndDate: string | null;
+    linkedStories: string[];
 }
 
 export interface IContainer {
-    containerPreferences: IAgilePreferences | ISpreadSheetPreferences;
     wspData?: IDataToDo[];
+    sprints?: ISprintsData[];
     spreadSheetData?: ISpreadSheet;
 }
 
@@ -30,6 +42,7 @@ export interface IWspUser {
     createdDate: string;
     createdById: string;
     type: string;
+    isGoalsModeActive: boolean;
     container: IContainer;
     collaborators: ICollaborators[];
 }

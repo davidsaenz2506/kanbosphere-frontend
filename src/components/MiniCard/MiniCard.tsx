@@ -13,6 +13,8 @@ import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { FcClock } from "react-icons/fc";
 import { useDrag } from "react-dnd";
 import currentBiridectionalCommunication from "@/services/socket";
+import { ICollaborators } from "@/domain/entities/userWsps.entity";
+import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 interface IMiniCardProps {
   item: IDataToDo;
@@ -34,6 +36,7 @@ const statusColorValues = {
 };
 
 const MiniCard = (Props: IMiniCardProps) => {
+  const { currentUser } = useCurrentUser();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const { item, key, setSelectedTasks, isGettingImage } = Props;
   const [isHovered, setIsHovered] = React.useState(false);
@@ -55,21 +58,27 @@ const MiniCard = (Props: IMiniCardProps) => {
   });
 
   async function sendToServerTask() {
-    await UpdateWorkSpace(currentWorkSpace?._id, {
-      body: {
-        container: {
-          ...currentWorkSpace?.container,
-          containerPreferences: {
-            ...currentWorkSpace?.container.containerPreferences,
-            selectedTask: item.taskId,
-          },
+    const currentUserUpdatedData: ICollaborators | undefined = currentWorkSpace?.collaborators.find((currentCollaborator: ICollaborators) => currentCollaborator._id === currentUser._id);
+    const currentCollaborators: ICollaborators[] | undefined = currentWorkSpace?.collaborators;
+
+    if (currentUserUpdatedData && currentCollaborators) {
+      currentUserUpdatedData.containerPreferences = { ...currentUserUpdatedData?.containerPreferences, selectedTask: item.taskId };
+      const modifiedCollaborators: ICollaborators[] = currentCollaborators.map((collaborator: ICollaborators) => {
+          if (collaborator._id === currentUserUpdatedData._id) return currentUserUpdatedData;
+          
+          return collaborator;
+      })
+
+      await UpdateWorkSpace(currentWorkSpace?._id, {
+        body: {
+          collaborators: modifiedCollaborators
         },
-      },
-      transactionObject: {
-        currentRoomToken: { roomToken: currentWorkSpace?._id ?? "" },
-        currentUserSocketId: currentBiridectionalCommunication.id,
-      },
-    });
+        transactionObject: {
+          currentRoomToken: { roomToken: currentWorkSpace?._id ?? "" },
+          currentUserSocketId: currentBiridectionalCommunication.id,
+        },
+      });
+    }
   }
 
   return (
@@ -96,16 +105,21 @@ const MiniCard = (Props: IMiniCardProps) => {
             setIsClicked(true);
             setSelectedTasks(item);
 
-            if (currentWorkSpace) {
+            const currentUserUpdatedData: ICollaborators | undefined = currentWorkSpace?.collaborators.find((currentCollaborator: ICollaborators) => currentCollaborator._id === currentUser._id);
+            const currentCollaborators: ICollaborators[] | undefined = currentWorkSpace?.collaborators;
+            
+
+            if (currentWorkSpace && currentUserUpdatedData && currentCollaborators) {
+              currentUserUpdatedData.containerPreferences = { ...currentUserUpdatedData?.containerPreferences, selectedTask: item.taskId };
+              const modifiedCollaborators: ICollaborators[] = currentCollaborators.map((collaborator: ICollaborators) => {
+                  if (collaborator._id === currentUserUpdatedData._id) return currentUserUpdatedData;
+                  
+                  return collaborator;
+              })
+        
               setCurrentWorkSpace({
                 ...currentWorkSpace,
-                container: {
-                  ...currentWorkSpace?.container,
-                  containerPreferences: {
-                    ...currentWorkSpace?.container.containerPreferences,
-                    selectedTask: item.taskId,
-                  },
-                },
+                collaborators: modifiedCollaborators
               });
               sendToServerTask();
             }

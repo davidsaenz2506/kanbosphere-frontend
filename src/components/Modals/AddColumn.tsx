@@ -51,10 +51,12 @@ interface ICreateColumnProps {
   isOpen: boolean;
   onClose: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  handleChangeEvent: () => Promise<void>;
 }
 
+
 const CreateColumn: React.FunctionComponent<ICreateColumnProps> = (props) => {
-  const { isOpen, setIsLoading, onClose } = props;
+  const { isOpen, setIsLoading, onClose, handleChangeEvent } = props;
   const currentWorkspace = useCurrentWorkspace();
   const maxOrderValue: number | undefined =
     currentWorkspace?.currentWorkSpace?.container?.spreadSheetData?.columns.reduce(
@@ -128,22 +130,14 @@ const CreateColumn: React.FunctionComponent<ICreateColumnProps> = (props) => {
   ];
 
   async function addColumn() {
-    const unmodifiedWorkspace: IWspUser | undefined =
-      currentWorkspace.currentWorkSpace;
+    const unmodifiedWorkspace: IWspUser | undefined =  currentWorkspace.currentWorkSpace;
 
     if (unmodifiedWorkspace) {
       unmodifiedWorkspace.container.spreadSheetData = currentSpreadData;
       currentWorkspace.setCurrentWorkSpace(unmodifiedWorkspace);
     }
 
-    const currentWorkspaces: IWspUser[] = performanceWorkspaces.userWsps;
-    const updatedWorkspaces = currentWorkspaces.map((bookRow: IWspUser) => {
-      if (bookRow._id === currentWorkspace?.currentWorkSpace?._id) {
-        return currentWorkspace.currentWorkSpace;
-      } else return bookRow;
-    });
-
-    performanceWorkspaces.setUsersWsps(updatedWorkspaces);
+    handleChangeEvent();
 
     setColumnType(undefined);
     setEngineOperation(undefined);
@@ -172,8 +166,6 @@ const CreateColumn: React.FunctionComponent<ICreateColumnProps> = (props) => {
       );
     }
   }, [currentWorkspace.currentWorkSpace]);
-
-  console.log(currentWorkspace.currentWorkSpace);
 
   return (
     <Modal

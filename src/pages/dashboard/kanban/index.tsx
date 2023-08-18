@@ -19,8 +19,12 @@ import {
 } from "firebase/storage";
 import SlideTask from "@/components/SlideTask";
 import { useRouter } from "next/router";
-import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
+import {
+  IAgilePreferences,
+  ICollaborators,
+  ISpreadSheetPreferences,
+  IWspUser,
+} from "@/domain/entities/userWsps.entity";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { getWorkspaceById } from "@/services/workspaces/getOne";
@@ -31,7 +35,6 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
-  const { userWsps } = useWorkspace();
   const { currentUser } = useCurrentUser();
   const { setLoadingChunk } = useLoadingChunk();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
@@ -100,13 +103,6 @@ const ToDoWorkspace = () => {
   }
 
   React.useEffect(() => {
-    const relatedWorkspace: IWspUser[] = userWsps.filter(
-      (currentRecord: IWspUser) => currentRecord._id === router.query?.fridgeKey
-    );
-    setCurrentWorkSpace(relatedWorkspace[0]);
-  }, [router.query?.fridgeKey]);
-
-  React.useEffect(() => {
     const InitialTodoDocument: HTMLDivElement | null =
       document.querySelector(".todoContainer");
     const InitialNavBarDocument: HTMLElement | null =
@@ -165,20 +161,31 @@ const ToDoWorkspace = () => {
   }
 
   React.useEffect(() => {
-    setSelectedTask(
-      currentWorkSpace?.container?.wspData?.filter((currentRecord) => {
-        if ("selectedTask" in currentWorkSpace.container.containerPreferences) {
-          currentRecord?.taskId ===
-            currentWorkSpace?.container.containerPreferences?.selectedTask;
-        }
-      })[0]
-    );
-  }, [currentWorkSpace]);
+    const currentUserPreferences:
+      | IAgilePreferences
+      | ISpreadSheetPreferences
+      | undefined = currentWorkSpace?.collaborators.find(
+      (currentCollaborator: ICollaborators) =>
+        currentCollaborator._id === currentUser._id
+    )?.containerPreferences;
+
+    if (currentUserPreferences) {
+      setSelectedTask(
+        currentWorkSpace?.container?.wspData?.filter((currentRecord) => {
+          if (currentUser && "selectedTask" in currentUserPreferences) {
+            return (
+              currentRecord?.taskId === currentUserPreferences.selectedTask
+            );
+          }
+        })[0]
+      );
+    }
+  }, [currentWorkSpace?._id, currentWorkSpace?.container?.wspData]);
 
   React.useEffect(() => {
-    if (typeof router.query.fridgeKey === "string")
+    if (typeof router.query.fridgeKey === "string" && currentUser._id)
       getWorkspaceData(router.query.fridgeKey);
-  }, [router.query.fridgeKey]);
+  }, [currentWorkSpace?._id, currentUser._id]);
 
   async function getWorkspaceData(fridgeKey: string) {
     if (fridgeKey && router.query.briefcase === "agile") {
@@ -188,7 +195,9 @@ const ToDoWorkspace = () => {
         currentBiridectionalCommunication.id,
         currentUser._id ?? ""
       );
-      if (workspaceData) setCurrentWorkSpace(workspaceData);
+      if (workspaceData) {
+        setCurrentWorkSpace(workspaceData);
+      }
       setLoadingChunk(false);
     }
   }
@@ -255,8 +264,9 @@ const ToDoWorkspace = () => {
                 position: "sticky",
                 height: "12%",
                 left: 0,
-                transition: "all .5s",
+                transition: "all .5s"
               }}
+              borderBottom={"2px solid #d9d9e3"}
             >
               <Header
                 currentWorkSpace={currentWorkSpace}
@@ -270,7 +280,7 @@ const ToDoWorkspace = () => {
                 setOpenSliderTask={setOpenSliderTask}
               />
             </Box>
-            <Box style={{ height: "90%" }}>
+            <Box style={{ height: "92%" }}>
               <ToDoLanes
                 currentCardHolderHeight={currentCardHolderHeight ?? 0}
                 isGettingImage={isGettingImage}

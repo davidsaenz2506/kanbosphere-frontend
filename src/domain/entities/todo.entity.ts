@@ -1,4 +1,5 @@
 import ICurrentUser from "./user.entity";
+import { ISprintsData } from "./userWsps.entity";
 
 export interface ITransactionData {
     currentUserSocketId: string,
@@ -10,6 +11,11 @@ export interface ITransactionData {
 export interface IPriority {
     value: string;
     color: string | undefined;
+}
+
+export interface ITypeHistory {
+    value: string;
+    label: string;
 }
 
 export interface IFilePath {
@@ -26,18 +32,24 @@ export interface IDataToDo {
     userId: string,
     taskId: string,
     status: string,
+    type: ITypeHistory,
     priority: IPriority,
     info: string,
     description: string,
     title: string,
     clockTime: IClockTime[],
     expectedWorkingHours: number,
-    createDate: string | undefined,
-    finishDate?: string | undefined
+    createDate: string,
+    finishDate?: string,
     file: IFilePath[] | undefined,
 }
 
 export interface ITransactionToDo {
     body: Partial<IDataToDo>;
+    transactionObject: ITransactionData
+}
+
+export interface ITransactionSprint {
+    body: Partial<ISprintsData>;
     transactionObject: ITransactionData
 }

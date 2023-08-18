@@ -43,7 +43,12 @@ import styles from "@/libraries/fylent-grid-engine/styles/spreadsheet.module.css
 import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { GridSelection, Item } from "@glideapps/glide-data-grid";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
+import {
+  IAgilePreferences,
+  ICollaborators,
+  ISpreadSheetPreferences,
+  IWspUser,
+} from "@/domain/entities/userWsps.entity";
 import { UpdateWorkSpace } from "@/services/workspaces/update";
 import { useRouter } from "next/router";
 import {
@@ -98,6 +103,7 @@ const Spreadsheet = () => {
   const [isMultipleSelectionActive, setIsMultipleSelectionActive] =
     useState<boolean>();
   const [isRowSelectionActive, setIsRowSelectionActive] = useState<boolean>();
+  const [isAutoSaveOpenActive, setIsAutoSaveOpenActive] = useState<boolean>();
   const [currentSelection, setCurrentSelection] = useState<GridSelection>();
   const [selectedColumnToSort, setSelectedColumnToSort] = useState<
     ISortColumn[]
@@ -114,6 +120,8 @@ const Spreadsheet = () => {
     workspaceID: "",
     query: "",
   });
+
+  const currentUserContainerPreferences: | IAgilePreferences | ISpreadSheetPreferences | undefined = currentWorkSpace?.currentWorkSpace?.collaborators.find((currentCollaborator) => currentCollaborator._id === currentSession.currentUser._id)?.containerPreferences;
 
   const [spreadColumns, setSpreadColumns] = useState<IColumnProjection[]>([]);
 
@@ -171,6 +179,23 @@ const Spreadsheet = () => {
 
     if (queryDataFromMongo) setSpreadSheetData(queryDataFromMongo);
     setIsSendingQuery(false);
+  }
+
+  async function handleChangeEvent() {
+    if (
+      currentWorkSpace.currentWorkSpace &&
+      currentWorkSpace.currentWorkSpace.container.spreadSheetData
+    ) {
+      await UpdateWorkSpace(currentWorkSpace?.currentWorkSpace?._id, {
+        body: currentWorkSpace.currentWorkSpace,
+        transactionObject: {
+          currentUserSocketId: currentBiridectionalCommunication.id,
+          currentRoomToken: {
+            roomToken: currentWorkSpace.currentWorkSpace?._id ?? "",
+          },
+        },
+      });
+    }
   }
 
   function exportToExcel() {
@@ -262,27 +287,30 @@ const Spreadsheet = () => {
       );
 
       setIsMultipleSelectionActive(
-        "isMultipleSelectionActive" in
-          currentWorkSpace.currentWorkSpace.container.containerPreferences
-          ? currentWorkSpace?.currentWorkSpace?.container?.containerPreferences
-              ?.isMultipleSelectionActive
+        currentUserContainerPreferences &&
+          "isMultipleSelectionActive" in currentUserContainerPreferences
+          ? currentUserContainerPreferences?.isMultipleSelectionActive
           : false
       );
       setIsRowSelectionActive(
-        "isRowSelectionActive" in
-          currentWorkSpace.currentWorkSpace.container.containerPreferences
-          ? currentWorkSpace?.currentWorkSpace?.container?.containerPreferences
-              ?.isRowSelectionActive
+        currentUserContainerPreferences &&
+          "isRowSelectionActive" in currentUserContainerPreferences
+          ? currentUserContainerPreferences?.isRowSelectionActive
           : false
       );
+
+      setIsAutoSaveOpenActive(
+        currentUserContainerPreferences &&
+          "isAutoSaveOpen" in currentUserContainerPreferences
+          ? currentUserContainerPreferences?.isAutoSaveOpen
+          : true
+      );
     }
-  }, [currentWorkSpace.currentWorkSpace]);
+  }, [currentWorkSpace.currentWorkSpace, currentUserContainerPreferences]);
 
   React.useEffect(() => {
-    const InitialTodoDocument: HTMLDivElement | null =
-      document.querySelector(".todoContainer");
-    const InitialNavBarDocument: HTMLElement | null =
-      document.getElementById("navbarHome");
+    const InitialTodoDocument: HTMLDivElement | null = document.querySelector(".todoContainer");
+    const InitialNavBarDocument: HTMLElement | null = document.getElementById("navbarHome");
 
     if (InitialTodoDocument && bodyDocument && InitialNavBarDocument) {
       InitialTodoDocument.style.height = `${
@@ -321,6 +349,7 @@ const Spreadsheet = () => {
         isOpen={addTask}
         onClose={setAddTask}
         setIsLoading={setIsLoading}
+        handleChangeEvent={handleChangeEvent}
       />
       <Box className={styles.toolbarsect}>
         <Grid
@@ -612,12 +641,15 @@ const Spreadsheet = () => {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setIsRowSelectionActive(e.target.checked);
                       if (currentWorkSpace.currentWorkSpace) {
-                        const workspaceToModify: IWspUser =
-                          currentWorkSpace.currentWorkSpace;
-                        workspaceToModify.container.containerPreferences[
-                          "isRowSelectionActive"
-                        ] = e.target.checked;
-                        currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                        const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
+                        const currentCollaboratorIndex: number = workspaceToModify.collaborators.findIndex((currentCollaborator, index: number) => currentCollaborator._id === currentSession.currentUser._id);
+
+                        if (currentCollaboratorIndex !== undefined) {
+                          workspaceToModify.collaborators[currentCollaboratorIndex].containerPreferences["isRowSelectionActive"] = e.target.checked;
+                          currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                          console.log(isAutoSaveOpenActive)
+                          if (isAutoSaveOpenActive) handleChangeEvent();
+                        }
                       }
                     }}
                     size="sm"
@@ -632,8 +664,8 @@ const Spreadsheet = () => {
               <Box display={"flex"} alignItems={"center"} marginRight={"10px"}>
                 <Badge colorScheme="purple">
                   {
-                    currentWorkSpace.currentWorkSpace?.container.spreadSheetData
-                      ?.data.length
+                    currentWorkSpace.currentWorkSpace?.container
+                      ?.spreadSheetData?.data.length
                   }{" "}
                   rows{" "}
                 </Badge>
@@ -673,7 +705,10 @@ const Spreadsheet = () => {
                 borderRight={"1px solid #dddddd"}
                 height={"30px"}
                 borderRadius={"0px"}
-                onClick={() => addGridRow(currentWorkSpace)}
+                onClick={() => {
+                  addGridRow(currentWorkSpace);
+                  if (isAutoSaveOpenActive) handleChangeEvent();
+                }}
                 isDisabled={spreadDataHasFilter}
               >
                 <Icon as={FcAddRow} />
@@ -707,6 +742,8 @@ const Spreadsheet = () => {
                     spreadSheetData
                   );
 
+                  if (isAutoSaveOpenActive) handleChangeEvent();
+
                   setInternalTriggerPointer(Math.random() * 1000 - 1 + 1);
                   setIsLoading(false);
                 }}
@@ -718,13 +755,14 @@ const Spreadsheet = () => {
                 borderRight={"1px solid #dddddd"}
                 height={"30px"}
                 borderRadius={"0px"}
-                onClick={() =>
+                onClick={() => {
                   deleteGridRow(
                     currentRowsSelected,
                     currentWorkSpace,
                     toastNotification
-                  )
-                }
+                  );
+                  if (isAutoSaveOpenActive) handleChangeEvent();
+                }}
                 isDisabled={
                   isRowSelectionActive
                     ? currentSelection?.rows["items"].length
@@ -740,6 +778,7 @@ const Spreadsheet = () => {
                 className={styles.syncButton}
                 borderRadius={"0px"}
                 height={"30px"}
+                isDisabled={isAutoSaveOpenActive}
                 onClick={() => {
                   setIsLoading(true);
                   setTimeout(async () => {
@@ -781,13 +820,16 @@ const Spreadsheet = () => {
                   isChecked={isMultipleSelectionActive}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setIsMultipleSelectionActive(e.target.checked);
+
                     if (currentWorkSpace.currentWorkSpace) {
-                      const workspaceToModify: IWspUser =
-                        currentWorkSpace.currentWorkSpace;
-                      workspaceToModify.container.containerPreferences[
-                        "isMultipleSelectionActive"
-                      ] = e.target.checked;
-                      currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                      const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
+                      const currentCollaboratorIndex: number = workspaceToModify.collaborators.findIndex((currentCollaborator) => currentCollaborator._id === currentSession.currentUser._id);
+
+                      if (currentCollaboratorIndex !== undefined) {
+                        workspaceToModify.collaborators[currentCollaboratorIndex].containerPreferences["isMultipleSelectionActive"] = e.target.checked;
+                        currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                        if (isAutoSaveOpenActive) handleChangeEvent();
+                      }
                     }
                   }}
                   size="sm"
@@ -829,7 +871,10 @@ const Spreadsheet = () => {
                   borderRight={"1px solid #dddddd"}
                   height={"30px"}
                   borderRadius={"0px"}
-                  onClick={() => addGridRow(currentWorkSpace)}
+                  onClick={() => {
+                    addGridRow(currentWorkSpace);
+                    handleChangeEvent();
+                  }}
                 >
                   <Icon as={GrDocumentPdf} />
                 </Button>
@@ -897,7 +942,24 @@ const Spreadsheet = () => {
                   alignItems={"center"}
                   paddingLeft={"20px"}
                 >
-                  <Switch size="sm" colorScheme="facebook" isChecked={false} />
+                  <Switch
+                    size="sm"
+                    colorScheme="facebook"
+                    isChecked={isAutoSaveOpenActive}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setIsAutoSaveOpenActive(e.target.checked);
+                      if (currentWorkSpace.currentWorkSpace) {
+                        const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
+                        const currentCollaboratorIndex: number = workspaceToModify.collaborators.findIndex((currentCollaborator) => currentCollaborator._id === currentSession.currentUser._id);
+
+                        if (currentCollaboratorIndex !== undefined) {
+                          workspaceToModify.collaborators[currentCollaboratorIndex].containerPreferences["isAutoSaveOpen"] = e.target.checked;
+                          currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                          if (isAutoSaveOpenActive) handleChangeEvent();
+                        }
+                      }
+                    }}
+                  />
                   <Text fontSize={"14px"} marginLeft={"15px"}>
                     Autoguardado
                   </Text>
@@ -924,7 +986,9 @@ const Spreadsheet = () => {
       <div className={styles.GridContainer}>
         <GridDataEditor
           data={spreadSheetData ?? []}
+          handleChangeEvent={handleChangeEvent}
           internalTriggerPointer={internalTriggerPointer}
+          isAutoSaveModeActive={isAutoSaveOpenActive ?? true}
           setCurrentRowsSelected={setCurrentRowsSelected}
           currentSelection={currentSelection}
           setCurrentSelection={setCurrentSelection}

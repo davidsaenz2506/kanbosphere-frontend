@@ -70,6 +70,15 @@ const priorityOptions: IPicklistOptions[] = [
   { label: "Crítica", value: "critical", color: "#FF9999" },
 ];
 
+const typeOptions: IPicklistOptions[] = [
+  { value: "history", label: "📘 Historia" },
+  { value: "bug", label: "📕 Bug" },
+  { value: "review", label: "📒 Revisión" },
+  { value: "feature", label: "📙 Feature" },
+  { value: "technical", label: "📗 Técnico" },
+  { value: "epic", label: "📓 Épico" },
+];
+
 const stringDataForUniqueId: string =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -99,6 +108,10 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
     color: "",
   });
   const [description, setDescription] = useState<string>("");
+  const [selectedType, setSelectedType] = useState({
+    value: "",
+    label: "",
+  });
   const [taskInfo, setTaskInfo] = useState("");
   const [pathImage, setPathImage] = useState<IFilePath[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
@@ -145,6 +158,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
     userId: "",
     taskId: "",
     status: "",
+    type: selectedType,
     priority: priority,
     description: "",
     info: "",
@@ -152,8 +166,8 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
     file: undefined,
     clockTime: [],
     expectedWorkingHours: 0,
-    createDate: undefined,
-    finishDate: undefined,
+    createDate: "",
+    finishDate: "",
   });
 
   useEffect(() => {
@@ -161,6 +175,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
       userId: data?.userId,
       taskId: data?.taskId,
       status: status.label,
+      type: selectedType,
       description: description,
       priority: priority,
       info: taskInfo,
@@ -180,6 +195,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
     priority,
     description,
     clockTime,
+    selectedType
   ]);
 
   React.useEffect(() => {
@@ -194,6 +210,10 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
       value: data?.priority?.value,
       label: data?.priority?.value,
       color: data?.priority?.color ?? "blue",
+    });
+    setSelectedType({
+      value: data.type.value,
+      label: typeOptions.find((currentOption) => currentOption.value === data.type.value)?.label ?? "undefined",
     });
     setNewDate(data?.createDate);
     setFinishDate(data?.finishDate);
@@ -422,6 +442,18 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
               readOnly={false}
             />
 
+            <FormLabel mt={marginStatusValue}>Tipo de historia</FormLabel>
+            <Select
+              value={selectedType}
+              options={typeOptions}
+             
+              onChange={(e: SingleValue<IPicklistOptions>) => {
+                if (e) {
+                  setSelectedType({ value: e.value, label: e.label });
+                }
+              }}
+            />
+
             <FormLabel mt={marginStatusValue}>Registrar tiempo</FormLabel>
             <Box marginTop={"-10px"}>
               <Box
@@ -610,6 +642,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
                 }
               }}
             />
+
             <FormLabel mt={marginStatusValue}>Priority</FormLabel>
             <Select
               menuPosition="fixed"

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Item,
   GridCell,
@@ -27,15 +27,19 @@ import { sendNewColumnsToServer } from "./utils/functions/sendColumnsToServet";
 
 import { useToast } from "@chakra-ui/react";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
-
+import { ICollaborators } from "@/domain/entities/userWsps.entity";
 
 interface ISpreadProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
+  isAutoSaveModeActive: boolean;
   internalTriggerPointer: number;
   setCurrentRowsSelected: React.Dispatch<React.SetStateAction<number[]>>;
-  currentSelection: GridSelection | undefined,
-  setCurrentSelection: React.Dispatch<React.SetStateAction<GridSelection | undefined>>;
+  handleChangeEvent: () => Promise<void>;
+  currentSelection: GridSelection | undefined;
+  setCurrentSelection: React.Dispatch<
+    React.SetStateAction<GridSelection | undefined>
+  >;
   freezeColumns: number;
   useTheme: Partial<Theme>;
 }
@@ -45,15 +49,18 @@ const GridDataEditor = (Props: ISpreadProps) => {
     data,
     setCurrentRowsSelected,
     internalTriggerPointer,
+    isAutoSaveModeActive,
     currentSelection,
     freezeColumns,
     useTheme,
     setCurrentSelection,
+    handleChangeEvent,
   } = Props;
   const currentUserWsp = useCurrentWorkspace();
   const currentUserWorkspaces = useWorkspace();
   const currentUser = useCurrentUser();
   const toastNotification = useToast();
+  const [triggerRearrangeEvent, setTriggerRearrangeEvent] = useState<number>(0);
 
   const selection: GridSelection = {
     current: undefined,
@@ -61,22 +68,31 @@ const GridDataEditor = (Props: ISpreadProps) => {
     rows: CompactSelection.empty(),
   };
 
-  const [userSelection, setUserSelection] = React.useState<GridSelection>(selection);
+  const [userSelection, setUserSelection] =
+    React.useState<GridSelection>(selection);
   const [userColumns, setUserColumns] = React.useState<IColumnProjection[]>(
     currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns ?? []
   );
+  const containerPreferences =
+    currentUserWsp.currentWorkSpace?.collaborators.find(
+      (currentCollaborator: ICollaborators) =>
+        currentCollaborator._id === currentUser.currentUser._id
+    )?.containerPreferences;
 
   const CustomCells = useCustomCells([
     Date,
     PickList,
     Multipicklist,
     Time,
-    Phone
+    Phone,
   ]);
 
   React.useEffect(() => {
     if (currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns) {
-      const sortedColumns: IColumnProjection[] = currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns.sort((a, b) => a.order - b.order);
+      const sortedColumns: IColumnProjection[] =
+        currentUserWsp?.currentWorkSpace?.container?.spreadSheetData?.columns.sort(
+          (a, b) => a.order - b.order
+        );
       setUserColumns(sortedColumns);
     }
   }, [
@@ -106,7 +122,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
       });
   }
 
-  const onColumnsMoved = (startIndex, endIndex) => {
+  const onColumnsMoved = (startIndex: number, endIndex: number) => {
     const newColumns = [...userColumns];
     const [toMove] = newColumns.splice(startIndex, 1);
     newColumns.splice(endIndex, 0, toMove);
@@ -122,9 +138,9 @@ const GridDataEditor = (Props: ISpreadProps) => {
       currentUserWsp,
       currentUser,
       assignNewOrderValues,
-      currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data ?? [],
-      currentUserWorkspaces
+      currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data ?? []
     );
+    setTriggerRearrangeEvent(Math.floor(Math.random() * 999) + 1);
   };
 
   const onCellEdited = useCallback(
@@ -136,6 +152,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
         newValue
       );
 
+      if (isAutoSaveModeActive) handleChangeEvent();
       handleStateForNotificationSnack(validationExportedFromUtils);
     },
     [userColumns, data]
@@ -145,7 +162,8 @@ const GridDataEditor = (Props: ISpreadProps) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const transformItemObjectToArray = userSelection.rows?.items.length ? userSelection.rows?.items : undefined;
-    const iterateObjectPlanning: number[][] = transformItemObjectToArray?.map((currentMappedBox: number[]) => {
+    const iterateObjectPlanning: number[][] = transformItemObjectToArray?.map(
+      (currentMappedBox: number[]) => {
         const indexValues: number[] = [];
         for (let i = currentMappedBox[0]; i < currentMappedBox[1]; i++) {
           indexValues.push(i);
@@ -164,12 +182,15 @@ const GridDataEditor = (Props: ISpreadProps) => {
     setCurrentRowsSelected(reducedObject);
   }, [userSelection.rows]);
 
-
   React.useEffect(() => {
     if (currentSelection === undefined) {
-        setUserSelection({...userSelection, current: undefined})
+      setUserSelection({ ...userSelection, current: undefined });
     }
   }, [currentSelection]);
+
+  React.useEffect(() => {
+    if (isAutoSaveModeActive) handleChangeEvent();
+  }, [triggerRearrangeEvent]);
 
   return (
     <div
@@ -182,8 +203,21 @@ const GridDataEditor = (Props: ISpreadProps) => {
       }}
     >
       <DataEditor
-        onColumnMoved={onColumnsMoved}
-        columns={userColumns}
+        onColumnMoved={async (startIndex: number, endIndex: number) => {
+          onColumnsMoved(startIndex, endIndex);
+        }}
+        // ToDO, Figure out how to avoid
+        columns={
+          userColumns.length === 0
+            ? [
+                {
+                  title:
+                    "Find out if there is a property of the column to replace in case of undefined",
+                  width: 0,
+                },
+              ]
+            : userColumns
+        }
         onColumnResize={(
           column: GridColumn,
           newSize: number,
@@ -199,25 +233,43 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
           setUserColumns(newColumnsWithMechanicalWidth);
         }}
-        onColumnResizeEnd={() =>
+        onColumnResizeEnd={() => {
           sendNewColumnsToServer(
             currentUserWsp,
             currentUser,
             userColumns,
-            currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data ?? [],
-            currentUserWorkspaces
-          )
-        }
+            currentUserWsp.currentWorkSpace?.container?.spreadSheetData?.data ??
+              []
+          );
+
+          if (isAutoSaveModeActive) handleChangeEvent();
+        }}
         onCellEdited={onCellEdited}
         onGridSelectionChange={(e: GridSelection) => {
           setCurrentSelection(e);
           setUserSelection(e);
         }}
         {...CustomCells}
-        rowMarkers={currentUserWsp.currentWorkSpace && "isRowSelectionActive" in currentUserWsp.currentWorkSpace.container.containerPreferences ? currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isRowSelectionActive ? "both": "none" : "none"}
+        rowMarkers={
+          currentUserWsp.currentWorkSpace &&
+          containerPreferences &&
+          "isRowSelectionActive" in containerPreferences
+            ? containerPreferences?.isRowSelectionActive
+              ? "both"
+              : "none"
+            : "none"
+        }
         rows={data.length ?? 0}
         getCellContent={getUserData}
-        rowSelectionMode={currentUserWsp.currentWorkSpace && "isMultipleSelectionActive" in currentUserWsp.currentWorkSpace.container.containerPreferences ? currentUserWsp.currentWorkSpace?.container?.containerPreferences?.isMultipleSelectionActive ? "multi" : "auto" : "auto"}
+        rowSelectionMode={
+          currentUserWsp.currentWorkSpace &&
+          containerPreferences &&
+          "isMultipleSelectionActive" in containerPreferences
+            ? containerPreferences?.isMultipleSelectionActive
+              ? "multi"
+              : "auto"
+            : "auto"
+        }
         width={"100%"}
         theme={useTheme}
         height={"100%"}
