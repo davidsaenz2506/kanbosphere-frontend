@@ -55,10 +55,18 @@ const PortalUser = () => {
   const userPrivateToken = cookies.get("tumbleToken");
   const workSpaces = useWorkspace();
 
-  const handleNotificationAction = async (index: number, requestData: IUserInvitations) => {
+  const handleNotificationAction = async (
+    index: number,
+    requestData: IUserInvitations
+  ) => {
     setDroppedElement(undefined);
-    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
-    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: IUserInvitations, blockIndex: number) => blockIndex !== index );
+    const currentNotifications: IUserInvitations[] =
+      computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] =
+      currentNotifications.filter(
+        (forgotten: IUserInvitations, blockIndex: number) =>
+          blockIndex !== index
+      );
 
     computedUserItems.setCurrentUser({
       ...computedUserItems.currentUser,
@@ -72,10 +80,18 @@ const PortalUser = () => {
       });
   };
 
-  const handleNotificationDelete = async ( index: number, requestData: IUserInvitations ) => {
+  const handleNotificationDelete = async (
+    index: number,
+    requestData: IUserInvitations
+  ) => {
     setDroppedElement(undefined);
-    const currentNotifications: IUserInvitations[] = computedUserItems.currentUser.invitations;
-    const newNotificationsChunk: IUserInvitations[] = currentNotifications.filter((forgotten: IUserInvitations, blockIndex: number) => blockIndex !== index);
+    const currentNotifications: IUserInvitations[] =
+      computedUserItems.currentUser.invitations;
+    const newNotificationsChunk: IUserInvitations[] =
+      currentNotifications.filter(
+        (forgotten: IUserInvitations, blockIndex: number) =>
+          blockIndex !== index
+      );
 
     computedUserItems.setCurrentUser({
       ...computedUserItems.currentUser,
@@ -106,21 +122,29 @@ const PortalUser = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const decodedInfoFromServer: any = jwtDecode(userPrivateToken);
 
-      const userInfoFromDataBase = await GetCurrentUser(decodedInfoFromServer.username);
+      const userInfoFromDataBase = await GetCurrentUser(
+        decodedInfoFromServer.username
+      );
 
-      const friendsData: string[] | undefined = userInfoFromDataBase?.friends.map((currentCanonicalId) => currentCanonicalId.canonicalId);
+      const friendsData: string[] | undefined =
+        userInfoFromDataBase?.friends.map(
+          (currentCanonicalId) => currentCanonicalId.canonicalId
+        );
 
-      const requestData: string[] | undefined = userInfoFromDataBase?.requests.map((currentCanonicalId) => currentCanonicalId.canonicalId);
+      const requestData: string[] | undefined =
+        userInfoFromDataBase?.requests.map(
+          (currentCanonicalId) => currentCanonicalId.canonicalId
+        );
 
       if (friendsData && requestData && userInfoFromDataBase) {
         const dataShakeFriends = await GetUsersByArray(friendsData);
         const dataShakeRequests = await GetUsersByArray(requestData);
-  
+
         const currentRequestAndFriendData = {
           friends: dataShakeFriends,
           requests: dataShakeRequests,
         };
-  
+
         computedUserItems.setCurrentUser(userInfoFromDataBase);
         setCurrentContacts(currentRequestAndFriendData);
       }
@@ -148,7 +172,11 @@ const PortalUser = () => {
   }
 
   React.useEffect(() => {
-    if (computedUserItems.currentUser.userID) workSpaces.fetchWorkSpaces(computedUserItems.currentUser._id ?? "", setLoadingServerData);
+    if (computedUserItems.currentUser.userID)
+      workSpaces.fetchWorkSpaces(
+        computedUserItems.currentUser._id ?? "",
+        setLoadingServerData
+      );
   }, [computedUserItems.currentUser.userID]);
 
   return (
@@ -319,7 +347,10 @@ const PortalUser = () => {
                           height: "16px",
                           borderRadius: "50%",
                           display: "flex",
-                          backgroundColor: computedUserItems.currentUser.invitations.length > 0 ? "red" : "green",
+                          backgroundColor:
+                            computedUserItems.currentUser.invitations.length > 0
+                              ? "red"
+                              : "green",
                           justifyContent: "center",
                           alignItems: "center",
                           color: "white",
@@ -374,7 +405,7 @@ const PortalUser = () => {
           <Box
             id="workSpace"
             opacity={isTriggerActive ? 0 : 1}
-            transition={!isTriggerActive ? "all .2s" : "none"}
+            transition={!isTriggerActive ? "all .4s" : "none"}
             className={styles.workSpace}
           >
             {renderComponent(query, loadingServerData)}

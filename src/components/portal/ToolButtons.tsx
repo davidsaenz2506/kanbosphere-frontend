@@ -99,7 +99,7 @@ const ToolButtons: React.FunctionComponent<IToolButtonsProps>  = (props) => {
       )}
       <Box
         className={styles.generalButtons}
-        style={{ marginTop: "10px", color: "#252525" }}
+        style={{ paddingTop: "10px", color: "#252525", backgroundColor: "rgb(255, 255, 255)" }}
       >
         <Box
           className={styles.mainObject}
@@ -284,7 +284,7 @@ const ToolButtons: React.FunctionComponent<IToolButtonsProps>  = (props) => {
                           await delayTime(150);
 
                           currentWorkSpace.setCurrentWorkSpace(undefined);
-                          await delayTime(66);
+                          await delayTime(200);
 
                           setIsTriggerActive(false);
                         }}

@@ -63,7 +63,7 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
       ];
       newWorkspaceToCreate.container = {
         wspData: [],
-        sprints: []
+        sprints: [],
       };
     }
 
@@ -136,9 +136,7 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
                     }
                   />
 
-                  <FormLabel pt={5}>
-                    ¿Deseas configurar objetivos en tu espacio agil?
-                  </FormLabel>
+                  <FormLabel pt={5}>Activar modo profesional</FormLabel>
                   <Checkbox
                     isChecked={workspaceHasGoals}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,10 +151,10 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
                       textAlign={"justify"}
                       color={"GrayText"}
                     >
-                      Si configuras los objetivos podrás establecer intervalos
-                      de tiempo durante los cuales se asignaran un determinado
-                      número de historias por terminar, de esta manera podrás
-                      tener una mejor gestión del proyecto o desarrollo.
+                      Si activas el modo profesional podrás establecer objetivos
+                      y administrar tu backlog, observar estadísticas, tener una
+                      mejor interacción con tu equipo y personalizar tu
+                      contenedor.
                     </Text>
                   )}
                 </>

@@ -19,13 +19,16 @@ interface ICalculatorProps {
 }
 
 export const Calculator: FunctionComponent<ICalculatorProps> = ({
-  onChange,currentResult
+  onChange,
+  currentResult,
 }) => {
   const [memory, setMemory] = useState<number>(0);
   const [result, setResult] = useState<number>(0);
   const [waitingForOperand, setWaitingForOperand] = useState<boolean>(true);
   const [pendingOperator, setPendingOperator] = useState<Operator>();
-  const [display, setDisplay] = useState<string>(currentResult?.toString() ?? "0");
+  const [display, setDisplay] = useState<string>(
+    currentResult?.toString() ?? "0"
+  );
   const [resultToReturn, setResultToReturn] = useState<number>(currentResult);
 
   const calculate = (

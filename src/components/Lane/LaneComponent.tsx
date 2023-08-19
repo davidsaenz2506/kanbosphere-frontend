@@ -107,8 +107,7 @@ const LaneComponent: React.FunctionComponent<ILaneComponentProps> = (props) => {
   }, [currentCardHolderHeight]);
 
   useEffect(() => {
-    const currentCardHolderElement: HTMLElement | null =
-      document.getElementById("cardHolder");
+    const currentCardHolderElement: HTMLElement | null = document.getElementById("cardHolder");
     if (currentCardHolderElement) {
       setSkeletonAmount(
         Math.floor(

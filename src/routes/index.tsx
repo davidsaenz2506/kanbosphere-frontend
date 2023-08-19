@@ -15,12 +15,7 @@ export const renderComponent = (
   loadingServerData: boolean
 ): ReactNode => {
   const briefCase: string | string[] | undefined = query.briefcase;
-  const newScopeChange: string | undefined =
-    typeof query?.fridgeKey === "string"
-      ? query?.fridgeKey?.split("/")[1]
-      : undefined;
-
-  console.log(newScopeChange);
+  const newScopeChange: string | undefined = typeof query?.fridgeKey === "string" ? query?.fridgeKey?.split("/")[1] : undefined;
 
   switch (briefCase) {
     case "main":

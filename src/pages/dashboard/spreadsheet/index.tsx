@@ -184,7 +184,7 @@ const Spreadsheet = () => {
   async function handleChangeEvent() {
     if (
       currentWorkSpace.currentWorkSpace &&
-      currentWorkSpace.currentWorkSpace.container.spreadSheetData
+      currentWorkSpace.currentWorkSpace?.container?.spreadSheetData
     ) {
       await UpdateWorkSpace(currentWorkSpace?.currentWorkSpace?._id, {
         body: currentWorkSpace.currentWorkSpace,
@@ -277,7 +277,7 @@ const Spreadsheet = () => {
   React.useEffect(() => {
     if (
       currentWorkSpace.currentWorkSpace &&
-      currentWorkSpace.currentWorkSpace.container.spreadSheetData
+      currentWorkSpace.currentWorkSpace?.container?.spreadSheetData
     ) {
       setSpreadSheetData(
         currentWorkSpace.currentWorkSpace.container.spreadSheetData.data

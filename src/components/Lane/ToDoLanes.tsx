@@ -36,13 +36,7 @@ const filterItemsMap = {
 
 const ToDoLanes: React.FC<ILaneProps> = (props) => {
   const { currentWorkSpace: data, setCurrentWorkSpace: setData } = useCurrentWorkspace();
-  const generalWorkspaceData = useWorkspace();
   const backGroundLaneColor = "#f5f6fA";
-
-  React.useEffect(() => {
-    const currentWorkSpace: IWspUser | undefined = generalWorkspaceData.userWsps.find((currentWsp) => currentWsp?._id === data?._id);
-    setData(currentWorkSpace); // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generalWorkspaceData.userWsps, data?._id]);
 
   return (
     <div

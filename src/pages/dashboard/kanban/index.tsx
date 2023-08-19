@@ -36,7 +36,7 @@ const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
   const bodyDocument: HTMLBodyElement | null = document.querySelector("body");
   const { currentUser } = useCurrentUser();
-  const { setLoadingChunk } = useLoadingChunk();
+  const { loadingChunk, setLoadingChunk } = useLoadingChunk();
   const { currentWorkSpace, setCurrentWorkSpace } = useCurrentWorkspace();
   const [currentColor, setCurrentColor] = useState<string>("#FAFAFA");
   const [isGettingImage, setIsGettingImage] = useState<boolean>(false);
@@ -161,6 +161,7 @@ const ToDoWorkspace = () => {
   }
 
   React.useEffect(() => {
+    setSelectedTask(undefined);
     const currentUserPreferences:
       | IAgilePreferences
       | ISpreadSheetPreferences
@@ -183,9 +184,10 @@ const ToDoWorkspace = () => {
   }, [currentWorkSpace?._id, currentWorkSpace?.container?.wspData]);
 
   React.useEffect(() => {
-    if (typeof router.query.fridgeKey === "string" && currentUser._id)
+    if (typeof router.query.fridgeKey === "string" && currentUser._id) {
       getWorkspaceData(router.query.fridgeKey);
-  }, [currentWorkSpace?._id, currentUser._id]);
+    }
+  }, [router.query.fridgeKey]);
 
   async function getWorkspaceData(fridgeKey: string) {
     if (fridgeKey && router.query.briefcase === "agile") {
@@ -264,7 +266,7 @@ const ToDoWorkspace = () => {
                 position: "sticky",
                 height: "12%",
                 left: 0,
-                transition: "all .5s"
+                transition: "all .5s",
               }}
               borderBottom={"2px solid #d9d9e3"}
             >

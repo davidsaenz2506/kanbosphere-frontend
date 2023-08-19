@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 
-import { Badge, Box, Button, Icon, Progress, Tooltip } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Button,
+  Icon,
+  Progress,
+  Skeleton,
+  Stack,
+  Tooltip,
+} from "@chakra-ui/react";
 import {
   ICollaborators,
   ISprintsData,
@@ -11,6 +20,7 @@ import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
 import { FcPuzzle, FcInspection, FcBullish } from "react-icons/fc";
 import { IDataToDo } from "@/domain/entities/todo.entity";
+import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 
 interface IHeaderProps {
   currentWorkSpace: IWspUser | undefined;
@@ -27,12 +37,9 @@ interface IHeaderProps {
 const Header = (Props: IHeaderProps) => {
   const router = useRouter();
   const { currentUser } = useCurrentUser();
-  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } =
-    Props;
-  const containerPreferences = currentWorkSpace?.collaborators.find(
-    (currentCollaborator: ICollaborators) =>
-      currentCollaborator._id === currentUser._id
-  )?.containerPreferences;
+  const { loadingChunk } = useLoadingChunk();
+  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } = Props;
+  const containerPreferences = currentWorkSpace?.collaborators.find((currentCollaborator: ICollaborators) => currentCollaborator._id === currentUser._id)?.containerPreferences;
   const isCreateHistoryDisabled: boolean = currentWorkSpace?.container?.sprints?.length === 0 ? true : false;
   const isGoalsModeActive: boolean | undefined = currentWorkSpace?.isGoalsModeActive;
   const [currentAchievementPercentage, setCurrentAchievementPercentage] = useState<number>(0);
@@ -41,8 +48,7 @@ const Header = (Props: IHeaderProps) => {
     const currentSprint = currentWorkSpace?.container?.sprints?.find(
       (sprints: ISprintsData) => sprints.isSprintActive
     );
-    const currentWorkspaceTask: IDataToDo[] | undefined =
-      currentWorkSpace?.container?.wspData;
+    const currentWorkspaceTask: IDataToDo[] | undefined = currentWorkSpace?.container?.wspData;
 
     if (currentSprint && currentWorkspaceTask) {
       const finishedTasks: number = currentWorkspaceTask.reduce(
@@ -67,55 +73,75 @@ const Header = (Props: IHeaderProps) => {
   return (
     <React.Fragment>
       <Box className="header">
-        <h2
-          style={{
-            textAlign: "start",
-            marginTop: "15px",
-            marginLeft: "30px",
-            color: "#0F0F0F",
-            fontSize: "25px",
-          }}
+        <Stack
+          opacity={loadingChunk ? 1 : 0}
+          transition={"all .2s"}
+          position={"absolute"}
+          marginLeft={"30px"}
+          marginTop={"15px"}
+          width={"60%"}
         >
-          {currentWorkSpace?.container?.wspData === undefined
-            ? "Obteniendo datos..."
-            : `Tablero Kanban / ${currentWorkSpace?.name}`}
-        </h2>
-        <Box display={"flex"} alignItems={"center"}>
+          <Skeleton width={"100%"} height="25px" />
+          <Skeleton width={"100%"} height="10px" />
+          <Skeleton width={"100%"} height="10px" />
+        </Stack>
+
+        <Box
+          opacity={!loadingChunk ? 1 : 0}
+          transition={"all .5s"}
+          display={"flex"}
+          flexDir={"column"}
+          justifyContent={"center"}
+        >
           <h2
             style={{
               textAlign: "start",
+              marginTop: "15px",
               marginLeft: "30px",
               color: "#0F0F0F",
-              fontSize: "18px",
-              fontWeight: "initial",
+              fontSize: "25px",
             }}
           >
-            {containerPreferences === undefined
-              ? "Esto puede tardar dependiento de tu conexion"
-              : "prefix" in containerPreferences
-              ? `Prefijo de historia ${containerPreferences?.prefix}`
-              : "Sin definir..."}
+            {`Tablero Kanban / ${currentWorkSpace?.name}`}
           </h2>
-          {isGoalsModeActive && (
-            <Box>
-              <Badge ml="5" fontSize="1em" mb={2} colorScheme="red">
-                No hay un objetivo actual
-              </Badge>
-              <Badge
-                ml="5"
-                transition={"all .3s"}
-                opacity={isOpenSliderTask ? 0 : 1}
-                fontSize="1em"
-                mb={2}
-                color={"gray.700"}
-                bgColor={"gray.300"}
-              >
-                ⏱ 1 Días restantes
-              </Badge>
-            </Box>
-          )}
+          <Box display={"flex"} alignItems={"center"}>
+            <h2
+              style={{
+                textAlign: "start",
+                marginLeft: "30px",
+                color: "#0F0F0F",
+                fontSize: "18px",
+                fontWeight: "initial",
+                transition: "all .5s",
+              }}
+            >
+              {containerPreferences !== undefined &&
+              "prefix" in containerPreferences
+                ? `Prefijo de historia ${containerPreferences?.prefix}`
+                : "Sin definir..."}
+            </h2>
+            {isGoalsModeActive && (
+              <Box>
+                <Badge ml="5" fontSize="1em" mb={2} colorScheme="red">
+                  No hay un objetivo actual
+                </Badge>
+                <Badge
+                  ml="5"
+                  transition={"all .3s"}
+                  opacity={isOpenSliderTask ? 0 : 1}
+                  fontSize="1em"
+                  mb={2}
+                  color={"gray.700"}
+                  bgColor={"gray.300"}
+                >
+                  ⏱ 1 Días restantes
+                </Badge>
+              </Box>
+            )}
+          </Box>
         </Box>
       </Box>
+
       <Box
         display={"flex"}
         flexDir={"column"}
