@@ -9,7 +9,7 @@ export interface IFriends {
     canonicalId: string
 }
 export default interface ICurrentUser {
-    _id?: string;
+    _id: string;
     username: string;
     fullname: string;
     email: string;

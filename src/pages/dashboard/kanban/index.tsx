@@ -31,6 +31,8 @@ import { getWorkspaceById } from "@/services/workspaces/getOne";
 import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 import currentBiridectionalCommunication from "@/services/socket";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
+import { GetUsersByArray } from "@/services/user/getByArray";
+import ICurrentUser from "@/domain/entities/user.entity";
 
 const ToDoWorkspace = () => {
   const [addTask, setAddTask] = useState(false);
@@ -47,6 +49,7 @@ const ToDoWorkspace = () => {
   >(currentCardHolderElement?.getBoundingClientRect().height);
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingOrDeleting, setIsSendingOrDeleting] = useState(false);
+  const [currentWorkspaceUsers, setCurrentWorkspaceUsers] = useState<ICurrentUser[]>();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenSliderTask, setOpenSliderTask] = useState(true);
   const isBrowser = () => typeof window !== "undefined";
@@ -67,6 +70,7 @@ const ToDoWorkspace = () => {
     New: "#FF5733",
     "In Proccess": "#FFC300",
     "For Review": "#6FB98F",
+    "In Tests": "#0099CC",
     Finished: "#4B0082",
     Blocked: "#FF3333",
   };
@@ -192,13 +196,12 @@ const ToDoWorkspace = () => {
   async function getWorkspaceData(fridgeKey: string) {
     if (fridgeKey && router.query.briefcase === "agile") {
       setLoadingChunk(true);
-      const workspaceData: IWspUser | undefined = await getWorkspaceById(
-        fridgeKey ?? "",
-        currentBiridectionalCommunication.id,
-        currentUser._id ?? ""
-      );
-      if (workspaceData) {
+      const workspaceData: IWspUser | undefined = await getWorkspaceById( fridgeKey ?? "", currentBiridectionalCommunication.id, currentUser._id ?? "");
+      const currentWorkspaceUsers: ICurrentUser[] | undefined = await GetUsersByArray(workspaceData?.collaborators.map((currentCollaborator) => currentCollaborator._id) ?? []);
+
+      if (workspaceData && currentWorkspaceUsers) {
         setCurrentWorkSpace(workspaceData);
+        setCurrentWorkspaceUsers(currentWorkspaceUsers);
       }
       setLoadingChunk(false);
     }
@@ -212,6 +215,7 @@ const ToDoWorkspace = () => {
             <EditTask
               isOpen={openEdit}
               onClose={setOpenEdit}
+              currentWorkspaceUsers={currentWorkspaceUsers}
               data={selectedTask}
               isLoading={isSendingOrDeleting}
               setIsLoading={setIsSendingOrDeleting}
@@ -241,7 +245,7 @@ const ToDoWorkspace = () => {
             setIsLoading={setIsLoading}
           />
           <Box
-            width={isOpenSliderTask ? "60%" : "100%"}
+            width={isOpenSliderTask ? "70%" : "100%"}
             transition={"all .3s ease"}
             css={{
               "&::-webkit-scrollbar": {
@@ -252,7 +256,7 @@ const ToDoWorkspace = () => {
               },
               "&::-webkit-scrollbar-thumb": {
                 background: "#D3D3D3",
-                borderRadius: "4px",
+                borderRadius: "0",
               },
             }}
             overflowX={"scroll"}
@@ -264,7 +268,7 @@ const ToDoWorkspace = () => {
                 justifyContent: "space-between",
                 alignItems: "center",
                 position: "sticky",
-                height: "12%",
+                height: "8%",
                 left: 0,
                 transition: "all .5s",
               }}
@@ -272,6 +276,7 @@ const ToDoWorkspace = () => {
             >
               <Header
                 currentWorkSpace={currentWorkSpace}
+                currentUsers={currentWorkspaceUsers}
                 setAddTask={setAddTask}
                 setCurrentColor={setCurrentColor}
                 currentColor={currentColor}

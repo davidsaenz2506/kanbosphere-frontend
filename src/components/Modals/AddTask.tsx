@@ -32,6 +32,7 @@ const statusOptions: IPicklistOptions[] = [
   { value: "In Proccess", label: "In Proccess" },
   { value: "Finished", label: "Finished" },
   { value: "For Review", label: "For Review" },
+  { value: "In Tests", label: "In Tests" },
   { value: "Blocked", label: "Blocked" },
   { value: "New", label: "New" },
 ];
@@ -63,7 +64,8 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
   const toastNotification = useToast();
   const { currentUser } = useCurrentUser();
   const { isOpen, onClose, isLoading, setIsLoading } = props;
-  const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
+  const { currentWorkSpace: data, setCurrentWorkSpace: setUserTasks } =
+    useCurrentWorkspace();
   const [status, setStatus] = useState<string>("");
   const mathRandomValue = React.useMemo(
     () => Math.floor(Math.random() * 999) + 1,
@@ -73,14 +75,26 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
   const [taskInfo, setTaskInfo] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [expectedHours, setExpectedHours] = useState<number>(0);
-  const [taskId, setTaskId] = useState<string>(Math.random().toString(36).substr(2, 18));
-  const [selectedPriority, setSelectedPriority] = useState<IPriority>({ value: "", color: "" });
-  const [ selectedType, setSelectedType ] = useState({ value: "", label: "" });
-  const containerPreferences = data?.collaborators.find((currentCollaborator: ICollaborators) => currentCollaborator._id === currentUser._id)?.containerPreferences;
-  const title = containerPreferences && "prefix" in containerPreferences ? `${containerPreferences.prefix}-${formatedValue}` : "undefined";
+  const [taskId, setTaskId] = useState<string>(
+    Math.random().toString(36).substr(2, 18)
+  );
+  const [selectedPriority, setSelectedPriority] = useState<IPriority>({
+    value: "",
+    color: "",
+  });
+  const [selectedType, setSelectedType] = useState({ value: "", label: "" });
+  const containerPreferences = data?.collaborators.find(
+    (currentCollaborator: ICollaborators) =>
+      currentCollaborator._id === currentUser._id
+  )?.containerPreferences;
+  const title =
+    containerPreferences && "prefix" in containerPreferences
+      ? `${containerPreferences.prefix}-${formatedValue}`
+      : "undefined";
 
   const [task, setTask] = useState<IDataToDo>({
-    userId: "1000933190",
+    informant: "",
+    responsible: "",
     taskId: "",
     status: "",
     type: selectedType,
@@ -95,20 +109,23 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
   });
 
   useEffect(() => {
-    setTask({
-      userId: "1000933190",
-      taskId: taskId,
-      status: status,
-      type: selectedType,
-      description: description,
-      priority: selectedPriority,
-      info: taskInfo,
-      title: title,
-      file: [],
-      createDate: DateTime.now().toISODate(),
-      clockTime: [],
-      expectedWorkingHours: expectedHours,
-    });
+    if (currentUser._id) {
+      setTask({
+        informant: currentUser._id,
+        responsible: currentUser._id,
+        taskId: taskId,
+        status: status,
+        type: selectedType,
+        description: description,
+        priority: selectedPriority,
+        info: taskInfo,
+        title: title,
+        file: [],
+        createDate: DateTime.now().toISODate(),
+        clockTime: [],
+        expectedWorkingHours: expectedHours,
+      });
+    }
   }, [status, taskInfo, title, selectedPriority, selectedType]);
 
   async function addTaskToWorkSpace(userTask: IDataToDo) {
@@ -163,79 +180,68 @@ const AddTask: React.FunctionComponent<IAddTaskProps> = (props) => {
           Añadir historia {title}
         </Modal.Header>
         <Modal.Body>
-          <FormControl>
-            <FormLabel>Título</FormLabel>
-            <Input
-              type="text"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDescription(e.target.value)
-              }
-            />
-          </FormControl>
+          <FormLabel>Título</FormLabel>
+          <Input
+            type="text"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setDescription(e.target.value)
+            }
+          />
 
-          <FormControl mt={0}>
-            <FormLabel>Tipo de historia</FormLabel>
-            <Select
-              options={typeOptions}
-              onChange={(e: SingleValue<IPicklistOptions>) => {
-                if (e) setSelectedType(e);
-              }}
-            />
-          </FormControl>
+          <FormLabel>Tipo de historia</FormLabel>
+          <Select
+            menuPlacement="auto"
+            options={typeOptions}
+            onChange={(e: SingleValue<IPicklistOptions>) => {
+              if (e) setSelectedType(e);
+            }}
+          />
 
-          <FormControl>
-            <FormLabel>Información</FormLabel>
-            <QuillEditor
-              value={taskInfo}
-              readOnly={false}
-              onChangeMethod={setTaskInfo}
-              modules={{
-                toolbar: [
-                  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                  ["bold", "italic", "underline", "strike"],
-                  [{ size: [] }],
-                  [{ font: [] }],
-                  [{ align: ["right", "center", "justify"] }],
-                  [{ list: "ordered" }, { list: "bullet" }],
-                  [{ color: [] }],
-                  [{ background: [] }],
-                ],
-              }}
-            />
-          </FormControl>
+          <FormLabel>Información</FormLabel>
+          <QuillEditor
+            value={taskInfo}
+            readOnly={false}
+            onChangeMethod={setTaskInfo}
+            modules={{
+              toolbar: [
+                [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                ["bold", "italic", "underline", "strike"],
+                [{ size: [] }],
+                [{ font: [] }],
+                [{ align: ["right", "center", "justify"] }],
+                [{ list: "ordered" }, { list: "bullet" }],
+                [{ color: [] }],
+                [{ background: [] }],
+              ],
+            }}
+          />
 
-          <FormControl>
-            <FormLabel>Horas de trabajo esperadas</FormLabel>
-            <Input
-              type="number"
-              placeholder="Asegúrese de ingresar valores consistentes"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setExpectedHours(parseInt(e.target.value))
-              }
-            />
-          </FormControl>
+          <FormLabel>Horas de trabajo esperadas</FormLabel>
+          <Input
+            type="number"
+            placeholder="Asegúrese de ingresar valores consistentes"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setExpectedHours(parseInt(e.target.value))
+            }
+          />
 
-          <FormControl mt={0}>
-            <FormLabel>Status</FormLabel>
-            <Select
-              menuPosition="fixed"
-              options={statusOptions}
-              onChange={(e: SingleValue<IPicklistOptions>) => {
-                if (e) setStatus(e.label);
-              }}
-            />
-          </FormControl>
+          <FormLabel>Status</FormLabel>
+          <Select
+           menuPlacement="auto"
+            options={statusOptions}
+            onChange={(e: SingleValue<IPicklistOptions>) => {
+              if (e) setStatus(e.label);
+            }}
+          />
 
-          <FormControl mt={0}>
-            <FormLabel>Priority</FormLabel>
-            <Select
-              menuPosition="fixed"
-              options={priorityOptions}
-              onChange={(e: SingleValue<IPicklistOptions>) => {
-                if (e) setSelectedPriority({ value: e.label, color: e.color });
-              }}
-            />
-          </FormControl>
+          <FormLabel>Priority</FormLabel>
+          <Select
+           menuPlacement="auto"
+            options={priorityOptions}
+            onChange={(e: SingleValue<IPicklistOptions>) => {
+              if (e) setSelectedPriority({ value: e.label, color: e.color });
+            }}
+          />
         </Modal.Body>
 
         <Modal.Footer>

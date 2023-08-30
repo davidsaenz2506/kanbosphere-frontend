@@ -7,7 +7,7 @@
 }
 
 .toolSpace {
-  min-width: 300px;
+  width: 70px;
   height: 100vh;
   display: flex;
   user-select: none;

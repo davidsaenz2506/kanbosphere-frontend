@@ -8,7 +8,8 @@ import {
     FcLowPriority,
     FcHighPriority,
     FcMediumPriority,
-    FcLeave
+    FcLeave,
+    FcBiomass
 } from "react-icons/fc";
 
 export const getIconValueForStatus = (value: string): IconType | undefined => {
@@ -19,6 +20,8 @@ export const getIconValueForStatus = (value: string): IconType | undefined => {
             return FcProcess;
         case "For Review":
             return FcCamcorderPro;
+        case "In Tests":
+            return FcBiomass;
         case "Finished":
             return FcApproval;
         case "Blocked":

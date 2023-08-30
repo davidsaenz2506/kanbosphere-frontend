@@ -25,6 +25,8 @@ export interface ISprintsData {
     sprintPurpose: string;
     sprintDescription: string;
     isSprintActive: boolean;
+    isAFinishedSprint: boolean;
+    finishDate: string | null;
     sprintStartDate: string | null;
     sprintEndDate: string | null;
     linkedStories: string[];

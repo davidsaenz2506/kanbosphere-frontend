@@ -16,7 +16,7 @@ export const calculateKE = ({ m, v }: { m: number, v: number }): string => `${(0
 export const calculateGravityForce = ({ m1, m2, r, G }: { m1: number, m2: number, r: number, G: number }): string =>
   `${((G * m1 * m2) / (Math.pow(r, 2))).toFixed(2)} N`;
 
-export const calculateVoltage = ({ I, R }: { I: number, R: number }): number => I * R;
+export const calculateVoltage = ({ I, R }: { I: number, R: number }): string => (I * R).toString();
 
 export const calculateVelocityFromKE = ({ KE, m }: { KE: number, m: number }): string =>
   `${(Math.sqrt((2 * KE) / m)).toFixed(2)} m/s`;

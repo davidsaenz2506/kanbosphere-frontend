@@ -15,7 +15,7 @@ import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
 
 function delayTime(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 interface IEndBarProps {
@@ -23,21 +23,21 @@ interface IEndBarProps {
 }
 
 const EndBar: React.FunctionComponent<IEndBarProps> = (props) => {
-  const {setIsTriggerActive} = props;
+  const { setIsTriggerActive } = props;
   const { setCurrentWorkSpace } = useCurrentWorkspace();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { loadingChunk } = useLoadingChunk();
 
-  async function handleRouterPath (caseUrl: string) { 
-    setIsTriggerActive(true)
+  async function handleRouterPath(caseUrl: string) {
+    setIsTriggerActive(true);
 
     setCurrentWorkSpace(undefined);
     router.push(`/dashboard?briefcase=${caseUrl}`);
     await delayTime(200);
 
-    setIsTriggerActive(false)
-}
+    setIsTriggerActive(false);
+  }
 
   return (
     <>
@@ -49,11 +49,11 @@ const EndBar: React.FunctionComponent<IEndBarProps> = (props) => {
           paddingBottom: "10px",
           color: "#252525",
           backgroundColor: "#ffffff",
+          width: "70px",
         }}
       >
-        <Divider width={"86%"} marginLeft={"20px"} marginBottom={"10px"} />
-        <Box style={{ paddingRight: "25px" }} className={styles.buttonSpace}>
-          <Icon as={CiSettings} w={6} h={6} sx={{ marginLeft: "15px" }} />
+        <Divider width={"70%"} marginLeft={"10px"} marginBottom={"10px"} />
+        <Box className={styles.buttonSpace}>
           <Button
             type="button"
             disabled={loadingChunk}
@@ -62,19 +62,18 @@ const EndBar: React.FunctionComponent<IEndBarProps> = (props) => {
               backgroundColor: "transparent",
               border: "none",
               color: "#1C1C1C",
-              marginLeft: "0px",
+
               fontSize: "15px",
             }}
             onClick={() => {
               const caseUrl: string = "settings";
-              handleRouterPath(caseUrl)
+              handleRouterPath(caseUrl);
             }}
           >
-            Configuración de usuario
+            <Icon marginLeft={"-5px"} as={CiSettings} w={6} h={6} />
           </Button>
         </Box>
         <Box className={styles.buttonSpace}>
-          <Icon as={IoExitOutline} w={5} h={5} sx={{ marginLeft: "19px" }} />
           <Button
             type="button"
             disabled={loadingChunk}
@@ -83,7 +82,7 @@ const EndBar: React.FunctionComponent<IEndBarProps> = (props) => {
               backgroundColor: "transparent",
               border: "none",
               color: "#1C1C1C",
-              marginLeft: "0px",
+
               fontSize: "15px",
             }}
             onClick={() => {
@@ -91,7 +90,7 @@ const EndBar: React.FunctionComponent<IEndBarProps> = (props) => {
               setIsOpen(true);
             }}
           >
-            Cerrar sesión
+            <Icon as={IoExitOutline} w={5} h={5} />
           </Button>
         </Box>
       </Box>

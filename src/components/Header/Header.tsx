@@ -9,6 +9,7 @@ import {
   Progress,
   Skeleton,
   Stack,
+  Text,
   Tooltip,
 } from "@chakra-ui/react";
 import {
@@ -18,12 +19,18 @@ import {
 } from "@/domain/entities/userWsps.entity";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
-import { FcPuzzle, FcInspection, FcBullish } from "react-icons/fc";
+import { GrInspect } from "react-icons/gr";
+import { MdOutlineAutoGraph, MdBookmarkAdd } from "react-icons/md";
 import { IDataToDo } from "@/domain/entities/todo.entity";
 import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
+import { Avatar } from "@nextui-org/react";
+import { AiOutlineClockCircle } from "react-icons/ai";
+import ICurrentUser from "@/domain/entities/user.entity";
+import { DateTime } from "luxon";
 
 interface IHeaderProps {
   currentWorkSpace: IWspUser | undefined;
+  currentUsers: ICurrentUser[] | undefined;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   colorObject: object;
   setCurrentColor: React.Dispatch<React.SetStateAction<string>>;
@@ -38,51 +45,84 @@ const Header = (Props: IHeaderProps) => {
   const router = useRouter();
   const { currentUser } = useCurrentUser();
   const { loadingChunk } = useLoadingChunk();
-  const { currentWorkSpace, setAddTask, setOpenSliderTask, isOpenSliderTask } = Props;
-  const containerPreferences = currentWorkSpace?.collaborators.find((currentCollaborator: ICollaborators) => currentCollaborator._id === currentUser._id)?.containerPreferences;
-  const isCreateHistoryDisabled: boolean = currentWorkSpace?.container?.sprints?.length === 0 ? true : false;
-  const isGoalsModeActive: boolean | undefined = currentWorkSpace?.isGoalsModeActive;
-  const [currentAchievementPercentage, setCurrentAchievementPercentage] = useState<number>(0);
+  const {
+    currentWorkSpace,
+    setAddTask,
+    setOpenSliderTask,
+    isOpenSliderTask,
+    currentUsers,
+  } = Props;
+  const containerPreferences = currentWorkSpace?.collaborators.find(
+    (currentCollaborator: ICollaborators) =>
+      currentCollaborator._id === currentUser._id
+  )?.containerPreferences;
+  const isCreateHistoryDisabled: boolean =
+    currentWorkSpace?.container?.sprints?.length === 0 ? true : false;
+  const isGoalsModeActive: boolean | undefined =
+    currentWorkSpace?.isGoalsModeActive;
+  const [currentAchievementPercentage, setCurrentAchievementPercentage] =
+    useState<number>(0);
+  const [currentSprintActive, setCurrentSprintActive] =
+    useState<ISprintsData>();
+  const [daysToFinishSprint, setDaysToFinishSprint] = useState<number>(0);
 
   React.useEffect(() => {
-    const currentSprint = currentWorkSpace?.container?.sprints?.find(
-      (sprints: ISprintsData) => sprints.isSprintActive
-    );
-    const currentWorkspaceTask: IDataToDo[] | undefined = currentWorkSpace?.container?.wspData;
-
-    if (currentSprint && currentWorkspaceTask) {
-      const finishedTasks: number = currentWorkspaceTask.reduce(
-        (count, object) => {
-          if (
-            object.status === "Finished" &&
-            currentSprint.linkedStories.includes(object.taskId)
-          ) {
-            return count + 1;
-          }
-          return count;
-        },
-        0
+    if (currentWorkSpace?.isGoalsModeActive) {
+      const currentSprint = currentWorkSpace?.container?.sprints?.find(
+        (sprints: ISprintsData) => sprints.isSprintActive
       );
+      const currentWorkspaceTask: IDataToDo[] | undefined =
+        currentWorkSpace?.container?.wspData;
 
-      setCurrentAchievementPercentage(
-        (finishedTasks / currentWorkspaceTask.length) * 100
-      );
+      if (
+        currentSprint &&
+        currentWorkspaceTask &&
+        currentSprint.sprintEndDate
+      ) {
+        const currentDate = DateTime.local();
+        const currentSprintFinishDate = DateTime.fromISO(
+          currentSprint.sprintEndDate
+        );
+        const diff = currentSprintFinishDate.diff(currentDate, [
+          "years",
+          "months",
+          "days",
+          "hours",
+        ]).days;
+
+        const finishedTasks: number = currentWorkspaceTask.reduce(
+          (count, object) => {
+            if (
+              object.status === "Finished" &&
+              currentSprint.linkedStories.includes(object.taskId)
+            ) {
+              return count + 1;
+            }
+            return count;
+          },
+          0
+        );
+
+        setCurrentSprintActive(currentSprint);
+        setCurrentAchievementPercentage(
+          (finishedTasks / currentWorkspaceTask.length) * 100
+        );
+        setDaysToFinishSprint(diff);
+      }
     }
   }, [currentWorkSpace?.container?.sprints]);
 
   return (
     <React.Fragment>
-      <Box className="header">
+      <Box display={"flex"} alignItems={"center"}>
         <Stack
           opacity={loadingChunk ? 1 : 0}
           transition={"all .2s"}
           position={"absolute"}
           marginLeft={"30px"}
-          marginTop={"15px"}
           width={"60%"}
         >
           <Skeleton width={"100%"} height="25px" />
-          <Skeleton width={"100%"} height="10px" />
           <Skeleton width={"100%"} height="10px" />
         </Stack>
 
@@ -92,50 +132,43 @@ const Header = (Props: IHeaderProps) => {
           display={"flex"}
           flexDir={"column"}
           justifyContent={"center"}
+          alignItems={"start"}
+          ml={"8"}
         >
-          <h2
+          <Box
             style={{
               textAlign: "start",
-              marginTop: "15px",
-              marginLeft: "30px",
               color: "#0F0F0F",
-              fontSize: "25px",
+              fontSize: "18px",
+              whiteSpace: "nowrap",
             }}
+            display={"flex"}
           >
-            {`Tablero Kanban / ${currentWorkSpace?.name}`}
-          </h2>
-          <Box display={"flex"} alignItems={"center"}>
-            <h2
-              style={{
-                textAlign: "start",
-                marginLeft: "30px",
-                color: "#0F0F0F",
-                fontSize: "18px",
-                fontWeight: "initial",
-                transition: "all .5s",
-              }}
-            >
-              {containerPreferences !== undefined &&
-              "prefix" in containerPreferences
-                ? `Prefijo de historia ${containerPreferences?.prefix}`
-                : "Sin definir..."}
-            </h2>
+            <Text
+              marginTop={"3px"}
+              fontSize={"20px"}
+            >{`Contenedores / ${currentWorkSpace?.name}`}</Text>
             {isGoalsModeActive && (
-              <Box>
-                <Badge ml="5" fontSize="1em" mb={2} colorScheme="red">
-                  No hay un objetivo actual
+              <Box display={"flex"} alignItems={"center"}>
+                <Badge ml={8} mr={10} fontSize=".8em" colorScheme="red">
+                  {currentSprintActive?.sprintPurpose ?? "No disponible"}
                 </Badge>
-                <Badge
-                  ml="5"
-                  transition={"all .3s"}
-                  opacity={isOpenSliderTask ? 0 : 1}
-                  fontSize="1em"
-                  mb={2}
-                  color={"gray.700"}
-                  bgColor={"gray.300"}
-                >
-                  ⏱ 1 Días restantes
-                </Badge>
+                <Avatar.Group count={currentUsers?.length}>
+                  {currentUsers &&
+                    currentUsers.map(
+                      (currentUser: ICurrentUser, index: number) => (
+                        <Avatar
+                          key={index}
+                          size="md"
+                          pointer
+                          src={currentUser.profilePicture}
+                          bordered
+                          color="gradient"
+                          stacked
+                        />
+                      )
+                    )}
+                </Avatar.Group>
               </Box>
             )}
           </Box>
@@ -146,23 +179,45 @@ const Header = (Props: IHeaderProps) => {
         display={"flex"}
         flexDir={"column"}
         justifyContent={"center"}
-        style={{ marginRight: "30px" }}
+        style={{ marginRight: "20px" }}
       >
-        <Box>
+        <Box display={"flex"}>
+          {isGoalsModeActive && (
+            <Badge
+              mr={2}
+              ml={2}
+              transition={"all .3s"}
+              fontSize="1em"
+              color={"gray.700"}
+              bgColor={"gray.300"}
+              display={"flex"}
+              alignItems={"center"}
+            >
+              <Icon mr={"1"} mb={"1px"} as={AiOutlineClockCircle} />
+              <Text fontSize={".8em"}>
+                {currentSprintActive &&
+                  (!daysToFinishSprint
+                    ? "Termina en menos de un día"
+                    : `${daysToFinishSprint} días restantes`)}
+                {!currentSprintActive && "Sin objetivos"}
+              </Text>
+            </Badge>
+          )}
           {isGoalsModeActive && (
             <Tooltip label={"Administrar objetivos"}>
               <Button
-                sx={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 3px 8px" }}
-                w={5}
+                bgColor={"transparent"}
+                size={"xs"}
                 onClick={() => {
                   const currentPath: string = router.asPath;
                   router.replace(`${currentPath + "/observeScopes"}`);
                 }}
               >
-                <Icon w={5} h={5} as={FcBullish} />
+                <Icon w={4} h={4} as={MdOutlineAutoGraph} />
               </Button>
             </Tooltip>
           )}
+
           <Tooltip
             label={
               isCreateHistoryDisabled
@@ -171,33 +226,26 @@ const Header = (Props: IHeaderProps) => {
             }
           >
             <Button
-              marginLeft={"15px"}
-              sx={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 3px 8px" }}
+              marginLeft={"5px"}
+              bgColor={"transparent"}
+              size={"xs"}
               onClick={() => setAddTask(true)}
               isDisabled={!isGoalsModeActive ? false : isCreateHistoryDisabled}
-              w={5}
             >
-              <Icon w={5} h={5} as={FcPuzzle} />
+              <Icon w={4} h={4} as={MdBookmarkAdd} />
             </Button>
           </Tooltip>
           <Tooltip label="Habilitar inspección">
             <Button
-              sx={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 3px 8px" }}
-              marginLeft={"15px"}
-              w={5}
+              bgColor={"transparent"}
+              marginLeft={"5px"}
+              size={"xs"}
               onClick={() => setOpenSliderTask(!isOpenSliderTask)}
             >
-              <Icon w={5} h={5} as={FcInspection} />
+              <Icon w={4} h={4} as={GrInspect} />
             </Button>
           </Tooltip>
         </Box>
-        {isGoalsModeActive && (
-          <Box marginTop={"10px"} cursor={"pointer"}>
-            <Tooltip hasArrow bgColor={"whatsapp.500"} label="Progreso actual">
-              <Progress colorScheme="green" size="md" value={34.5} />
-            </Tooltip>
-          </Box>
-        )}
       </Box>
     </React.Fragment>
   );

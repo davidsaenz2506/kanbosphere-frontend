@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { WorkBook, WorkSheet, utils, writeFile } from "xlsx";
 
-import Select from "react-select";
+import Select, { SingleValue } from "react-select";
 import chroma from "chroma-js";
 
 import {
@@ -78,6 +78,7 @@ import { sortRowsBySelection } from "@/utilities/sortColumns";
 import Calculator from "@/components/Calculator/components/App/App";
 import { getWorkspaceById } from "@/services/workspaces/getOne";
 import { useLoadingChunk } from "@/context/loadingChunks/loadingChunk.hook";
+import { IPicklistOptions } from "@/components/Modals/AddTask";
 
 interface ISpreadGrid {
   wch: number;
@@ -121,7 +122,13 @@ const Spreadsheet = () => {
     query: "",
   });
 
-  const currentUserContainerPreferences: | IAgilePreferences | ISpreadSheetPreferences | undefined = currentWorkSpace?.currentWorkSpace?.collaborators.find((currentCollaborator) => currentCollaborator._id === currentSession.currentUser._id)?.containerPreferences;
+  const currentUserContainerPreferences:
+    | IAgilePreferences
+    | ISpreadSheetPreferences
+    | undefined = currentWorkSpace?.currentWorkSpace?.collaborators.find(
+    (currentCollaborator) =>
+      currentCollaborator._id === currentSession.currentUser._id
+  )?.containerPreferences;
 
   const [spreadColumns, setSpreadColumns] = useState<IColumnProjection[]>([]);
 
@@ -309,8 +316,10 @@ const Spreadsheet = () => {
   }, [currentWorkSpace.currentWorkSpace, currentUserContainerPreferences]);
 
   React.useEffect(() => {
-    const InitialTodoDocument: HTMLDivElement | null = document.querySelector(".todoContainer");
-    const InitialNavBarDocument: HTMLElement | null = document.getElementById("navbarHome");
+    const InitialTodoDocument: HTMLDivElement | null =
+      document.querySelector(".todoContainer");
+    const InitialNavBarDocument: HTMLElement | null =
+      document.getElementById("navbarHome");
 
     if (InitialTodoDocument && bodyDocument && InitialNavBarDocument) {
       InitialTodoDocument.style.height = `${
@@ -582,7 +591,10 @@ const Spreadsheet = () => {
                             };
                           }
                         )}
-                        value={freezeColumns}
+                        value={{
+                          value: freezeColumns,
+                          label: freezeColumns.toString(),
+                        }}
                         menuPortalTarget={document.body}
                         styles={{
                           menuPortal: (base) => ({ ...base, zIndex: 1000000 }),
@@ -603,9 +615,11 @@ const Spreadsheet = () => {
                             };
                           },
                         }}
-                        onChange={(e) => {
+                        onChange={(
+                          e: SingleValue<ISelectionForFreezeColumns>
+                        ) => {
                           if (e) {
-                            if (e) setFreezeColums(e);
+                            setFreezeColums(e.value);
                           }
                         }}
                         placeholder="Congelar columnas"
@@ -641,13 +655,24 @@ const Spreadsheet = () => {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setIsRowSelectionActive(e.target.checked);
                       if (currentWorkSpace.currentWorkSpace) {
-                        const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
-                        const currentCollaboratorIndex: number = workspaceToModify.collaborators.findIndex((currentCollaborator, index: number) => currentCollaborator._id === currentSession.currentUser._id);
+                        const workspaceToModify: IWspUser =
+                          currentWorkSpace.currentWorkSpace;
+                        const currentCollaboratorIndex: number =
+                          workspaceToModify.collaborators.findIndex(
+                            (currentCollaborator, index: number) =>
+                              currentCollaborator._id ===
+                              currentSession.currentUser._id
+                          );
 
                         if (currentCollaboratorIndex !== undefined) {
-                          workspaceToModify.collaborators[currentCollaboratorIndex].containerPreferences["isRowSelectionActive"] = e.target.checked;
-                          currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
-                          console.log(isAutoSaveOpenActive)
+                          workspaceToModify.collaborators[
+                            currentCollaboratorIndex
+                          ].containerPreferences["isRowSelectionActive"] =
+                            e.target.checked;
+                          currentWorkSpace.setCurrentWorkSpace(
+                            workspaceToModify
+                          );
+                          console.log(isAutoSaveOpenActive);
                           if (isAutoSaveOpenActive) handleChangeEvent();
                         }
                       }
@@ -822,11 +847,20 @@ const Spreadsheet = () => {
                     setIsMultipleSelectionActive(e.target.checked);
 
                     if (currentWorkSpace.currentWorkSpace) {
-                      const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
-                      const currentCollaboratorIndex: number = workspaceToModify.collaborators.findIndex((currentCollaborator) => currentCollaborator._id === currentSession.currentUser._id);
+                      const workspaceToModify: IWspUser =
+                        currentWorkSpace.currentWorkSpace;
+                      const currentCollaboratorIndex: number =
+                        workspaceToModify.collaborators.findIndex(
+                          (currentCollaborator) =>
+                            currentCollaborator._id ===
+                            currentSession.currentUser._id
+                        );
 
                       if (currentCollaboratorIndex !== undefined) {
-                        workspaceToModify.collaborators[currentCollaboratorIndex].containerPreferences["isMultipleSelectionActive"] = e.target.checked;
+                        workspaceToModify.collaborators[
+                          currentCollaboratorIndex
+                        ].containerPreferences["isMultipleSelectionActive"] =
+                          e.target.checked;
                         currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
                         if (isAutoSaveOpenActive) handleChangeEvent();
                       }
@@ -949,12 +983,23 @@ const Spreadsheet = () => {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setIsAutoSaveOpenActive(e.target.checked);
                       if (currentWorkSpace.currentWorkSpace) {
-                        const workspaceToModify: IWspUser = currentWorkSpace.currentWorkSpace;
-                        const currentCollaboratorIndex: number = workspaceToModify.collaborators.findIndex((currentCollaborator) => currentCollaborator._id === currentSession.currentUser._id);
+                        const workspaceToModify: IWspUser =
+                          currentWorkSpace.currentWorkSpace;
+                        const currentCollaboratorIndex: number =
+                          workspaceToModify.collaborators.findIndex(
+                            (currentCollaborator) =>
+                              currentCollaborator._id ===
+                              currentSession.currentUser._id
+                          );
 
                         if (currentCollaboratorIndex !== undefined) {
-                          workspaceToModify.collaborators[currentCollaboratorIndex].containerPreferences["isAutoSaveOpen"] = e.target.checked;
-                          currentWorkSpace.setCurrentWorkSpace(workspaceToModify);
+                          workspaceToModify.collaborators[
+                            currentCollaboratorIndex
+                          ].containerPreferences["isAutoSaveOpen"] =
+                            e.target.checked;
+                          currentWorkSpace.setCurrentWorkSpace(
+                            workspaceToModify
+                          );
                           if (isAutoSaveOpenActive) handleChangeEvent();
                         }
                       }

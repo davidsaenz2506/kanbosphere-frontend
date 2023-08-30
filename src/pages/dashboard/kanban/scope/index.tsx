@@ -18,19 +18,17 @@ import {
   AccordionPanel,
   IconButton,
 } from "@chakra-ui/react";
-import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { IoArrowBackCircleOutline, IoAddCircleOutline } from "react-icons/io5";
 import {
   FcApproval,
   FcClock,
-  FcIdea,
   FcOpenedFolder,
   FcPositiveDynamic,
   FcPuzzle,
-  FcTodoList,
 } from "react-icons/fc";
 import AddTask from "@/components/Modals/AddTask";
-import { IDataToDo } from "@/domain/entities/todo.entity";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
+import { IClockTime, IDataToDo } from "@/domain/entities/todo.entity";
+import { ISprintsData, IWspUser } from "@/domain/entities/userWsps.entity";
 
 import { DateTime } from "luxon";
 import { formatDate } from "@/utilities/date/format";
@@ -38,7 +36,6 @@ import ScopeCardComponent from "@/components/Scope/Card";
 
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import AddSprint from "@/components/Modals/AddSprint";
 
 import { HiOutlinePlayCircle } from "react-icons/hi2";
 
@@ -52,8 +49,11 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
+  AreaChart,
+  Area,
 } from "recharts";
+import UpdateSprint from "@/components/Modals/UpdateSprint";
+import AddSprint from "@/components/Modals/AddSprint";
 
 const getSortedByDate = (
   currentWorkSpace: IWspUser | undefined
@@ -82,11 +82,17 @@ const getSortedByDate = (
 };
 
 const getCurrentSprintHeight = (shrinkVector: boolean): void => {
-  const navBarDocument: HTMLElement | null = document.getElementById("navbarHome");
-  const bodyDocumentData: HTMLBodyElement | null = document.querySelector("body");
-  const sprintBoxDocumentData: HTMLElement | null = document.getElementById("currentSprintBox");
-  const historiesBoxDocumentData: HTMLElement | null = document.getElementById("currentHistoriesBox");
-  const scopesHeaderBoxDocumentData: HTMLElement | null = document.getElementById("scopesHeaderBox");
+  const navBarDocument: HTMLElement | null =
+    document.getElementById("navbarHome");
+  const bodyDocumentData: HTMLBodyElement | null =
+    document.querySelector("body");
+  const sprintBoxDocumentData: HTMLElement | null =
+    document.getElementById("currentSprintBox");
+  const historiesBoxDocumentData: HTMLElement | null = document.getElementById(
+    "currentHistoriesBox"
+  );
+  const scopesHeaderBoxDocumentData: HTMLElement | null =
+    document.getElementById("scopesHeaderBox");
 
   if (
     navBarDocument &&
@@ -96,12 +102,24 @@ const getCurrentSprintHeight = (shrinkVector: boolean): void => {
     scopesHeaderBoxDocumentData
   ) {
     let calculateSprintHeigth: number;
-    historiesBoxDocumentData.style.height = shrinkVector ? "0%" : "60%";
-    sprintBoxDocumentData.style.height = shrinkVector ? "100%" : "40%";
+    historiesBoxDocumentData.style.height = shrinkVector ? "0%" : "65%";
+    sprintBoxDocumentData.style.height = shrinkVector ? "100%" : "35%";
     sprintBoxDocumentData.style.transition = shrinkVector ? "all .2s" : "none";
-    historiesBoxDocumentData.style.transition = shrinkVector ? "all .2s" : "none";
-    calculateSprintHeigth = bodyDocumentData.getBoundingClientRect().height - navBarDocument.getBoundingClientRect().height - historiesBoxDocumentData.getBoundingClientRect().height - scopesHeaderBoxDocumentData.getBoundingClientRect().height;
-    sprintBoxDocumentData.style.height = shrinkVector ? "100%" : `${calculateSprintHeigth}px`;
+    historiesBoxDocumentData.style.transition = shrinkVector
+      ? "all .2s"
+      : "none";
+    calculateSprintHeigth =
+      bodyDocumentData.getBoundingClientRect().height -
+      navBarDocument.getBoundingClientRect().height -
+      historiesBoxDocumentData.getBoundingClientRect().height -
+      scopesHeaderBoxDocumentData.getBoundingClientRect().height;
+    sprintBoxDocumentData.style.height = shrinkVector
+      ? `${
+          bodyDocumentData.getBoundingClientRect().height -
+          navBarDocument.getBoundingClientRect().height -
+          scopesHeaderBoxDocumentData.getBoundingClientRect().height
+        }px`
+      : `${calculateSprintHeigth}px`;
   }
 };
 
@@ -109,12 +127,21 @@ export const ObserveScopes = () => {
   const router = useRouter();
   const { currentWorkSpace } = useCurrentWorkspace();
   const [addTask, setAddTask] = useState<boolean>(false);
-  const [addSprint, setAddSprint] = useState<boolean>(false);
+  const [openSprintModal, setOpenSprintModal] = useState<boolean>(false);
+  const [selectedSprint, setSelectedSprint] = useState<string>();
+  const [openEditSprintModal, setOpenEditSprintModal] =
+    useState<boolean>(false);
+  const [currentSprintActive, setCurrentSprintActive] =
+    useState<ISprintsData>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [shrinkVector, setShrinkVector] = useState<boolean>(false);
   const [currentSortedChildren, setCurrentSortedChildren] =
     useState<[string, IDataToDo[]][]>();
+  const [currentWorkingHours, setCurrentWorkingHours] = useState<number>(0);
+  const [currentFinishedTasks, setCurrentFinishedTasks] = useState<number>(0);
+  const [currentSprintHoursStats, setCurrentSprintHoursStats] = useState<any>();
   const [indexes, setIndexes] = useState<number[]>();
+
   const isBrowser = () => typeof window !== "undefined";
   const data = [
     {
@@ -185,6 +212,66 @@ export const ObserveScopes = () => {
       setIndexes(currentSortedData.map((_, index: number) => index));
   }, [currentWorkSpace?.container.wspData]);
 
+  React.useEffect(() => {
+    const currentActiveSprint: ISprintsData | undefined =
+      currentWorkSpace?.container.sprints?.find(
+        (currentSprint) => currentSprint.isSprintActive
+      );
+
+    if (currentActiveSprint && currentWorkSpace?.container.wspData) {
+      setCurrentSprintActive(currentActiveSprint);
+      const currentSprintTasks: IDataToDo[] =
+        currentWorkSpace?.container?.wspData.filter((currentTask) =>
+          currentActiveSprint?.linkedStories.includes(currentTask.taskId)
+        );
+      const currentFinishedTasks: number = currentSprintTasks.filter(
+        (currentTask) => currentTask.status === "Finished"
+      ).length;
+      const currentWorkedHours: number = currentSprintTasks.reduce(
+        (acc, counter) => {
+          const currentTaskWorkingHours: number = counter.clockTime.reduce(
+            (accChild, counterChild) => {
+              return accChild + counterChild.recordedTime;
+            },
+            0
+          );
+          return acc + currentTaskWorkingHours;
+        },
+        0
+      );
+
+      setCurrentWorkingHours(currentWorkedHours);
+      setCurrentFinishedTasks(currentFinishedTasks);
+    }
+  }, [currentWorkSpace?.container]);
+
+  React.useEffect(() => {
+    const currentActiveSprint: ISprintsData | undefined =
+      currentWorkSpace?.container.sprints?.find(
+        (currentSprint) => currentSprint.isSprintActive
+      );
+
+    if (currentActiveSprint && currentWorkSpace?.container.wspData) {
+      const currentSprintTasks: IDataToDo[] = currentWorkSpace?.container?.wspData.filter((currentTask) => currentActiveSprint?.linkedStories.includes(currentTask.taskId));
+      const currentClockRecords: IClockTime[] = currentSprintTasks.flatMap((currentBlock) => currentBlock.clockTime);
+      const currentRecordStats: any[] = [];
+
+      console.log(currentClockRecords)
+
+      currentClockRecords.forEach((currentRecordClocked: IClockTime) => {
+        const { recordedBy, recordedTime, registrationDate } = currentRecordClocked;
+        const recordedByName: string = recordedBy.fullname ?? "";
+        const newObjectToRender = { name: registrationDate, [recordedByName]: recordedTime };
+
+        currentRecordStats.push(newObjectToRender);
+      });
+
+      setCurrentSprintHoursStats(currentRecordStats);
+    }
+  }, [currentWorkSpace?.container.wspData]);
+
+  console.log(currentSprintHoursStats);
+
   return (
     <React.Fragment>
       <DndProvider backend={HTML5Backend}>
@@ -195,19 +282,27 @@ export const ObserveScopes = () => {
           setIsLoading={setIsLoading}
         />
         <AddSprint
-          isOpen={addSprint}
-          onClose={setAddSprint}
+          isOpen={openSprintModal}
+          onClose={setOpenSprintModal}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+        />
+        <UpdateSprint
+          sprintId={selectedSprint ?? ""}
+          setSprintId={setSelectedSprint}
+          isOpen={openEditSprintModal}
+          onClose={setOpenEditSprintModal}
           isLoading={isLoading}
           setIsLoading={setIsLoading}
         />
         <Box bgColor={"white"} style={{ height: "100vh" }}>
           <Box
             id="scopesHeaderBox"
-            pl={"30px"}
+            pl={"20px"}
             pr={"30px"}
             display={"flex"}
             justifyContent={"space-between"}
-            height={"8%"}
+            height={"6%"}
             borderBottom={"2px solid #d9d9e3"}
             bgColor={"rgba(247,247,248,1)"}
           >
@@ -215,7 +310,7 @@ export const ObserveScopes = () => {
               <Button
                 size={"sm"}
                 fontSize={"20px"}
-                colorScheme="teal"
+                bgColor={"transparent"}
                 aria-label="add sprint"
                 fontWeight={"normal"}
                 onClick={() => {
@@ -229,13 +324,13 @@ export const ObserveScopes = () => {
                 }}
               >
                 <Icon marginRight={"10px"} as={IoArrowBackCircleOutline} />
-                Volver al tablero
+                <Text> Volver al tablero</Text>
               </Button>
 
               <Button
                 size={"sm"}
                 fontSize={"20px"}
-                colorScheme="purple"
+                bgColor={"transparent"}
                 marginLeft={"15px"}
                 aria-label="add sprint"
                 fontWeight={"normal"}
@@ -243,8 +338,8 @@ export const ObserveScopes = () => {
                   setAddTask(true);
                 }}
               >
-                <Icon marginRight={"10px"} as={FcIdea} />
-                Añadir historia
+                <Icon marginRight={"10px"} as={IoAddCircleOutline} />
+                <Text>Añadir historia</Text>
               </Button>
             </Box>
 
@@ -257,11 +352,11 @@ export const ObserveScopes = () => {
                 fontSize={"20px"}
               >
                 <Icon marginRight={"10px"} as={FcOpenedFolder} />
-                Gestor de objetivos {currentWorkSpace?.name}
+                <Text> Gestor de objetivos {currentWorkSpace?.name}</Text>
               </Tag>
             </Box>
           </Box>
-          <Box display={"flex"} height={"92%"}>
+          <Box display={"flex"} height={"94%"}>
             <Box display={"flex"} flexDir={"column"} width={"75%"}>
               <Box
                 id="currentHistoriesBox"
@@ -285,11 +380,24 @@ export const ObserveScopes = () => {
                 }}
               >
                 <Box
-                  marginTop={"5px"}
+                  marginTop={"10px"}
                   display={"flex"}
-                  alignItems={"center"}
-                  height={"10%"}
+                  flexDir={"column"}
+                  alignItems={"self-start"}
+                  justifyContent={"center"}
+                  height={"12%"}
                 >
+                  <Text
+                    cursor={"default"}
+                    display={"flex"}
+                    alignItems={"center"}
+                    fontSize={"15px"}
+                    textAlign={"start"}
+                    marginBottom={"-5px"}
+                    color="gray"
+                  >
+                    Tablero Kanban / {currentWorkSpace?.name}
+                  </Text>
                   <Text
                     cursor={"default"}
                     display={"flex"}
@@ -297,11 +405,10 @@ export const ObserveScopes = () => {
                     fontSize={"20px"}
                     textAlign={"start"}
                   >
-                    <Icon marginRight={"10px"} as={FcTodoList} />
-                    Historias de {currentWorkSpace?.name}
+                    Backlog
                   </Text>
                 </Box>
-                <Box height={"90%"}>
+                <Box height={"88%"}>
                   {indexes && (
                     <Accordion defaultIndex={indexes} allowMultiple>
                       {currentSortedChildren &&
@@ -338,13 +445,17 @@ export const ObserveScopes = () => {
                                 </AccordionButton>
 
                                 <AccordionPanel>
-                                  <Box mt={"2"}>
+                                  <Box mt={"-1"}>
                                     {currentMappedChildren[1].map(
-                                      (currentTaskChildren) => {
+                                      (currentTaskChildren, index) => {
                                         return (
                                           <ScopeCardComponent
                                             currentTaskChildren={
                                               currentTaskChildren
+                                            }
+                                            index={index}
+                                            totalItems={
+                                              currentMappedChildren[1].length
                                             }
                                           />
                                         );
@@ -420,7 +531,7 @@ export const ObserveScopes = () => {
                       <Icon w={7} h={7} marginRight={"10px"} as={FcApproval} />
                       Objetivo actual:{" "}
                       <span style={{ marginLeft: "10px", fontWeight: "bold" }}>
-                        Maquetación
+                        {currentSprintActive?.sprintPurpose ?? "Sin establecer"}
                       </span>
                     </Tag>
                   </Box>
@@ -433,23 +544,14 @@ export const ObserveScopes = () => {
                       <Tag
                         boxShadow={"2px 2px 5px rgba(0, 0, 0, 0.1)"}
                         cursor={"default"}
-                        display={"flex"}
-                        flexDir={"column"}
                         fontSize={"12px"}
-                        textAlign={"start"}
+                        textAlign={"justify"}
                         colorScheme="messenger"
                         padding={"10px"}
                         width={"100%"}
                       >
-                        Hay muchas variaciones de los pasajes de Lorem Ipsum
-                        disponibles, pero la mayoría sufrió alteraciones en
-                        alguna manera, ya sea porque se le agregó humor, o
-                        palabras aleatorias que no parecen ni un poco creíbles.
-                        Si vas a utilizar un pasaje de Lorem Ipsum, necesitás
-                        estar seguro de que no hay nada avergonzante escondido
-                        en el medio del texto. Todos los generadores de Lorem
-                        Ipsum que se encuentran en Internet tienden a repetir
-                        trozos predefinidos cuando sea necesario.
+                        {currentSprintActive?.sprintDescription ??
+                          "Crea e inicia un objetivo para llevar un seguimiento de las estadísticas y el progreso en este apartado"}
                       </Tag>
                     </Box>
                   </Box>
@@ -484,6 +586,40 @@ export const ObserveScopes = () => {
                     >
                       En proceso
                     </Tag>
+                  </Box>
+
+                  <Box
+                    padding={"30px 50px 20px 0px"}
+                    borderTop={"2px solid #d9d9e3"}
+                    borderBottom={"2px solid #d9d9e3"}
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    marginTop={"40px"}
+                  >
+                    <AreaChart
+                      width={500}
+                      height={200}
+                      data={data}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="hdsaenz"
+                        stroke="#82ca9d"
+                        fill="#82ca9d"
+                      />
+                    </AreaChart>
                   </Box>
                 </Box>
                 <Box
@@ -532,7 +668,7 @@ export const ObserveScopes = () => {
                       }}
                     >
                       <Icon w={5} h={5} marginRight={"10px"} as={FcClock} />
-                      Horas completadas: 38
+                      Horas completadas: {currentWorkingHours}
                     </Tag>
                     <Tag
                       cursor={"default"}
@@ -556,7 +692,7 @@ export const ObserveScopes = () => {
                         marginRight={"10px"}
                         as={FcPositiveDynamic}
                       />
-                      Finalizadas: 12
+                      Finalizadas: {currentFinishedTasks}
                     </Tag>
                   </Box>
 
@@ -600,7 +736,14 @@ export const ObserveScopes = () => {
                             color={"white"}
                             marginRight={"20px"}
                           >
-                            Agosto
+                            {currentSprintActive?.sprintStartDate
+                              ? DateTime.fromISO(
+                                  currentSprintActive?.sprintStartDate
+                                )
+                                  .setLocale("es")
+                                  .toFormat("LLLL")
+                                  .toUpperCase()
+                              : "Vacío"}
                           </Text>
                         </Box>
                       </Box>
@@ -617,7 +760,11 @@ export const ObserveScopes = () => {
                           color={"white"}
                           fontSize={"50px"}
                         >
-                          22
+                          {currentSprintActive?.sprintStartDate
+                            ? DateTime.fromISO(
+                                currentSprintActive?.sprintStartDate
+                              ).toFormat("d")
+                            : "00"}
                         </Text>
                       </Box>
                     </Box>
@@ -657,7 +804,14 @@ export const ObserveScopes = () => {
                             color={"white"}
                             marginRight={"20px"}
                           >
-                            Septiembre
+                            {currentSprintActive?.sprintEndDate
+                              ? DateTime.fromISO(
+                                  currentSprintActive?.sprintEndDate
+                                )
+                                  .setLocale("es")
+                                  .toFormat("LLLL")
+                                  .toUpperCase()
+                              : "Vacío"}
                           </Text>
                         </Box>
                       </Box>
@@ -674,42 +828,15 @@ export const ObserveScopes = () => {
                           color={"white"}
                           fontSize={"50px"}
                         >
-                          30
+                          {currentSprintActive?.sprintEndDate
+                            ? DateTime.fromISO(
+                                currentSprintActive?.sprintEndDate
+                              ).toFormat("d")
+                            : "00"}
                         </Text>
                       </Box>
                     </Box>
                   </Box>
-
-                  {/* <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      width={500}
-                      height={300}
-                      data={data}
-                      margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="hdsaenz"
-                        stroke="#8884d8"
-                        activeDot={{ r: 8 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="laurav2612"
-                        stroke="#82ca9d"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer> */}
                 </Box>
               </Box>
             </Box>
@@ -731,7 +858,7 @@ export const ObserveScopes = () => {
                   colorScheme="teal"
                   size={"sm"}
                   onClick={() => {
-                    setAddSprint(true);
+                    setOpenSprintModal(true);
                   }}
                 >
                   Añadir objetivo
@@ -753,60 +880,77 @@ export const ObserveScopes = () => {
                       Ahora mismo no tienes objetivos pendientes
                     </Text>
                   )}
-                  {currentWorkSpace?.container?.sprints?.length && (
-                    <Box marginTop={"10px"} pl={"30px"} pr={"30px"}>
-                      {currentWorkSpace?.container?.sprints.map(
-                        (currentSprint) => {
-                          return (
-                            <Box
-                              cursor={"default"}
-                              boxShadow={"2px 2px 5px rgba(0, 0, 0, 0.1)"}
-                              borderRadius={"5px"}
-                              padding={"10px"}
-                              display={"flex"}
-                              justifyContent={"space-between"}
-                              marginBottom={"10px"}
-                              transition={"all .3s"}
-                              bgColor={"white"}
-                              zIndex={10000}
-                              _hover={{
-                                transform: "scale(1.03)",
-                              }}
-                            >
-                              <Box>
-                                <Text>{currentSprint.sprintPurpose}</Text>
-                                <Badge
-                                  colorScheme={
-                                    currentSprint.isSprintActive
-                                      ? "green"
-                                      : "red"
-                                  }
-                                >
-                                  {currentSprint.isSprintActive
-                                    ? "Activo"
-                                    : "Inactivo"}
-                                </Badge>
-                              </Box>
-
+                  {currentWorkSpace?.container?.sprints &&
+                    currentWorkSpace?.container?.sprints?.length > 0 && (
+                      <Box marginTop={"10px"} pl={"30px"} pr={"30px"}>
+                        {currentWorkSpace?.container?.sprints.map(
+                          (currentSprint) => {
+                            return (
                               <Box
-                                marginRight={"5px"}
+                                cursor={"default"}
+                                boxShadow={"2px 2px 5px rgba(0, 0, 0, 0.1)"}
+                                borderRadius={"5px"}
+                                padding={"10px"}
                                 display={"flex"}
-                                alignItems={"center"}
+                                justifyContent={"space-between"}
+                                marginBottom={"10px"}
+                                transition={"all .3s"}
+                                bgColor={"white"}
+                                zIndex={10000}
+                                _hover={{
+                                  transform: "scale(1.03)",
+                                }}
                               >
-                                <Button
-                                  colorScheme="whatsapp"
-                                  borderRadius={"50%"}
-                                  size={""}
+                                <Box>
+                                  <Text>{currentSprint.sprintPurpose}</Text>
+                                  <Badge
+                                    colorScheme={
+                                      currentSprint.isSprintActive
+                                        ? "green"
+                                        : "red"
+                                    }
+                                  >
+                                    {currentSprint.isSprintActive
+                                      ? "Activo"
+                                      : "Inactivo"}
+                                  </Badge>
+                                </Box>
+
+                                <Box
+                                  marginRight={"5px"}
+                                  display={"flex"}
+                                  alignItems={"center"}
                                 >
-                                  <Icon w={8} h={8} as={HiOutlinePlayCircle} />
-                                </Button>
+                                  <Button
+                                    colorScheme="whatsapp"
+                                    borderRadius={"50%"}
+                                    isDisabled={
+                                      currentWorkSpace?.container?.sprints?.find(
+                                        (currentSprint) =>
+                                          currentSprint.isSprintActive
+                                      )
+                                        ? true
+                                        : false
+                                    }
+                                    size={""}
+                                    onClick={() => {
+                                      setSelectedSprint(currentSprint.sprintId);
+                                      setOpenEditSprintModal(true);
+                                    }}
+                                  >
+                                    <Icon
+                                      w={8}
+                                      h={8}
+                                      as={HiOutlinePlayCircle}
+                                    />
+                                  </Button>
+                                </Box>
                               </Box>
-                            </Box>
-                          );
-                        }
-                      )}
-                    </Box>
-                  )}
+                            );
+                          }
+                        )}
+                      </Box>
+                    )}
                 </Box>
               </Box>
             </Box>

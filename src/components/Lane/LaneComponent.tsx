@@ -24,6 +24,7 @@ const statusColorValues = {
   New: "#FF5733",
   "In Proccess": "#FFC300",
   "For Review": "#6FB98F",
+  "In Tests": "#0099CC",
   Finished: "#4B0082",
   Blocked: "#FF3333",
 };
