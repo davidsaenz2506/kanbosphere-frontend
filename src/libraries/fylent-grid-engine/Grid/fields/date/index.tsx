@@ -23,7 +23,9 @@ export type DatePickerCell = CustomCell<DatePickerCellProps>;
 const renderer: CustomRenderer<DatePickerCell> = {
   kind: GridCellKind.Custom,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  isMatch: (cell: CustomCell): cell is DatePickerCell => { return (cell.data as any).type === "date"},
+  isMatch: (cell: CustomCell): cell is DatePickerCell => {
+    return (cell.data as any).type === "date";
+  },
 
   draw: (args, cell) => {
     const { ctx, theme, rect } = args;
@@ -35,6 +37,7 @@ const renderer: CustomRenderer<DatePickerCell> = {
       width: rect.width - 2 * theme.cellHorizontalPadding,
       height: rect.height - 2 * theme.cellVerticalPadding,
     };
+
     const rows = Math.max(
       1,
       Math.floor(drawArea.height / (tagHeight + innerPad))
@@ -45,39 +48,34 @@ const renderer: CustomRenderer<DatePickerCell> = {
     let y =
       drawArea.y +
       (drawArea.height - rows * tagHeight - (rows - 1) * innerPad) / 2;
-  
-      const color = "#EEEEEE";
-      const metrics = measureTextCached(displayDate, ctx);
-      const width = metrics.width + innerPad * 2;
-      const textY = tagHeight / 2;
 
-      if (
-        x !== drawArea.x &&
-        x + width > drawArea.x + drawArea.width &&
-        row < rows
-      ) {
-        row++;
-        y += tagHeight + innerPad;
-        x = drawArea.x;
-      }
+    const color = "#EEEEEE";
+    const metrics = measureTextCached(displayDate, ctx);
+    const width = metrics.width + innerPad * 2;
+    const textY = tagHeight / 2;
 
-      ctx.fillStyle = color;
+    if (
+      x !== drawArea.x &&
+      x + width > drawArea.x + drawArea.width &&
+      row < rows
+    ) {
+      row++;
+      y += tagHeight + innerPad;
+      x = drawArea.x;
+    }
 
-      ctx.beginPath();
-      ctx.font = `${500} ${13}px ${theme.fontFamily}`;
-      roundedRect(ctx, x, y, width, tagHeight, tagHeight / 5);
-      ctx.fill();
+    ctx.fillStyle = color;
 
-      ctx.fillStyle = "black";
-      ctx.fillText(
-        displayDate,
-        x + innerPad,
-        y + textY
-      );
+    ctx.beginPath();
+    ctx.font = `${500} ${13}px ${theme.fontFamily}`;
+    roundedRect(ctx, x, y, width, tagHeight, tagHeight / 5);
+    ctx.fill();
 
-      x += width + 8;
-      if (x > drawArea.x + drawArea.width && row >= rows) return;
-    
+    ctx.fillStyle = "black";
+    ctx.fillText(displayDate, x + innerPad, y + textY);
+
+    x += width + 8;
+    if (x > drawArea.x + drawArea.width && row >= rows) return;
 
     return true;
   },

@@ -54,11 +54,13 @@ import currentBiridectionalCommunication from "@/services/socket";
 import { useDrop } from "react-dnd";
 import DraggableImage from "../Draggable/Image";
 import { BsFillTrashFill } from "react-icons/bs";
+import ICurrentUser from "@/domain/entities/user.entity";
 
 const statusOptions = [
   { value: "In Proccess", label: "In Proccess" },
   { value: "Finished", label: "Finished" },
   { value: "For Review", label: "For Review" },
+  { value: "In Tests", label: "In Tests" },
   { value: "Blocked", label: "Blocked" },
   { value: "New", label: "New" },
 ];
@@ -84,6 +86,7 @@ const stringDataForUniqueId: string =
 
 interface IEditTaskProps {
   isOpen: boolean;
+  currentWorkspaceUsers: ICurrentUser[] | undefined;
   onClose: React.Dispatch<React.SetStateAction<boolean>>;
   data: IDataToDo;
   isLoading: boolean;
@@ -91,11 +94,10 @@ interface IEditTaskProps {
 }
 
 const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
-  const { isOpen, onClose, data, isLoading, setIsLoading } = props;
+  const { isOpen, onClose, data, isLoading, setIsLoading, currentWorkspaceUsers } = props;
   const uniqueIdFactory = customAlphabet(stringDataForUniqueId, 12);
   const { currentUser } = useCurrentUser();
-  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } =
-    useCurrentWorkspace();
+  const { currentWorkSpace: wspData, setCurrentWorkSpace: setUserTasks } = useCurrentWorkspace();
   const [newDate, setNewDate] = useState(data?.createDate);
   const [finishDate, setFinishDate] = useState(data?.finishDate);
   const [status, setStatus] = useState({
@@ -155,7 +157,8 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
   }, []);
 
   const [modifiedTask, setModifiedTask] = useState<IDataToDo>({
-    userId: "",
+    informant: "",
+    responsible: "",
     taskId: "",
     status: "",
     type: selectedType,
@@ -172,7 +175,8 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
 
   useEffect(() => {
     setModifiedTask({
-      userId: data?.userId,
+      informant: data.informant,
+      responsible: data.responsible,
       taskId: data?.taskId,
       status: status.label,
       type: selectedType,
@@ -284,8 +288,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
         workspaceData[index] = currentTaskUser;
     });
 
-    if (currentWorkSpace?.container?.wspData)
-      currentWorkSpace.container.wspData = workspaceData;
+    if (currentWorkSpace?.container?.wspData) currentWorkSpace.container.wspData = workspaceData;
 
     setUserTasks(currentWorkSpace);
   }
@@ -588,7 +591,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
                                         w={8}
                                         h={8}
                                         marginRight={"10px"}
-                                        name={currentChunk.recordedBy.fullname}
+                                        src={currentWorkspaceUsers?.find((currentUser: ICurrentUser) => currentUser._id === currentChunk.recordedBy._id)?.profilePicture ?? ""}
                                       />
                                       {currentChunk.recordedBy.fullname}
                                     </Box>
@@ -633,7 +636,7 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
             <Select
               value={status}
               options={statusOptions}
-              menuPosition="fixed"
+              menuPlacement="top"
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) {
                   if (e.value === "Finished" || e.value === "For Review")
@@ -645,9 +648,9 @@ const EditTask: React.FunctionComponent<IEditTaskProps> = (props) => {
 
             <FormLabel mt={marginStatusValue}>Priority</FormLabel>
             <Select
-              menuPosition="fixed"
               value={priority}
               options={priorityOptions}
+              menuPlacement="auto"
               onChange={(e: SingleValue<IPicklistOptions>) => {
                 if (e) {
                   setPriority({

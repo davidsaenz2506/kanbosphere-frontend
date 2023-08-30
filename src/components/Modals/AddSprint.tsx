@@ -39,6 +39,8 @@ const AddSprint: React.FunctionComponent<IAddTaskProps> = (props) => {
         sprintId: sprintId,
         sprintPurpose: purpose,
         sprintDescription: description,
+        isAFinishedSprint: false,
+        finishDate: null,
         isSprintActive: false,
         sprintStartDate: null,
         sprintEndDate: null,

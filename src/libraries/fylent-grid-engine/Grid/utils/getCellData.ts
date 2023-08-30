@@ -27,10 +27,12 @@ export const getCellData = (
         case "compound": {
             let currentColumnParameters: ICompoundProjection;
             let valueToRender: string | undefined;
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let currentMethod: any = undefined;
 
             if (columnsCol.compoundValues) {
+
                 currentColumnParameters = columnsCol.compoundValues;
 
                 const currentFormulaName = currentColumnParameters.formulaName;
@@ -59,6 +61,8 @@ export const getCellData = (
 
                 valueToRender = currentMethod(newEntryPoint);
                 dataRow[field] = valueToRender;
+
+                debugger;
             }
 
             return {

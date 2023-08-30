@@ -206,7 +206,6 @@ const GridDataEditor = (Props: ISpreadProps) => {
         onColumnMoved={async (startIndex: number, endIndex: number) => {
           onColumnsMoved(startIndex, endIndex);
         }}
-        // ToDO, Figure out how to avoid
         columns={
           userColumns.length === 0
             ? [

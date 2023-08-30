@@ -1,14 +1,13 @@
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
-import React from "react";
+import React, { useState } from "react";
 import LaneComponent from "./LaneComponent";
-import { IWspUser } from "@/domain/entities/userWsps.entity";
 import { IDataToDo } from "@/domain/entities/todo.entity";
+import { ISprintsData } from "@/domain/entities/userWsps.entity";
 
 interface ILaneProps {
   setSelectedTasks: React.Dispatch<React.SetStateAction<IDataToDo | undefined>>;
   isGettingImage: boolean;
-  currentCardHolderHeight: number
+  currentCardHolderHeight: number;
 }
 
 const filterItemsMap = {
@@ -24,6 +23,10 @@ const filterItemsMap = {
     title: "Para revisión",
     filterValue: "For Review",
   },
+  "In Tests": {
+    title: "En pruebas",
+    filterValue: "In Tests",
+  },
   Finished: {
     title: "Finalizadas",
     filterValue: "Finished",
@@ -35,8 +38,29 @@ const filterItemsMap = {
 };
 
 const ToDoLanes: React.FC<ILaneProps> = (props) => {
-  const { currentWorkSpace: data, setCurrentWorkSpace: setData } = useCurrentWorkspace();
+  const { currentWorkSpace: data } = useCurrentWorkspace();
+  const [dataWithSprintRelation, setDataWithSprintRelation] =
+    useState<IDataToDo[]>();
   const backGroundLaneColor = "#f5f6fA";
+
+  React.useEffect(() => {
+    if (data?.container && data?.container?.sprints) {
+      const currentWorkspaceTasks: IDataToDo[] | undefined =
+        data?.container?.wspData;
+      const currentSprintInfo: ISprintsData | undefined =
+        data?.container?.sprints.find(
+          (currentSprint) => currentSprint.isSprintActive
+        );
+
+      if (currentWorkspaceTasks && currentSprintInfo) {
+        setDataWithSprintRelation(
+          currentWorkspaceTasks.filter((currentTask) =>
+            currentSprintInfo?.linkedStories.includes(currentTask.taskId)
+          )
+        );
+      }
+    }
+  }, [data?.container]);
 
   return (
     <div
@@ -48,7 +72,8 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
         height: "90%",
       }}
     >
-        {Object.entries(filterItemsMap).map((currentItemMapped, index: number) => {
+      {Object.entries(filterItemsMap).map(
+        (currentItemMapped, index: number) => {
           return (
             <LaneComponent
               key={index}
@@ -58,10 +83,25 @@ const ToDoLanes: React.FC<ILaneProps> = (props) => {
               bgColor={backGroundLaneColor}
               setSelectedTasks={props.setSelectedTasks}
               isGettingImage={props.isGettingImage}
-              data={data?.container?.wspData ? data?.container?.wspData?.filter((instance: IDataToDo) => instance.status === currentItemMapped[1].filterValue) : []}
+              data={
+                !data?.isGoalsModeActive
+                  ? data?.container?.wspData
+                    ? data?.container?.wspData?.filter(
+                        (instance: IDataToDo) =>
+                          instance.status === currentItemMapped[1].filterValue
+                      )
+                    : []
+                  : dataWithSprintRelation
+                  ? dataWithSprintRelation.filter(
+                      (instance: IDataToDo) =>
+                        instance.status === currentItemMapped[1].filterValue
+                    )
+                  : []
+              }
             />
           );
-        })}
+        }
+      )}
     </div>
   );
 };

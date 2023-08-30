@@ -29,7 +29,8 @@ export interface IClockTime {
     registrationDate: string ;
 }
 export interface IDataToDo {
-    userId: string,
+    informant: string,
+    responsible: string,
     taskId: string,
     status: string,
     type: ITypeHistory,

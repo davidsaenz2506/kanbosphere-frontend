@@ -5,31 +5,30 @@ import { Badge, Box, Tag, Text } from "@chakra-ui/react";
 
 interface IScopeCardProps {
   currentTaskChildren: IDataToDo;
+  index: number;
+  totalItems: number;
 }
 
 const statusColorValues = {
   New: "#FF5733",
   "In Proccess": "#FFC300",
   "For Review": "#6FB98F",
+  "In Tests": "#0099CC",
   Finished: "#4B0082",
   Blocked: "#FF3333",
 };
 
 
-const ScopeCardComponent: React.FunctionComponent<IScopeCardProps> = (
-  props
-) => {
-  const { currentTaskChildren } = props;
+const ScopeCardComponent: React.FunctionComponent<IScopeCardProps> = ( props ) => {
+  const { currentTaskChildren, index, totalItems } = props;
 
   return (
     <React.Fragment>
       <Box
-        boxShadow={"2px 2px 5px rgba(0, 0, 0, 0.1)"}
         cursor={"pointer"}
-        borderRadius={"5px"}
-        marginBottom={"10px"}
         padding={"5px 10px 5px 10px"}
-        bgColor={"#ececf1"}
+        borderTop={"1px solid #d9d9e3"}
+        borderBottom={index === totalItems - 1 ? "1px solid #d9d9e3" : "none"}
         justifyContent={"space-between"}
         alignItems={"center"}
         transition={"all .2s"}

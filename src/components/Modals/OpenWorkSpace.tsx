@@ -47,7 +47,7 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
     if (title === "agile") {
       newWorkspaceToCreate.createdDate = DateTime.now().toString();
       newWorkspaceToCreate.name = nameValue;
-      newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
+      newWorkspaceToCreate.createdById = currentUserInfo.currentUser._id;
       newWorkspaceToCreate.type = title;
       newWorkspaceToCreate.isGoalsModeActive = workspaceHasGoals;
       newWorkspaceToCreate.collaborators = [
@@ -69,7 +69,7 @@ const OpenWorkSpace: React.FunctionComponent<IEditTaskProps> = (props) => {
 
     if (title === "spreadsheet") {
       newWorkspaceToCreate.createdDate = DateTime.now().toString();
-      newWorkspaceToCreate.createdById = currentUserInfo.currentUser.userID;
+      newWorkspaceToCreate.createdById = currentUserInfo.currentUser._id;
       newWorkspaceToCreate.type = title;
       newWorkspaceToCreate.name = nameValue;
       newWorkspaceToCreate.collaborators = [

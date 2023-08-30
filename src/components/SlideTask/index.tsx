@@ -84,7 +84,7 @@ const SlideTask: React.FC<ISlideTaskProps> = (props) => {
       }}
       overflowY={"auto"}
       zIndex={1000}
-      width={isOpenSliderTask ? "40%" : "0%"}
+      width={isOpenSliderTask ? "30%" : "0%"}
     >
       {selectedTask ? (
         <Box padding={"20px"}>

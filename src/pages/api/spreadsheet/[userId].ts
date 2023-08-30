@@ -10,7 +10,7 @@ export default handler.post(async (req: NextApiRequest, res: NextApiResponse) =>
     try {
         const { userId } = req.query;
         const toQuery: Partial<IQuerySpread> = req.body;
-        const { data: filteredSpreadData } = await axios.post<[]>(`${process.env.WORKSPACE_API || "https://fair-lime-crocodile-slip.cyclic.app/api"}/spread/${userId}`, toQuery, {
+        const { data: filteredSpreadData } = await axios.post<[]>(`${process.env.WORKSPACE_API}/spread/${userId}`, toQuery, {
             headers: {
                 Authorization: `Bearer ${req.headers.cookie?.split("=")[1]}`
             }
