@@ -45,7 +45,6 @@ import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { GridSelection, Item } from "@glideapps/glide-data-grid";
 import {
   IAgilePreferences,
-  ICollaborators,
   ISpreadSheetPreferences,
   IWspUser,
 } from "@/domain/entities/userWsps.entity";
@@ -189,10 +188,7 @@ const Spreadsheet = () => {
   }
 
   async function handleChangeEvent() {
-    if (
-      currentWorkSpace.currentWorkSpace &&
-      currentWorkSpace.currentWorkSpace?.container?.spreadSheetData
-    ) {
+    if ( currentWorkSpace.currentWorkSpace && currentWorkSpace.currentWorkSpace?.container?.spreadSheetData ) {
       await UpdateWorkSpace(currentWorkSpace?.currentWorkSpace?._id, {
         body: currentWorkSpace.currentWorkSpace,
         transactionObject: {
@@ -408,10 +404,7 @@ const Spreadsheet = () => {
                         typedQueryFromUser.query === "" ||
                         typedQueryFromUser.query === undefined
                       ) {
-                        setSpreadSheetData(
-                          currentWorkSpace?.currentWorkSpace?.container
-                            ?.spreadSheetData?.data ?? []
-                        );
+                        setSpreadSheetData( currentWorkSpace?.currentWorkSpace?.container?.spreadSheetData?.data ?? []);
                         setSpreadDataHasFilter(false);
                         return;
                       } else {
@@ -672,7 +665,6 @@ const Spreadsheet = () => {
                           currentWorkSpace.setCurrentWorkSpace(
                             workspaceToModify
                           );
-                          console.log(isAutoSaveOpenActive);
                           if (isAutoSaveOpenActive) handleChangeEvent();
                         }
                       }

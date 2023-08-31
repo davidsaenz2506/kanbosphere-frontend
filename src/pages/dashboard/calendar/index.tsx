@@ -1,8 +1,6 @@
 import Image from "next/image";
 import React from "react";
 
-import OutOfService from "../../../../public/assets/outservices.png";
-
 export const CalendaryUser = () => {
   return (
     <React.Fragment>
@@ -14,11 +12,7 @@ export const CalendaryUser = () => {
           height: "100vh",
         }}
       >
-        <Image
-          style={{ marginBottom: "90px", borderRadius: "10px" }}
-          src={OutOfService}
-          alt="Out of service data"
-        />
+        <h1>Implementar calendario aqui</h1>
       </div>
     </React.Fragment>
   );

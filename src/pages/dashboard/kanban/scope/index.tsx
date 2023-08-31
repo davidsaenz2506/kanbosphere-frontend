@@ -256,8 +256,6 @@ export const ObserveScopes = () => {
       const currentClockRecords: IClockTime[] = currentSprintTasks.flatMap((currentBlock) => currentBlock.clockTime);
       const currentRecordStats: any[] = [];
 
-      console.log(currentClockRecords)
-
       currentClockRecords.forEach((currentRecordClocked: IClockTime) => {
         const { recordedBy, recordedTime, registrationDate } = currentRecordClocked;
         const recordedByName: string = recordedBy.fullname ?? "";

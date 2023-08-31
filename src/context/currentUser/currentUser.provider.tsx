@@ -10,6 +10,7 @@ type PropTypes = {
 
 export const CurrentUserProvider: FC<PropTypes> = ({ children }) => {
   const [currentUser, setCurrentUser] = React.useState<ICurrentUser>({
+    _id: "",
     username: "",
     fullname: "",
     userID: "",
@@ -18,7 +19,7 @@ export const CurrentUserProvider: FC<PropTypes> = ({ children }) => {
     profilePicture: "",
     friends: [],
     requests: [],
-    invitations: []
+    invitations: [],
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
