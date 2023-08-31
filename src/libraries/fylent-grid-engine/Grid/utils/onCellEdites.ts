@@ -2,6 +2,7 @@
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { EditableGridCell, Item } from "@glideapps/glide-data-grid";
 import { DateTime } from "luxon";
+import { isDate } from "lodash";
 
 export const editGridCell = async (
     cell: Item,
@@ -19,16 +20,8 @@ export const editGridCell = async (
     if (type === "number") data[row][key] = newValue.data;
 
     if (type === "date") {
-        const currentDate =
-            newValue.data &&
-                typeof newValue.data === "object" &&
-                "date" in newValue.data
-                ? newValue.data.date
-                : "";
-        const ISODate: Date = new Date(
-            typeof currentDate === "string" ? currentDate : ""
-        );
-        const newDate: Date = DateTime.fromISO(ISODate.toISOString()).toISO();
+        const currentDate: Date = newValue.data && typeof newValue.data === "object" && "date" in newValue.data && isDate(newValue.data.date) ? newValue.data.date : new Date();
+        const newDate: Date = DateTime.fromISO(currentDate.toISOString()).toISO();
 
         data[row][key] = newDate;
     }
@@ -56,11 +49,9 @@ export const editGridCell = async (
         ? newValue.data.phone
         : "";
 
-    if (type === "time") data[row][key] = newValue.data &&
-        typeof newValue.data === "object" &&
-        "time" in newValue.data
-        ? newValue.data.time
-        : "";
+    if (type === "time") {
+        data[row][key] = newValue.data && typeof newValue.data === "object" && "time" in newValue.data ? newValue.data.time : "";
+    }
 
     if (type === "mail") {
         const errors: string[] = [];

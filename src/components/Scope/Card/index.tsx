@@ -18,8 +18,9 @@ const statusColorValues = {
   Blocked: "#FF3333",
 };
 
-
-const ScopeCardComponent: React.FunctionComponent<IScopeCardProps> = ( props ) => {
+const ScopeCardComponent: React.FunctionComponent<IScopeCardProps> = (
+  props
+) => {
   const { currentTaskChildren, index, totalItems } = props;
 
   return (

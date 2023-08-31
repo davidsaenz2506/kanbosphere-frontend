@@ -1,5 +1,6 @@
 import UserWorkSpace from "@/components/UserWorkspace/UserWorkSpace";
 import { BalanceUser } from "@/pages/dashboard/balance";
+import { CalendaryUser } from "@/pages/dashboard/calendar";
 import UserConfig from "@/pages/dashboard/config/UserConfig";
 import { ContactUser } from "@/pages/dashboard/contact";
 import ToDoWorkspace from "@/pages/dashboard/kanban";
@@ -36,6 +37,8 @@ export const renderComponent = (
       return <BalanceUser />;
     case "settings":
       return <UserConfig />;
+    case "meets": 
+      return <CalendaryUser/>;
     default:
       return <MainLoad loadingServerData={loadingServerData} />;
   }

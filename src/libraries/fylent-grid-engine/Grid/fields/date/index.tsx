@@ -85,6 +85,7 @@ const renderer: CustomRenderer<DatePickerCell> = {
     const { format, date } = cellData;
 
     let val = "";
+
     if (date !== undefined) {
       val = new Date(date).toISOString();
 

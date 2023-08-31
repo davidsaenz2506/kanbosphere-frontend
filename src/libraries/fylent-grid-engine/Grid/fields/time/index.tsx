@@ -34,7 +34,7 @@ function TopEditor(p: any) {
             ...p.value,
             data: {
               ...p.value.data,
-              date: e.formatted12 ?? undefined,
+              time: e.formatted12 ?? undefined,
             },
           });
         }}
