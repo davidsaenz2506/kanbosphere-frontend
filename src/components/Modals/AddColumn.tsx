@@ -33,8 +33,8 @@ import { getColor } from "@/utilities/spreadsheet/getTagColor";
 import { useWorkspace } from "@/context/usersWorkSpaces/wsp.hook";
 import { IWspUser } from "@/domain/entities/userWsps.entity";
 
-import { mathematicalEnginedEncapsuled } from "@/libraries/fylent-math-engine/index";
-import iconsForCols from "@/libraries/fylent-grid-engine/Grid/utils/iconsForCols";
+import { mathematicalEnginedEncapsuled } from "@/libraries/math-engine/index";
+import iconsForCols from "@/libraries/grid-engine/Grid/utils/iconsForCols";
 
 export interface IPicklistOptions {
   value: string;

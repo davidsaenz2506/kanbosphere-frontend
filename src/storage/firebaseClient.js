@@ -2,24 +2,13 @@ import { initializeApp, getApps } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET ?? "kanbosphere-files.appspot.com",
-  messagingSenderId: process.env.MESSAGING_SENDER_ID,
-  appId: process.env.APP_ID,
-  measurementId: process.env.MEASUREMENT_ID,
-  type: process.env.TYPE,
-  project_id: process.env.PROJECT_ID,
-  private_key_id: process.env.PRIVATE_KEY_ID,
-  private_key: process.env.PRIVATE_KEY,
-  client_email: process.env.CLIENT_EMAIL,
-  client_id: process.env.CLIENT_ID,
-  auth_uri: process.env.AUTH_URI,
-  token_uri: process.env.TOKEN_URI,
-  auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
-  client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
-  universe_domain: process.env.UNIVERSE_DOMAIN,
+  apiKey: "AIzaSyDCSC56Rv87sCkOzh2of-hMDyqcbwaRWVA",
+  authDomain: "kanbosphere-files.firebaseapp.com",
+  projectId: "kanbosphere-files",
+  storageBucket: "kanbosphere-files.appspot.com",
+  messagingSenderId: "629989007247",
+  appId: "1:629989007247:web:7ffa658f94f59662aeb5fa",
+  measurementId: "G-TMZH7G0VD1",
 };
 
 let firebase_app =

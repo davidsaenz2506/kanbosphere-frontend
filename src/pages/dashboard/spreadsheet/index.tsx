@@ -29,17 +29,17 @@ import {
 
 import "@glideapps/glide-data-grid/dist/index.css";
 import { useCurrentWorkspace } from "@/context/currentWorkSpace/currentWsp.hook";
-import GridDataEditor from "@/libraries/fylent-grid-engine/Grid/DataEditor";
+import GridDataEditor from "@/libraries/grid-engine/Grid/DataEditor";
 import CreateColumn from "../../../components/Modals/AddColumn";
 
 import { ICurrentWspContext } from "@/context/currentWorkSpace/currentWsp.context";
 
-import { deleteGridRow } from "@/libraries/fylent-grid-engine/Grid/utils/functions/deleteIndividualGridRows";
-import { addGridRow } from "@/libraries/fylent-grid-engine/Grid/utils/functions/addGridRow";
+import { deleteGridRow } from "@/libraries/grid-engine/Grid/utils/functions/deleteIndividualGridRows";
+import { addGridRow } from "@/libraries/grid-engine/Grid/utils/functions/addGridRow";
 import { GetFilteredDataByQuery } from "@/services/spreadsheet/getQueryData";
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 
-import styles from "@/libraries/fylent-grid-engine/styles/spreadsheet.module.css";
+import styles from "@/libraries/grid-engine/styles/spreadsheet.module.css";
 import { uniqBy } from "lodash";
 import { IColumnProjection } from "@/domain/entities/spreadsheet.entity";
 import { GridSelection, Item } from "@glideapps/glide-data-grid";
@@ -70,7 +70,7 @@ import { GrDocumentPdf } from "react-icons/gr";
 import { BsFiletypeJson } from "react-icons/bs";
 
 import { TbMathFunction } from "react-icons/tb";
-import { sendNewColumnsToServer } from "@/libraries/fylent-grid-engine/Grid/utils/functions/sendColumnsToServet";
+import { sendNewColumnsToServer } from "@/libraries/grid-engine/Grid/utils/functions/sendColumnsToServet";
 import PopoverComponent from "@/components/Popover/General";
 import currentBiridectionalCommunication from "@/services/socket";
 import { sortRowsBySelection } from "@/utilities/sortColumns";

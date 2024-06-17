@@ -43,7 +43,6 @@
     "firebase": "^10.1.0",
     "firebase-tools": "^12.4.5",
     "framer-motion": "^10.15.0",
-    "fylent-math-engine": "^1.0.1",
     "global": "^4.4.0",
     "google-geocoder": "^0.2.1",
     "googlemaps": "^1.12.0",

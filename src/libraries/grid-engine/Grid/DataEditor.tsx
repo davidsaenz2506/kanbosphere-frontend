@@ -194,7 +194,7 @@ const GridDataEditor = (Props: ISpreadProps) => {
 
   return (
     <div
-      id="fylent-grid-engine"
+      id="grid-engine"
       style={{
         borderTop: "2px solid #A0A0B8",
         borderBottom: "2px solid #A0A0B8",

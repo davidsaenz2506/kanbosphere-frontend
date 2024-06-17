@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import styles from "../../styles/portal.module.css";
 import "bootstrap/dist/css/bootstrap.css";
 
-import ToolButtons from "../../components/Portal/ToolButtons";
-import EndBar from "../../components/Portal/EndBar";
+import ToolButtons from "../../components/portal/ToolButtons";
+import EndBar from "../../components/portal/EndBar";
 
 import { useCurrentUser } from "@/context/currentUser/currentUser.hook";
 

@@ -1,5 +1,5 @@
 import { IChildCompounds, IColumnProjection, ICompoundProjection } from "@/domain/entities/spreadsheet.entity";
-import { mathematicalEnginedEncapsuled } from "@/libraries/fylent-math-engine";
+import { mathematicalEnginedEncapsuled } from "@/libraries/math-engine";
 import { GridCell, GridCellKind, Item } from "@glideapps/glide-data-grid";
 import { DateTime } from "luxon";
 
